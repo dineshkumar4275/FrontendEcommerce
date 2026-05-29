@@ -7,7 +7,6 @@ export const metadata = {
   description: 'Latest news, tips, and updates from our team',
 };
 
-// Sample blog posts
 const blogPosts = [
   {
     id: 1,
@@ -17,7 +16,6 @@ const blogPosts = [
     readTime: '5 min read',
     excerpt: 'Learn how to make the most of your online shopping experience...',
     category: 'Shopping Tips',
-    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=400&fit=crop',
   },
   {
     id: 2,
@@ -27,7 +25,6 @@ const blogPosts = [
     readTime: '3 min read',
     excerpt: 'Behind the scenes of our logistics optimization...',
     category: 'Company News',
-    image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=800&h=400&fit=crop',
   },
   {
     id: 3,
@@ -37,7 +34,6 @@ const blogPosts = [
     readTime: '4 min read',
     excerpt: 'Discover the most popular items among our customers...',
     category: 'Product Highlights',
-    image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=400&fit=crop',
   },
 ];
 
@@ -62,46 +58,36 @@ export default function BlogPage() {
           {/* Blog Posts */}
           <div className="space-y-8">
             {blogPosts.map((post) => (
-              <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                {/* Featured Image */}
-                <div className="h-48 overflow-hidden">
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                  />
+              <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-700">
+                    {post.category}
+                  </span>
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-700">
-                      {post.category}
-                    </span>
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2 hover:text-purple-600 transition">
-                    <Link href={`/blog/${post.id}`}>{post.title}</Link>
-                  </h2>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {post.date}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User className="w-3.5 h-3.5" />
-                      {post.author}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      {post.readTime}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                  <Link 
-                    href={`/blog/${post.id}`}
-                    className="text-purple-600 hover:text-purple-700 font-medium text-sm inline-flex items-center gap-1"
-                  >
-                    Read more →
-                  </Link>
+                <h2 className="text-xl font-semibold text-gray-800 mb-2 hover:text-purple-600 transition">
+                  <Link href={`/blog/${post.id}`}>{post.title}</Link>
+                </h2>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {post.date}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <User className="w-3.5 h-3.5" />
+                    {post.author}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {post.readTime}
+                  </span>
                 </div>
+                <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                <Link 
+                  href={`/blog/${post.id}`}
+                  className="text-purple-600 hover:text-purple-700 font-medium text-sm inline-flex items-center gap-1"
+                >
+                  Read more →
+                </Link>
               </div>
             ))}
           </div>

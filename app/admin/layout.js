@@ -132,38 +132,38 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  HomeIcon, 
-  ShoppingBagIcon, 
-  ClipboardDocumentListIcon,
-  UserGroupIcon,
-  TruckIcon,
-  ArrowLeftOnRectangleIcon,
-  PlusIcon,
-  Bars3Icon,
-  XMarkIcon,
-  SparklesIcon,
-  ChartBarIcon,
-  BellIcon,
-  SearchIcon,
-  SettingsIcon,
-  HelpCircleIcon,
-  LayoutDashboardIcon,
-  PackageIcon,
-  ShoppingCartIcon,
-  UsersIcon,
-  GaugeIcon,
-  ReceiptIcon,
-  LogOutIcon
+  Home,
+  ShoppingBag,
+  ClipboardList,
+  Users,
+  Truck,
+  LogOut,
+  Plus,
+  Menu,
+  X,
+  Sparkles,
+  BarChart3,
+  Bell,
+  Search,
+  Settings,
+  HelpCircle,
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Gauge,
+  Receipt,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboardIcon },
-  { name: 'Products', href: '/admin/products', icon: PackageIcon },
-  { name: 'Add Product', href: '/admin/products/new', icon: PlusIcon },
-  { name: 'Orders', href: '/admin/orders', icon: ShoppingCartIcon },
-  { name: 'Analytics', href: '/admin/analytics', icon: GaugeIcon },
-  { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
-  { name: 'Drivers', href: '/admin/drivers', icon: TruckIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Products', href: '/admin/products', icon: Package },
+  { name: 'Add Product', href: '/admin/products/new', icon: Plus },
+  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
+  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { name: 'Customers', href: '/admin/customers', icon: Users },
+  { name: 'Drivers', href: '/admin/drivers', icon: Truck },
 ];
 
 export default function AdminLayout({ children }) {
@@ -235,14 +235,14 @@ export default function AdminLayout({ children }) {
         {!isCollapsed && (
           <Link href="/admin/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <SparklesIcon className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold text-gray-900">AdminHub</span>
           </Link>
         )}
         {isCollapsed && (
           <Link href="/admin/dashboard" className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto">
-            <SparklesIcon className="w-4 h-4 text-white" />
+            <Sparkles className="w-4 h-4 text-white" />
           </Link>
         )}
         <button
@@ -250,13 +250,9 @@ export default function AdminLayout({ children }) {
           className="hidden lg:block p-1 rounded-md hover:bg-gray-100 transition-colors"
         >
           {isCollapsed ? (
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
           ) : (
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-4 h-4 text-gray-500" />
           )}
         </button>
       </div>
@@ -316,7 +312,7 @@ export default function AdminLayout({ children }) {
           } group`}
           title={isCollapsed ? 'Logout' : ''}
         >
-          <LogOutIcon className="h-4 w-4" />
+          <LogOut className="h-4 w-4" />
           {!isCollapsed && <span>Logout</span>}
           {isCollapsed && (
             <div className="absolute left-full ml-2 px-2 py-1 bg-white text-gray-900 text-xs rounded-md shadow-lg border border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
@@ -335,7 +331,7 @@ export default function AdminLayout({ children }) {
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-md bg-blue-600 text-white shadow-md"
       >
-        {isMobileMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+        {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {/* Desktop Sidebar */}
@@ -379,7 +375,7 @@ export default function AdminLayout({ children }) {
             <div className="flex items-center gap-3">
               <div className="lg:hidden">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <SparklesIcon className="w-4 h-4 text-white" />
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
               </div>
               <div>
@@ -398,7 +394,7 @@ export default function AdminLayout({ children }) {
             <div className="flex items-center gap-2">
               {/* Search */}
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 bg-white">
-                <SearchIcon className="h-4 w-4 text-gray-400" />
+                <Search className="h-4 w-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search..."
@@ -408,18 +404,18 @@ export default function AdminLayout({ children }) {
               
               {/* Notifications */}
               <button className="relative p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <BellIcon className="h-4 w-4 text-gray-500" />
+                <Bell className="h-4 w-4 text-gray-500" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               
               {/* Settings */}
               <button className="hidden sm:flex p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <SettingsIcon className="h-4 w-4 text-gray-500" />
+                <Settings className="h-4 w-4 text-gray-500" />
               </button>
               
               {/* Help */}
               <button className="hidden sm:flex p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <HelpCircleIcon className="h-4 w-4 text-gray-500" />
+                <HelpCircle className="h-4 w-4 text-gray-500" />
               </button>
             </div>
           </div>

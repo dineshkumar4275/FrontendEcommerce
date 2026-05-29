@@ -1,6 +1,6 @@
 // app/blog/page.js
 import Link from 'next/link';
-import { Blog, Calendar, User, Clock } from 'lucide-react';
+import { Newspaper, Calendar, User, Clock, BookOpen } from 'lucide-react';
 
 export const metadata = {
   title: 'Blog - FrontendEcommerce',
@@ -47,7 +47,7 @@ export default function BlogPage() {
           <div className="text-center mb-12">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <Blog className="w-8 h-8 text-white" />
+                <BookOpen className="w-8 h-8 text-white" />
               </div>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">

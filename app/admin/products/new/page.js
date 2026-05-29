@@ -1,7 +1,7 @@
 // app/admin/products/new/page.jsx
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -21,18 +21,12 @@ const ImageUploader = ({ images, onChange, maxImages = 5 }) => {
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     const newImages = [...images];
-    
     for (const file of files) {
       if (file.type.startsWith('image/')) {
         if (newImages.length < maxImages) {
           const reader = new FileReader();
           reader.onloadend = () => {
-            newImages.push({
-              url: reader.result,
-              file: file,
-              name: file.name,
-              type: 'file'
-            });
+            newImages.push({ url: reader.result, file: file, name: file.name, type: 'file' });
             onChange(newImages);
           };
           reader.readAsDataURL(file);
@@ -52,53 +46,17 @@ const ImageUploader = ({ images, onChange, maxImages = 5 }) => {
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Product Images
-            <span className="text-xs text-gray-500 ml-2">(Max {maxImages} images)</span>
-            <span className="text-red-500 ml-1">*</span>
-          </label>
-        </div>
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="px-3 py-1.5 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-        >
-          <PlusIcon className="w-4 h-4 inline mr-1" />
-          Upload Images
-        </button>
+        <div><label className="block text-sm font-medium text-gray-700">Product Images<span className="text-xs text-gray-500 ml-2">(Max {maxImages} images)</span><span className="text-red-500 ml-1">*</span></label></div>
+        <button type="button" onClick={() => fileInputRef.current?.click()} className="px-3 py-1.5 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700"><PlusIcon className="w-4 h-4 inline mr-1" />Upload Images</button>
       </div>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={handleFileUpload}
-        className="hidden"
-      />
-
+      <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         {images.map((image, index) => (
           <div key={index} className="relative group">
             <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-50">
-              <img
-                src={image.url}
-                alt={`Product ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              {index === 0 && (
-                <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  Main
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => removeImage(index)}
-                className="absolute top-2 left-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
-              >
-                <TrashIcon className="w-3.5 h-3.5" />
-              </button>
+              <img src={image.url} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
+              {index === 0 && <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full">Main</div>}
+              <button type="button" onClick={() => removeImage(index)} className="absolute top-2 left-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"><TrashIcon className="w-3.5 h-3.5" /></button>
             </div>
           </div>
         ))}
@@ -107,149 +65,64 @@ const ImageUploader = ({ images, onChange, maxImages = 5 }) => {
   );
 };
 
-const FormInput = ({ label, name, value, onChange, type = "text", required = false, placeholder = "" }) => {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
-    </div>
-  );
-};
+const FormInput = ({ label, name, value, onChange, type = "text", required = false, placeholder = "" }) => (
+  <div><label className="block text-sm font-medium text-gray-700 mb-1">{label} {required && <span className="text-red-500">*</span>}</label>
+  <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} required={required} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
+);
 
 export default function NewProductPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [images, setImages] = useState([]);
-  
-  const [enableColors, setEnableColors] = useState(true);
+  const [enableColors, setEnableColors] = useState(false);
   const [enableSizes, setEnableSizes] = useState(false);
-  
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    compare_price: '',
-    stock: '',
-    category: '',
-    brand: '',
-    colors: [],
-    sizes: []
+    name: '', description: '', price: '', compare_price: '', stock: '', category: '', brand: '', colors: [], sizes: []
   });
 
-  useEffect(() => {
-    const category = selectedCategory.toLowerCase();
-    
-    if (category.includes('clothing') || category.includes('shirt') || category.includes('dress') || category.includes('jeans')) {
-      setEnableSizes(true);
-      setEnableColors(true);
-    } else if (category.includes('shoe') || category.includes('footwear')) {
-      setEnableSizes(true);
-      setEnableColors(true);
-    } else if (category.includes('electronic') || category.includes('phone') || category.includes('laptop')) {
-      setEnableSizes(false);
-      setEnableColors(true);
-    } else {
-      setEnableSizes(false);
-      setEnableColors(true);
-    }
-  }, [selectedCategory]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'category') {
-      setSelectedCategory(value);
-      setFormData(prev => ({ ...prev, [name]: value }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-  };
+  const handleChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
 
   const addColor = () => {
     const colorName = document.getElementById('colorName')?.value;
     const colorCode = document.getElementById('colorCode')?.value;
-    
     if (colorName && colorCode) {
       const exists = formData.colors.some(c => c.name === colorName);
       if (!exists) {
-        setFormData(prev => ({ 
-          ...prev, 
-          colors: [...prev.colors, { name: colorName, code: colorCode }] 
-        }));
+        setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: colorName, code: colorCode }] }));
         showToast(`${colorName} added`, 'success');
+        document.getElementById('colorName').value = '';
       } else {
         showToast(`${colorName} already exists`, 'error');
       }
-      document.getElementById('colorName').value = '';
-    } else {
-      showToast('Please enter color name', 'error');
     }
   };
 
-  const removeColor = (index) => {
-    setFormData(prev => ({ 
-      ...prev, 
-      colors: prev.colors.filter((_, i) => i !== index) 
-    }));
-  };
+  const removeColor = (index) => setFormData(prev => ({ ...prev, colors: prev.colors.filter((_, i) => i !== index) }));
 
   const addSize = () => {
     const sizeName = document.getElementById('sizeName')?.value;
-    
     if (sizeName) {
       const exists = formData.sizes.includes(sizeName);
       if (!exists) {
         setFormData(prev => ({ ...prev, sizes: [...prev.sizes, sizeName] }));
         showToast(`${sizeName} added`, 'success');
+        document.getElementById('sizeName').value = '';
       } else {
         showToast(`${sizeName} already exists`, 'error');
       }
-      document.getElementById('sizeName').value = '';
-    } else {
-      showToast('Please enter size', 'error');
     }
   };
 
-  const removeSize = (index) => {
-    setFormData(prev => ({ 
-      ...prev, 
-      sizes: prev.sizes.filter((_, i) => i !== index) 
-    }));
-  };
+  const removeSize = (index) => setFormData(prev => ({ ...prev, sizes: prev.sizes.filter((_, i) => i !== index) }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.name) {
-      showToast('Please enter product name', 'error');
-      return;
-    }
-    if (!formData.price) {
-      showToast('Please enter product price', 'error');
-      return;
-    }
-    if (!formData.stock) {
-      showToast('Please enter stock quantity', 'error');
-      return;
-    }
-    if (images.length === 0) {
-      showToast('Please add at least one product image', 'error');
-      return;
-    }
-
+    if (!formData.name) { showToast('Please enter product name', 'error'); return; }
+    if (!formData.price) { showToast('Please enter product price', 'error'); return; }
+    if (!formData.stock) { showToast('Please enter stock quantity', 'error'); return; }
+    if (images.length === 0) { showToast('Please add at least one product image', 'error'); return; }
     setSubmitting(true);
-
     try {
       const productData = {
         ...formData,
@@ -261,43 +134,26 @@ export default function NewProductPage() {
         colors: enableColors ? formData.colors : [],
         sizes: enableSizes ? formData.sizes : []
       };
-
-      images.forEach((image, index) => {
-        productData[`image_url${index === 0 ? '' : `_${index + 1}`}`] = image.url;
-      });
-
+      images.forEach((image, index) => { productData[`image_url${index === 0 ? '' : `_${index + 1}`}`] = image.url; });
       await createProduct(productData);
       showToast('Product created successfully!', 'success');
       router.push('/admin/products');
-    } catch (error) {
-      console.error('Error:', error);
-      showToast('Failed to create product', 'error');
-    } finally {
-      setSubmitting(false);
-    }
+    } catch (error) { showToast('Failed to create product', 'error'); } finally { setSubmitting(false); }
   };
 
   const colorPresets = [
-    { name: "Red", code: "#FF0000" },
-    { name: "Blue", code: "#0000FF" },
-    { name: "Black", code: "#000000" },
-    { name: "White", code: "#FFFFFF" },
-    { name: "Green", code: "#00FF00" },
-    { name: "Purple", code: "#800080" }
+    { name: "Red", code: "#FF0000" }, { name: "Blue", code: "#0000FF" }, { name: "Black", code: "#000000" },
+    { name: "White", code: "#FFFFFF" }, { name: "Green", code: "#00FF00" }, { name: "Gold", code: "#FFD700" }
   ];
+  
+  const sizePresets = ["XS", "S", "M", "L", "XL", "XXL", "6", "7", "8", "9", "10", "11", "12"];
 
   return (
     <div className="max-w-5xl mx-auto pb-10 px-4">
       <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Add New Product</h1>
-          <p className="text-gray-500 text-sm mt-1">Create a new product with colors and sizes</p>
-        </div>
-        <Link href="/admin/products" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-          Back to Products
-        </Link>
+        <div><h1 className="text-2xl font-bold">Add New Product</h1><p className="text-gray-500 text-sm mt-1">Create a new product with colors and sizes</p></div>
+        <Link href="/admin/products" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">Back to Products</Link>
       </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Basic Information</h2>
@@ -313,7 +169,7 @@ export default function NewProductPage() {
                   <option value="Men's Clothing">Men's Clothing</option>
                   <option value="Women's Clothing">Women's Clothing</option>
                   <option value="Footwear">Footwear</option>
-                  <option value="Accessories">Accessories</option>
+                  <option value="Watches">Watches</option>
                 </select>
               </div>
               <FormInput label="Brand" name="brand" value={formData.brand} onChange={handleChange} placeholder="Enter brand name" />
@@ -335,23 +191,17 @@ export default function NewProductPage() {
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Product Variants</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <div className="flex items-center gap-2"><SwatchIcon className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-700">Enable Colors</span></div>
-                <p className="text-xs text-gray-500 mt-1">Show color options for this product</p>
-              </div>
+              <div className="flex items-center gap-2"><SwatchIcon className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-700">Enable Colors</span></div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={enableColors} onChange={(e) => { setEnableColors(e.target.checked); if (!e.target.checked) setFormData(prev => ({ ...prev, colors: [] })); }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-purple-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
               </label>
             </div>
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <div className="flex items-center gap-2"><ArrowsRightLeftIcon className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-700">Enable Sizes</span></div>
-                <p className="text-xs text-gray-500 mt-1">Show size options for this product</p>
-              </div>
+              <div className="flex items-center gap-2"><ArrowsRightLeftIcon className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-700">Enable Sizes</span></div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={enableSizes} onChange={(e) => { setEnableSizes(e.target.checked); if (!e.target.checked) setFormData(prev => ({ ...prev, sizes: [] })); }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-purple-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
               </label>
             </div>
           </div>
@@ -365,7 +215,7 @@ export default function NewProductPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Quick Color Presets</label>
               <div className="flex flex-wrap gap-2">
                 {colorPresets.map((color, idx) => (
-                  <button key={idx} type="button" onClick={() => { if (!formData.colors.some(c => c.name === color.name)) { setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: color.name, code: color.code }] })); showToast(`${color.name} added`, 'success'); } else { showToast(`${color.name} already added`, 'error'); } }} className="w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform" style={{ backgroundColor: color.code }} title={color.name} />
+                  <button key={idx} type="button" onClick={() => { if (!formData.colors.some(c => c.name === color.name)) setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: color.name, code: color.code }] })); }} className="w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110" style={{ backgroundColor: color.code }} title={color.name} />
                 ))}
               </div>
             </div>
@@ -375,16 +225,16 @@ export default function NewProductPage() {
                 {formData.colors.map((color, index) => (
                   <div key={index} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
                     <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: color.code }} /><span className="text-sm">{color.name}</span>
-                    <button type="button" onClick={() => removeColor(index)} className="text-red-500 hover:text-red-700"><TrashIcon className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => removeColor(index)} className="text-red-500"><TrashIcon className="w-3.5 h-3.5" /></button>
                   </div>
                 ))}
-                {formData.colors.length === 0 && <p className="text-gray-500 text-sm">No colors selected.</p>}
+                {formData.colors.length === 0 && <p className="text-gray-500 text-sm">No colors selected. Click on presets above.</p>}
               </div>
             </div>
             <div className="flex gap-2">
-              <input type="text" id="colorName" placeholder="Color name" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+              <input type="text" id="colorName" placeholder="Color name" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg" />
               <input type="color" id="colorCode" className="w-12 h-10 border border-gray-300 rounded cursor-pointer" defaultValue="#000000" />
-              <button type="button" onClick={addColor} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Add</button>
+              <button type="button" onClick={addColor} className="px-4 py-2 bg-purple-600 text-white rounded-lg">Add</button>
             </div>
           </div>
         )}
@@ -396,8 +246,8 @@ export default function NewProductPage() {
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Quick Size Presets</label>
               <div className="flex flex-wrap gap-2">
-                {["XS","S","M","L","XL","XXL","3XL","6","7","8","9","10","11","12"].map((size) => (
-                  <button key={size} type="button" onClick={() => { if (!formData.sizes.includes(size)) { setFormData(prev => ({ ...prev, sizes: [...prev.sizes, size] })); showToast(`${size} added`, 'success'); } else { showToast(`${size} already added`, 'error'); } }} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-purple-100">{size}</button>
+                {sizePresets.map((size) => (
+                  <button key={size} type="button" onClick={() => { if (!formData.sizes.includes(size)) setFormData(prev => ({ ...prev, sizes: [...prev.sizes, size] })); }} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-purple-100">{size}</button>
                 ))}
               </div>
             </div>
@@ -407,15 +257,15 @@ export default function NewProductPage() {
                 {formData.sizes.map((size, index) => (
                   <div key={index} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
                     <span className="text-sm">{size}</span>
-                    <button type="button" onClick={() => removeSize(index)} className="text-red-500 hover:text-red-700"><TrashIcon className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => removeSize(index)} className="text-red-500"><TrashIcon className="w-3.5 h-3.5" /></button>
                   </div>
                 ))}
-                {formData.sizes.length === 0 && <p className="text-gray-500 text-sm">No sizes selected.</p>}
+                {formData.sizes.length === 0 && <p className="text-gray-500 text-sm">No sizes selected. Click on presets above.</p>}
               </div>
             </div>
             <div className="flex gap-2">
-              <input type="text" id="sizeName" placeholder="Size (e.g., 2XL, 42)" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-              <button type="button" onClick={addSize} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Add Size</button>
+              <input type="text" id="sizeName" placeholder="Size (e.g., 2XL, 42)" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg" />
+              <button type="button" onClick={addSize} className="px-4 py-2 bg-purple-600 text-white rounded-lg">Add Size</button>
             </div>
           </div>
         )}

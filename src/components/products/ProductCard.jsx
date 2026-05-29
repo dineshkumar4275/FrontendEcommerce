@@ -1,4 +1,4 @@
-// components/ProductCard.jsx (Updated with multiple images)
+// components/ProductCard.jsx (Updated with mobile-responsive wishlist)
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -15,10 +15,21 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   
   const discount = product.compare_price && product.compare_price > product.price
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
     : 0;
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Collect all 5 images
   const productImages = [
@@ -32,16 +43,16 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
   const hasMultipleImages = productImages.length > 1;
   const mainImage = productImages[currentImageIndex] || product.image_url || 'https://via.placeholder.com/500x500?text=No+Image';
 
-  // Auto-rotate images on hover
+  // Auto-rotate images on hover (only for desktop)
   useEffect(() => {
     let interval;
-    if (isHovered && hasMultipleImages && !isDragging) {
+    if (isHovered && hasMultipleImages && !isDragging && !isMobile) {
       interval = setInterval(() => {
         setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
       }, 2000);
     }
     return () => clearInterval(interval);
-  }, [isHovered, hasMultipleImages, isDragging, productImages.length]);
+  }, [isHovered, hasMultipleImages, isDragging, isMobile, productImages.length]);
 
   const nextImage = (e) => {
     e.preventDefault();
@@ -89,6 +100,9 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
     await onAddToCart(product);
     setIsAdding(false);
   };
+
+  // Determine if wishlist button should be visible
+  const isWishlistVisible = isMobile ? true : isHovered;
 
   return (
     <motion.div
@@ -149,7 +163,7 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
               </div>
             )}
 
-            {/* Wishlist Button */}
+            {/* Wishlist Button - FIXED FOR MOBILE */}
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -160,7 +174,12 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
                 isInWishlist
                   ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/30 scale-110'
                   : 'bg-white/90 backdrop-blur-sm text-gray-500 shadow-md hover:shadow-lg'
-              } ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}`}
+              } ${
+                // FIX: For mobile, always visible. For desktop, show on hover
+                isMobile 
+                  ? 'opacity-100 translate-y-0' 
+                  : `opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0`
+              }`}
             >
               {isInWishlist ? (
                 <svg className="w-4 h-4 fill-current" fill="currentColor" viewBox="0 0 24 24">
@@ -174,10 +193,11 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
             </button>
 
             {/* LEFT CHEVRON BUTTON */}
-            {hasMultipleImages && isHovered && (
+            {hasMultipleImages && (isHovered || isMobile) && (
               <button
                 onClick={prevImage}
                 className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+                style={{ opacity: isMobile ? 0.7 : undefined }}
               >
                 <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -186,10 +206,11 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
             )}
 
             {/* RIGHT CHEVRON BUTTON */}
-            {hasMultipleImages && isHovered && (
+            {hasMultipleImages && (isHovered || isMobile) && (
               <button
                 onClick={nextImage}
                 className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+                style={{ opacity: isMobile ? 0.7 : undefined }}
               >
                 <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -198,18 +219,20 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
             )}
 
             {/* Drag Instruction */}
-            {hasMultipleImages && isHovered && !isDragging && productImages.length > 1 && (
+            {hasMultipleImages && isHovered && !isDragging && productImages.length > 1 && !isMobile && (
               <div className="absolute bottom-2 left-2 z-20 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full text-white text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
                 ← Drag to rotate →
               </div>
             )}
 
-            {/* Quick View Overlay */}
-            <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-4 transition-all duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-              <span className="bg-white/95 backdrop-blur-sm text-gray-900 px-4 py-2 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2">
-                👁️ Quick View
-              </span>
-            </div>
+            {/* Quick View Overlay - Hide on mobile or adjust */}
+            {!isMobile && (
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-4 transition-all duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                <span className="bg-white/95 backdrop-blur-sm text-gray-900 px-4 py-2 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2">
+                  👁️ Quick View
+                </span>
+              </div>
+            )}
 
             {/* Product Image */}
             {!imageError ? (
@@ -217,7 +240,7 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
                 src={mainImage}
                 alt={`${product.name} - Image ${currentImageIndex + 1}`}
                 className="w-full h-full object-contain p-4 transition-transform duration-500"
-                style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}
+                style={{ transform: isHovered && !isMobile ? 'scale(1.05)' : 'scale(1)' }}
                 onError={() => setImageError(true)}
                 draggable={false}
               />
@@ -231,7 +254,7 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
             )}
 
             {/* Thumbnail Indicators */}
-            {hasMultipleImages && (
+            {hasMultipleImages && (isHovered || isMobile) && (
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20">
                 {productImages.map((_, idx) => (
                   <button

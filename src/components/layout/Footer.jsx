@@ -1,4 +1,4 @@
-// components/Footer.jsx
+// src/components/Footer.jsx
 import React from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
@@ -83,7 +83,6 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Footer Sections */}
           {Object.values(footerSections).map((section) => (
             <div key={section.title}>
               <h3 className="font-semibold mb-4 text-white">{section.title}</h3>
@@ -100,12 +99,9 @@ export const Footer = () => {
           ))}
         </div>
 
-        {/* Payment Methods & Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm text-center sm:text-left">
-              &copy; {currentYear} ShopHub. All rights reserved.
-            </p>
+            <p className="text-gray-400 text-sm">&copy; {currentYear} ShopHub. All rights reserved.</p>
             <div className="flex gap-3">
               <span className="text-gray-400 text-xs">Visa</span>
               <span className="text-gray-400 text-xs">Mastercard</span>

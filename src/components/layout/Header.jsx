@@ -234,7 +234,7 @@ export const Header = ({
       }`}>
         <nav className="container mx-auto px-4 py-3">
           <div className="flex justify-between items-center gap-4">
-            {/* Logo - Unchanged for desktop, adjusted for mobile */}
+            {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
                 <SparklesIcon className="w-5 h-5 text-white" />
@@ -252,7 +252,7 @@ export const Header = ({
               />
             </div>
 
-            {/* Desktop Navigation - Unchanged */}
+            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
@@ -270,9 +270,9 @@ export const Header = ({
               ))}
             </div>
 
-            {/* Desktop Icons - Unchanged for desktop */}
+            {/* Desktop Icons */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Mobile Search Icon - ONLY SHOWS ON MOBILE */}
+              {/* Mobile Search Icon */}
               <button 
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
                 className="md:hidden p-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-purple-200"
@@ -282,7 +282,21 @@ export const Header = ({
                 </svg>
               </button>
 
-              {/* Admin Icon - Desktop unchanged */}
+              {/* ✅ WISHLIST HEART ICON WITH COUNT - ADDED HERE */}
+              <Link 
+                href="/wishlist" 
+                className="relative p-2 hover:bg-pink-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-pink-300"
+                aria-label="Wishlist"
+              >
+                <HeartIcon className="w-5 h-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 shadow-lg">
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Admin Icon */}
               {isAdmin && (
                 <Link
                   href="/admin/dashboard"
@@ -310,7 +324,7 @@ export const Header = ({
                 )}
               </button>
 
-              {/* Login/User Button - Desktop unchanged */}
+              {/* Login/User Button */}
               {isLoggedIn ? (
                 <div className="relative">
                   <button
@@ -410,7 +424,7 @@ export const Header = ({
                 </Link>
               )}
 
-              {/* Mobile Menu Button - ONLY SHOWS ON MOBILE */}
+              {/* Mobile Menu Button */}
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)} 
                 className="lg:hidden p-2 hover:bg-purple-500/10 rounded-lg transition"
@@ -420,7 +434,7 @@ export const Header = ({
             </div>
           </div>
 
-          {/* Mobile Search Bar - ONLY SHOWS ON MOBILE */}
+          {/* Mobile Search Bar */}
           <AnimatePresence>
             {showMobileSearch && (
               <motion.div
@@ -440,7 +454,7 @@ export const Header = ({
             )}
           </AnimatePresence>
 
-          {/* Mobile Navigation Menu - ONLY SHOWS ON MOBILE */}
+          {/* Mobile Navigation Menu */}
           <AnimatePresence>
             {isMenuOpen && (
               <motion.div
@@ -527,7 +541,7 @@ export const Header = ({
         </nav>
       </header>
 
-      {/* Filter Drawer - Mobile optimized */}
+      {/* Filter Drawer */}
       <AnimatePresence>
         {isFilterOpen && (
           <>

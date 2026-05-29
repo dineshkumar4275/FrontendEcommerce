@@ -11,16 +11,14 @@ import {
   PlusIcon,
   ArrowUpIcon,
   ArrowDownIcon,
-  TagIcon,
   SwatchIcon,
   ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 import { createProduct } from '@/services/productService';
 import { useToast } from '@/hooks/useToast';
 
-// 🎯 CATEGORY PRESETS - Auto colors and sizes based on category
+// 🎯 CATEGORY PRESETS
 const CATEGORY_PRESETS = {
-  // Clothing Categories
   "Clothing": {
     colors: [
       { name: "Black", code: "#000000" },
@@ -41,9 +39,7 @@ const CATEGORY_PRESETS = {
       { name: "Navy Blue", code: "#000080" },
       { name: "Gray", code: "#808080" },
       { name: "Red", code: "#FF0000" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Maroon", code: "#800000" },
-      { name: "Olive", code: "#808000" }
+      { name: "Blue", code: "#0000FF" }
     ],
     sizes: ["XS", "S", "M", "L", "XL", "XXL", "3XL"],
     hasColors: true,
@@ -56,173 +52,52 @@ const CATEGORY_PRESETS = {
       { name: "Black", code: "#000000" },
       { name: "White", code: "#FFFFFF" },
       { name: "Blue", code: "#0000FF" },
-      { name: "Purple", code: "#800080" },
-      { name: "Yellow", code: "#FFFF00" },
-      { name: "Teal", code: "#008080" }
+      { name: "Purple", code: "#800080" }
     ],
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
     hasColors: true,
     hasSizes: true
   },
-  "Kid's Clothing": {
-    colors: [
-      { name: "Red", code: "#FF0000" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Green", code: "#00FF00" },
-      { name: "Yellow", code: "#FFFF00" },
-      { name: "Pink", code: "#FFC0CB" },
-      { name: "Purple", code: "#800080" }
-    ],
-    sizes: ["2T", "3T", "4T", "5T", "6", "7", "8", "9", "10", "11", "12"],
-    hasColors: true,
-    hasSizes: true
-  },
-
-  // Footwear Categories
-  "Men's Footwear": {
-    colors: [
-      { name: "Black", code: "#000000" },
-      { name: "Brown", code: "#8B4513" },
-      { name: "White", code: "#FFFFFF" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Red", code: "#FF0000" }
-    ],
-    sizes: ["6", "7", "8", "9", "10", "11", "12"],
-    hasColors: true,
-    hasSizes: true
-  },
-  "Women's Footwear": {
-    colors: [
-      { name: "Black", code: "#000000" },
-      { name: "White", code: "#FFFFFF" },
-      { name: "Gold", code: "#FFD700" },
-      { name: "Silver", code: "#C0C0C0" },
-      { name: "Pink", code: "#FFC0CB" },
-      { name: "Red", code: "#FF0000" }
-    ],
-    sizes: ["5", "6", "7", "8", "9", "10"],
-    hasColors: true,
-    hasSizes: true
-  },
-  "Sports Shoes": {
-    colors: [
-      { name: "Black", code: "#000000" },
-      { name: "White", code: "#FFFFFF" },
-      { name: "Red", code: "#FF0000" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Gray", code: "#808080" }
-    ],
-    sizes: ["6", "7", "8", "9", "10", "11", "12", "13"],
-    hasColors: true,
-    hasSizes: true
-  },
-
-  // Electronics Categories
   "Electronics": {
     colors: [
       { name: "Black", code: "#000000" },
       { name: "White", code: "#FFFFFF" },
-      { name: "Silver", code: "#C0C0C0" },
-      { name: "Space Gray", code: "#4A4A4A" },
-      { name: "Gold", code: "#FFD700" }
+      { name: "Silver", code: "#C0C0C0" }
     ],
     sizes: [],
     hasColors: true,
     hasSizes: false
   },
-  "Mobiles": {
+  "Men's Footwear": {
     colors: [
-      { name: "Black", code: "#000000" },
-      { name: "White", code: "#FFFFFF" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Green", code: "#00FF00" },
-      { name: "Purple", code: "#800080" },
-      { name: "Gold", code: "#FFD700" }
-    ],
-    sizes: ["64GB", "128GB", "256GB", "512GB", "1TB"],
-    hasColors: true,
-    hasSizes: true
-  },
-  "Laptops": {
-    colors: [
-      { name: "Black", code: "#000000" },
-      { name: "Silver", code: "#C0C0C0" },
-      { name: "Space Gray", code: "#4A4A4A" },
-      { name: "Gold", code: "#FFD700" }
-    ],
-    sizes: ["8GB RAM", "16GB RAM", "32GB RAM", "512GB SSD", "1TB SSD"],
-    hasColors: true,
-    hasSizes: true
-  },
-
-  // Home & Living
-  "Home & Living": {
-    colors: [
-      { name: "Beige", code: "#F5F5DC" },
-      { name: "White", code: "#FFFFFF" },
       { name: "Black", code: "#000000" },
       { name: "Brown", code: "#8B4513" },
-      { name: "Gray", code: "#808080" },
+      { name: "White", code: "#FFFFFF" }
+    ],
+    sizes: ["6", "7", "8", "9", "10", "11", "12"],
+    hasColors: true,
+    hasSizes: true
+  },
+  "Sports": {
+    colors: [
+      { name: "Black", code: "#000000" },
+      { name: "Red", code: "#FF0000" },
       { name: "Blue", code: "#0000FF" }
     ],
     sizes: [],
     hasColors: true,
     hasSizes: false
   },
-  "Furniture": {
-    colors: [
-      { name: "Brown", code: "#8B4513" },
-      { name: "Black", code: "#000000" },
-      { name: "White", code: "#FFFFFF" },
-      { name: "Natural Wood", code: "#DEB887" },
-      { name: "Gray", code: "#808080" }
-    ],
-    sizes: ["Small", "Medium", "Large", "Extra Large"],
-    hasColors: true,
-    hasSizes: true
-  },
-
-  // Sports
-  "Sports": {
-    colors: [
-      { name: "Black", code: "#000000" },
-      { name: "Red", code: "#FF0000" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Green", code: "#00FF00" },
-      { name: "Yellow", code: "#FFFF00" }
-    ],
-    sizes: [],
-    hasColors: true,
-    hasSizes: false
-  },
-  "Cricket": {
-    colors: [
-      { name: "White", code: "#FFFFFF" },
-      { name: "Red", code: "#FF0000" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Green", code: "#00FF00" }
-    ],
-    sizes: ["Size 5", "Size 6", "Adult", "Youth"],
-    hasColors: true,
-    hasSizes: true
-  },
-
-  // Books
   "Books": {
     colors: [],
     sizes: [],
     hasColors: false,
     hasSizes: false
   },
-
-  // Default
   "default": {
     colors: [
       { name: "Black", code: "#000000" },
-      { name: "White", code: "#FFFFFF" },
-      { name: "Blue", code: "#0000FF" },
-      { name: "Red", code: "#FF0000" },
-      { name: "Green", code: "#00FF00" }
+      { name: "White", code: "#FFFFFF" }
     ],
     sizes: [],
     hasColors: true,
@@ -642,7 +517,7 @@ export default function NewProductPage() {
   const [autoColors, setAutoColors] = useState([]);
   const [autoSizes, setAutoSizes] = useState([]);
   
-  // 🎯 Toggle switches for colors and sizes
+  // Toggle switches
   const [enableColors, setEnableColors] = useState(true);
   const [enableSizes, setEnableSizes] = useState(true);
   
@@ -672,8 +547,6 @@ export default function NewProductPage() {
     const preset = CATEGORY_PRESETS[selectedCategory] || CATEGORY_PRESETS.default;
     setAutoColors(preset.colors);
     setAutoSizes(preset.sizes);
-    
-    // Reset toggles based on category presets
     setEnableColors(preset.hasColors);
     setEnableSizes(preset.hasSizes);
     
@@ -776,7 +649,7 @@ export default function NewProductPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Add New Product</h1>
-          <p className="text-gray-500 text-sm mt-1">Select category - Colors & Sizes will auto-fill</p>
+          <p className="text-gray-500 text-sm mt-1">Create a new product with up to 5 images</p>
         </div>
         <Link
           href="/admin/products"
@@ -868,7 +741,7 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* 🎯 TOGGLE SWITCHES FOR COLORS & SIZES */}
+        {/* 🎯 PRODUCT VARIANTS - TOGGLE SWITCHES */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Product Variants</h2>
           

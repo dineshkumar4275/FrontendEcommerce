@@ -50,7 +50,6 @@ export const Header = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   
-  // Local filter state
   const [tempCategory, setTempCategory] = useState(selectedCategory);
   const [tempMinPrice, setTempMinPrice] = useState(minPrice);
   const [tempMaxPrice, setTempMaxPrice] = useState(maxPrice);
@@ -61,7 +60,7 @@ export const Header = ({
   const dispatch = useDispatch();
   const { totalQuantity } = useCart();
   const { wishlistCount } = useWishlist();
-  const { user, token, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
 
   useEffect(() => {
     setMounted(true);
@@ -104,7 +103,6 @@ export const Header = ({
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [user, token]);
 
-  // Check if logged in user is admin
   const isAdmin = isLoggedIn && (userEmail === 'admin@example.com' || user?.role === 'admin');
 
   const handleLogout = () => {
@@ -162,28 +160,6 @@ export const Header = ({
     }
   };
 
-  const handleSortChange = (value) => {
-    setTempSortBy(value);
-    if (setSortBy) setSortBy(value);
-    if (onFilterChange) {
-      onFilterChange({
-        category: tempCategory,
-        minPrice: tempMinPrice,
-        maxPrice: tempMaxPrice,
-        sortBy: value
-      });
-    }
-    
-    window.dispatchEvent(new CustomEvent('filterChange', {
-      detail: {
-        category: tempCategory,
-        minPrice: tempMinPrice,
-        maxPrice: tempMaxPrice,
-        sortBy: value
-      }
-    }));
-  };
-
   const handleClearFilters = () => {
     setTempCategory('');
     setTempMinPrice('');
@@ -233,18 +209,17 @@ export const Header = ({
     return (
       <>
         <header className="fixed top-0 w-full z-40 bg-slate-900 border-b border-purple-500/20">
-          <nav className="container mx-auto px-4 py-4">
+          <nav className="container mx-auto px-4 py-3">
             <div className="flex justify-between items-center">
-              <div className="w-10 h-10 bg-purple-500/20 rounded-xl animate-pulse" />
-              <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-purple-500/20 rounded-xl animate-pulse" />
+              <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-purple-500/10 rounded-xl animate-pulse" />
                 <div className="w-8 h-8 bg-purple-500/10 rounded-xl animate-pulse" />
-                <div className="w-20 h-10 bg-purple-500/20 rounded-xl animate-pulse" />
               </div>
             </div>
           </nav>
         </header>
-        <div className="h-20"></div>
+        <div className="h-14 sm:h-16"></div>
       </>
     );
   }
@@ -256,172 +231,142 @@ export const Header = ({
           ? 'bg-slate-900 shadow-lg shadow-purple-900/30 border-b border-purple-500/30' 
           : 'bg-slate-900 border-b border-purple-500/20'
       }`}>
-        <nav className="container mx-auto px-4 py-3">
-          <div className="flex justify-between items-center gap-4">
+        <nav className="container mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          {/* Top Row - Logo and Icons */}
+          <div className="flex justify-between items-center gap-2">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <SparklesIcon className="w-5 h-5 text-white" />
+            <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-purple-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent hidden sm:block">
+              <span className="text-base sm:text-xl md:text-2xl font-extrabold bg-gradient-to-r from-purple-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent hidden xs:block">
                 ShopHub
               </span>
             </Link>
 
-            {/* Search Bar - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-2xl">
+            {/* Search Bar - Desktop only */}
+            <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl mx-4">
               <AutoSuggestSearch 
-                placeholder="Search for products, brands, and categories..."
+                placeholder="Search for products..."
                 onSelect={handleSearchSelect}
               />
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                    pathname === link.href
-                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 text-purple-200 shadow-sm border border-purple-500/20'
-                      : 'text-purple-300/70 hover:bg-purple-500/10 hover:text-purple-200'
-                  }`}
-                >
-                  <link.icon className="w-4 h-4" />
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-
-            {/* Desktop Icons */}
+            {/* Action Icons */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Search Icon for Mobile */}
+              {/* Mobile Search Button */}
               <button 
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
-                className="md:hidden p-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-purple-200"
+                className="md:hidden p-1.5 sm:p-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-purple-200"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
 
-              {/* ✅ ADMIN ICON FOR DESKTOP */}
+              {/* Admin Icon */}
               {isAdmin && (
                 <Link
                   href="/admin/dashboard"
-                  className="relative p-2 hover:bg-green-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-green-400"
+                  className="relative p-1.5 sm:p-2 hover:bg-green-500/10 rounded-lg transition-all duration-300"
                   title="Admin Dashboard"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300/60 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse"></span>
                 </Link>
               )}
 
               {/* Cart Button */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 hover:bg-fuchsia-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-fuchsia-300"
+                className="relative p-1.5 sm:p-2 hover:bg-fuchsia-500/10 rounded-lg transition-all duration-300"
               >
-                <ShoppingCartIcon className="w-5 h-5" />
+                <ShoppingCartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300/60 hover:text-fuchsia-300" />
                 {totalQuantity > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 shadow-lg">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white text-[9px] sm:text-[10px] font-bold rounded-full min-w-[16px] sm:min-w-[18px] h-4 sm:h-[18px] flex items-center justify-center px-1 shadow-lg">
                     {totalQuantity > 99 ? '99+' : totalQuantity}
                   </span>
                 )}
               </button>
 
-              {/* Login/User Button */}
+              {/* User Menu */}
               {isLoggedIn ? (
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300"
+                    className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2 py-1 sm:py-1.5 hover:bg-purple-500/10 rounded-lg transition-all duration-300"
                   >
                     <div className="relative">
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                         {userName.charAt(0).toUpperCase()}
                       </div>
-                      {/* Admin Crown Badge */}
                       {isAdmin && (
-                        <span className="absolute -top-1 -right-1 text-xs">👑</span>
+                        <span className="absolute -top-1 -right-1 text-[10px] sm:text-xs">👑</span>
                       )}
                     </div>
-                    <span className="text-purple-200 font-semibold text-sm hidden sm:block">{userName}</span>
-                    <ChevronDownIcon className={`w-4 h-4 text-purple-400/60 transition-transform hidden sm:block ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                    <span className="text-purple-200 font-semibold text-xs sm:text-sm hidden xs:block">{userName.split(' ')[0]}</span>
+                    <ChevronDownIcon className={`w-3 h-3 sm:w-4 sm:h-4 text-purple-400/60 transition-transform hidden xs:block ${isUserMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isUserMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
-                      <div className="absolute right-0 mt-2 w-64 bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/30 z-50 overflow-hidden">
-                        <div className="px-4 py-3 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border-b border-purple-500/30">
-                          <div className="flex items-center gap-3">
+                      <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/30 z-50 overflow-hidden">
+                        <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border-b border-purple-500/30">
+                          <div className="flex items-center gap-2 sm:gap-3">
                             <div className="relative">
-                              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold text-sm sm:text-base">
                                 {userName.charAt(0).toUpperCase()}
                               </div>
-                              {isAdmin && (
-                                <span className="absolute -top-1 -right-1 text-xs">👑</span>
-                              )}
+                              {isAdmin && <span className="absolute -top-1 -right-1 text-xs">👑</span>}
                             </div>
-                            <div>
-                              <p className="text-sm font-bold text-purple-100">{userName}</p>
-                              <p className="text-xs text-purple-400">{userEmail}</p>
-                              {isAdmin && (
-                                <span className="text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded mt-1 inline-block">
-                                  Administrator
-                                </span>
-                              )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs sm:text-sm font-bold text-purple-100 truncate">{userName}</p>
+                              <p className="text-[10px] sm:text-xs text-purple-400 truncate">{userEmail}</p>
                             </div>
                           </div>
                         </div>
                         <div className="py-2">
                           {[
-                            { href: '/profile', icon: UserIcon, label: 'Your Profile' },
-                            { href: '/orders', icon: TruckIcon, label: 'Your Orders' },
-                            { href: '/track', icon: TruckIcon, label: 'Track Order' },
+                            { href: '/profile', icon: UserIcon, label: 'Profile' },
+                            { href: '/orders', icon: TruckIcon, label: 'Orders' },
                             { href: '/wishlist', icon: HeartIcon, label: 'Wishlist' },
                           ].map((item) => (
                             <Link
                               key={item.href}
                               href={item.href}
                               onClick={() => setIsUserMenuOpen(false)}
-                              className="flex items-center gap-3 px-4 py-2 text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 transition-all text-sm"
+                              className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 transition-all text-xs sm:text-sm"
                             >
-                              <item.icon className="w-4 h-4" />
+                              <item.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               {item.label}
                             </Link>
                           ))}
-                          
-                          {/* ✅ ADMIN OPTION IN USER DROPDOWN */}
                           {isAdmin && (
                             <>
                               <div className="border-t border-purple-500/20 my-1" />
                               <Link
                                 href="/admin/dashboard"
                                 onClick={() => setIsUserMenuOpen(false)}
-                                className="flex items-center gap-3 px-4 py-2 text-green-400 hover:bg-green-500/10 hover:text-green-300 transition-all text-sm"
+                                className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-green-400 hover:bg-green-500/10 transition-all text-xs sm:text-sm"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                                 Admin Dashboard
-                                <span className="ml-auto text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded">Admin</span>
                               </Link>
                             </>
                           )}
-                          
                           <div className="border-t border-purple-500/20 my-1" />
                           <button
                             onClick={handleLogout}
-                            className="flex items-center gap-3 w-full px-4 py-2 text-red-400 hover:bg-red-500/10 transition-all text-sm"
+                            className="flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-1.5 sm:py-2 text-red-400 hover:bg-red-500/10 transition-all text-xs sm:text-sm"
                           >
-                            <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                            <ArrowRightOnRectangleIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Sign Out
                           </button>
                         </div>
@@ -430,20 +375,19 @@ export const Header = ({
                   )}
                 </div>
               ) : (
-                <Link href="/login" className="px-3 sm:px-5 py-1.5 sm:py-2.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300 shadow-lg shadow-purple-500/25 flex items-center gap-1 sm:gap-2">
-                  <UserIcon className="w-4 h-4" />
-                  <span className="hidden xs:inline text-sm">Login</span>
+                <Link href="/login" className="px-2 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300 shadow-lg shadow-purple-500/25 text-xs sm:text-sm">
+                  Login
                 </Link>
               )}
-            </div>
 
-            {/* Mobile Menu Button */}
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)} 
-              className="lg:hidden p-2 hover:bg-purple-500/10 rounded-lg transition"
-            >
-              {isMenuOpen ? <XMarkIcon className="h-5 w-5 text-purple-300" /> : <Bars3Icon className="h-5 w-5 text-purple-300" />}
-            </button>
+              {/* Mobile Menu Button */}
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                className="lg:hidden p-1.5 sm:p-2 hover:bg-purple-500/10 rounded-lg transition"
+              >
+                {isMenuOpen ? <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5 text-purple-300" /> : <Bars3Icon className="h-4 w-4 sm:h-5 sm:w-5 text-purple-300" />}
+              </button>
+            </div>
           </div>
 
           {/* Mobile Search Bar */}
@@ -453,7 +397,7 @@ export const Header = ({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="md:hidden mt-3 pt-3 border-t border-purple-500/20"
+                className="md:hidden mt-2 pt-2 border-t border-purple-500/20"
               >
                 <AutoSuggestSearch 
                   placeholder="Search products..."
@@ -473,32 +417,31 @@ export const Header = ({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
+                className="lg:hidden mt-3 pt-3 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all font-medium text-sm ${
                       pathname === link.href
                         ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 text-purple-200 border border-purple-500/20'
                         : 'text-purple-300/70 hover:bg-purple-500/10'
                     }`}
                   >
-                    <link.icon className="w-5 h-5" />
+                    <link.icon className="w-4 h-4" />
                     {link.name}
                   </Link>
                 ))}
 
-                {/* ✅ Admin Button in Mobile (Already Working) */}
                 {isAdmin && (
                   <Link 
                     href="/admin/dashboard" 
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-green-500/10 hover:text-green-300 transition-all font-medium"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-purple-300/70 hover:bg-green-500/10 hover:text-green-300 transition-all font-medium text-sm"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -507,18 +450,17 @@ export const Header = ({
                   </Link>
                 )}
 
-                {/* Filter Button in Mobile */}
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
                     setIsFilterOpen(true);
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-purple-500/10 transition-all font-medium w-full"
+                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-purple-300/70 hover:bg-purple-500/10 transition-all font-medium text-sm"
                 >
-                  <FunnelIcon className="w-5 h-5" />
+                  <FunnelIcon className="w-4 h-4" />
                   Filters
                   {hasActiveFilters && (
-                    <span className="bg-purple-500 text-white text-xs font-bold rounded-full px-2 ml-auto">
+                    <span className="bg-purple-500 text-white text-[10px] font-bold rounded-full px-2 ml-auto">
                       {activeFilterCount}
                     </span>
                   )}
@@ -527,41 +469,23 @@ export const Header = ({
                 <Link 
                   href="/wishlist" 
                   onClick={() => setIsMenuOpen(false)} 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-pink-500/10 hover:text-pink-300 transition-all font-medium"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-purple-300/70 hover:bg-pink-500/10 hover:text-pink-300 transition-all font-medium text-sm"
                 >
-                  <HeartIcon className="w-5 h-5" />
+                  <HeartIcon className="w-4 h-4" />
                   Wishlist
                   {wishlistCount > 0 && (
-                    <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded-lg px-2 py-0.5 ml-auto">
+                    <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-lg px-2 py-0.5 ml-auto">
                       {wishlistCount}
                     </span>
                   )}
                 </Link>
 
                 <div className="pt-3 border-t border-purple-500/20 mt-3">
-                  {isLoggedIn ? (
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="relative">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
-                          {userName.charAt(0).toUpperCase()}
-                        </div>
-                        {isAdmin && (
-                          <span className="absolute -top-1 -right-1 text-xs">👑</span>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-bold text-purple-100">{userName}</p>
-                        {isAdmin && (
-                          <p className="text-xs text-green-400">Administrator</p>
-                        )}
-                        <button onClick={handleLogout} className="text-sm text-red-400 font-medium">Sign Out</button>
-                      </div>
-                    </div>
-                  ) : (
+                  {!isLoggedIn && (
                     <Link 
                       href="/login" 
                       onClick={() => setIsMenuOpen(false)} 
-                      className="block w-full text-center py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25"
+                      className="block w-full text-center py-2.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-purple-500/25"
                     >
                       Login
                     </Link>
@@ -573,7 +497,7 @@ export const Header = ({
         </nav>
       </header>
 
-      {/* Filter Drawer */}
+      {/* Filter Drawer - Mobile Friendly */}
       <AnimatePresence>
         {isFilterOpen && (
           <>
@@ -583,23 +507,23 @@ export const Header = ({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30 }}
-              className="fixed right-0 top-0 h-full w-full max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
+              className="fixed right-0 top-0 h-full w-full max-w-[85%] sm:max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
-                <h2 className="text-xl font-bold text-purple-100">Filters</h2>
-                <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-purple-500/10 rounded-xl transition">
-                  <XMarkIcon className="w-6 h-6 text-purple-300" />
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
+                <h2 className="text-base sm:text-xl font-bold text-purple-100">Filters</h2>
+                <button onClick={() => setIsFilterOpen(false)} className="p-1.5 sm:p-2 hover:bg-purple-500/10 rounded-xl transition">
+                  <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
                 {categories.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-bold text-purple-300 uppercase tracking-wider mb-3">Categories</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Categories</h3>
+                    <div className="space-y-1.5 sm:space-y-2">
                       <button
                         onClick={() => setTempCategory('')}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
+                        className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
                         All Categories
                       </button>
@@ -607,7 +531,7 @@ export const Header = ({
                         <button
                           key={cat}
                           onClick={() => setTempCategory(cat)}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition capitalize ${tempCategory === cat ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
+                          className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition capitalize text-xs sm:text-sm ${tempCategory === cat ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                         >
                           {cat}
                         </button>
@@ -617,28 +541,28 @@ export const Header = ({
                 )}
 
                 <div>
-                  <h3 className="text-sm font-bold text-purple-300 uppercase tracking-wider mb-3">Price Range (₹)</h3>
-                  <div className="flex gap-3">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Price Range (₹)</h3>
+                  <div className="flex gap-2 sm:gap-3">
                     <input
                       type="number"
-                      placeholder="Min Price"
+                      placeholder="Min"
                       value={tempMinPrice}
                       onChange={(e) => setTempMinPrice(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <input
                       type="number"
-                      placeholder="Max Price"
+                      placeholder="Max"
                       value={tempMaxPrice}
                       onChange={(e) => setTempMaxPrice(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-bold text-purple-300 uppercase tracking-wider mb-3">Sort By</h3>
-                  <div className="space-y-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Sort By</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
                     {[
                       { value: 'newest', label: 'Newest First' },
                       { value: 'price_low', label: 'Price: Low to High' },
@@ -648,7 +572,7 @@ export const Header = ({
                       <button
                         key={option.value}
                         onClick={() => setTempSortBy(option.value)}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
+                        className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
                         {option.label}
                       </button>
@@ -657,19 +581,19 @@ export const Header = ({
                 </div>
               </div>
 
-              <div className="border-t border-purple-500/30 p-6 space-y-3">
+              <div className="border-t border-purple-500/30 p-4 sm:p-6 space-y-2 sm:space-y-3">
                 <button
                   onClick={handleApplyFilters}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition"
                 >
                   Apply Filters
                 </button>
                 {(tempCategory || tempMinPrice || tempMaxPrice || tempSortBy !== 'newest') && (
                   <button
                     onClick={handleClearFilters}
-                    className="w-full bg-slate-800 text-purple-300 py-3 rounded-xl font-semibold hover:bg-slate-700 transition"
+                    className="w-full bg-slate-800 text-purple-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-slate-700 transition"
                   >
-                    Clear All Filters
+                    Clear All
                   </button>
                 )}
               </div>
@@ -681,7 +605,8 @@ export const Header = ({
       {/* Cart Sidebar */}
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
-      <div className="h-20"></div>
+      {/* Spacer for fixed header */}
+      <div className="h-14 sm:h-16"></div>
     </>
   );
 };

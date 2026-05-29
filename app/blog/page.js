@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Newspaper, Calendar, User, Clock, BookOpen } from 'lucide-react';
 
 export const metadata = {
-  title: 'Blog - FrontendEcommerce',
+  title: 'Blog - ShopHub',
   description: 'Latest news, tips, and updates from our team',
 };
 
@@ -17,6 +17,7 @@ const blogPosts = [
     readTime: '5 min read',
     excerpt: 'Learn how to make the most of your online shopping experience...',
     category: 'Shopping Tips',
+    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=400&fit=crop',
   },
   {
     id: 2,
@@ -26,6 +27,7 @@ const blogPosts = [
     readTime: '3 min read',
     excerpt: 'Behind the scenes of our logistics optimization...',
     category: 'Company News',
+    image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=800&h=400&fit=crop',
   },
   {
     id: 3,
@@ -35,6 +37,7 @@ const blogPosts = [
     readTime: '4 min read',
     excerpt: 'Discover the most popular items among our customers...',
     category: 'Product Highlights',
+    image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=400&fit=crop',
   },
 ];
 
@@ -60,6 +63,14 @@ export default function BlogPage() {
           <div className="space-y-8">
             {blogPosts.map((post) => (
               <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+                {/* Featured Image */}
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
+                  />
+                </div>
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-700">

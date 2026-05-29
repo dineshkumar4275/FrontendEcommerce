@@ -282,7 +282,7 @@ export const Header = ({
                 </svg>
               </button>
 
-              {/* ✅ WISHLIST HEART ICON WITH COUNT - ADDED HERE */}
+              {/* ✅ WISHLIST HEART WITH NUMBER ON TOP */}
               <Link 
                 href="/wishlist" 
                 className="relative p-2 hover:bg-pink-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-pink-300"
@@ -290,9 +290,9 @@ export const Header = ({
               >
                 <HeartIcon className="w-5 h-5" />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 shadow-lg">
+                  <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-lg z-10">
                     {wishlistCount > 99 ? '99+' : wishlistCount}
-                  </span>
+                  </div>
                 )}
               </Link>
 
@@ -518,7 +518,7 @@ export const Header = ({
                   <HeartIcon className="w-5 h-5" />
                   Wishlist
                   {wishlistCount > 0 && (
-                    <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded-lg px-2 py-0.5 ml-auto">
+                    <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-auto">
                       {wishlistCount}
                     </span>
                   )}

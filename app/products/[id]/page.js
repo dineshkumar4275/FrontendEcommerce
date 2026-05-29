@@ -508,7 +508,7 @@ export default function ProductDetailPage() {
                 <p className="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery</p>
               </div>
 
-              {/* 🎯 SIZE SELECTOR - Only shows if product has sizes and hasSizes is true */}
+              {/* 🎯 SIZE SELECTOR - Only shows if product has sizes */}
               {product.hasSizes && product.sizes && product.sizes.length > 0 && (
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-3">
@@ -539,7 +539,7 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* 🎯 COLOR SELECTOR - Only shows if product has colors and hasColors is true */}
+              {/* 🎯 COLOR SELECTOR - CHANGES IMAGE WHEN CLICKED */}
               {product.hasColors && product.colors && product.colors.length > 0 && (
                 <div className="mb-6">
                   <label className="text-sm font-semibold text-gray-700 mb-3 block">Select Color</label>
@@ -552,7 +552,18 @@ export default function ProductDetailPage() {
                       return (
                         <button
                           key={colorName}
-                          onClick={() => handleColorChange(color)}
+                          onClick={() => {
+                            setSelectedColor(colorName);
+                            // 🎯 THIS CHANGES THE IMAGE - Find image matching this color
+                            const colorLower = colorName.toLowerCase();
+                            const matchingIndex = productImages.findIndex((img, idx) => {
+                              if (idx === 0) return false;
+                              return img?.toLowerCase().includes(colorLower);
+                            });
+                            if (matchingIndex !== -1) {
+                              setSelectedImage(matchingIndex);
+                            }
+                          }}
                           className={`relative w-12 h-12 rounded-full transition-all ${
                             selectedColor === colorName
                               ? 'ring-2 ring-purple-600 ring-offset-2 scale-110'

@@ -132,9 +132,8 @@ export default function NewProductPage() {
   const [submitting, setSubmitting] = useState(false);
   const [images, setImages] = useState([]);
   
-  // ✅ Toggle switches - Default based on category
   const [enableColors, setEnableColors] = useState(true);
-  const [enableSizes, setEnableSizes] = useState(false); // Default OFF for electronics
+  const [enableSizes, setEnableSizes] = useState(false);
   
   const [selectedCategory, setSelectedCategory] = useState('');
   const [formData, setFormData] = useState({
@@ -149,27 +148,19 @@ export default function NewProductPage() {
     sizes: []
   });
 
-  // 🎯 Auto-set toggles based on category
   useEffect(() => {
     const category = selectedCategory.toLowerCase();
     
-    // Clothing categories - has sizes
     if (category.includes('clothing') || category.includes('shirt') || category.includes('dress') || category.includes('jeans')) {
       setEnableSizes(true);
       setEnableColors(true);
-    } 
-    // Footwear - has sizes
-    else if (category.includes('shoe') || category.includes('footwear')) {
+    } else if (category.includes('shoe') || category.includes('footwear')) {
       setEnableSizes(true);
       setEnableColors(true);
-    }
-    // Electronics - no sizes
-    else if (category.includes('electronic') || category.includes('phone') || category.includes('laptop')) {
+    } else if (category.includes('electronic') || category.includes('phone') || category.includes('laptop')) {
       setEnableSizes(false);
       setEnableColors(true);
-    }
-    // Default
-    else {
+    } else {
       setEnableSizes(false);
       setEnableColors(true);
     }
@@ -190,7 +181,6 @@ export default function NewProductPage() {
     const colorCode = document.getElementById('colorCode')?.value;
     
     if (colorName && colorCode) {
-      // Check if color already exists
       const exists = formData.colors.some(c => c.name === colorName);
       if (!exists) {
         setFormData(prev => ({ 
@@ -245,17 +235,14 @@ export default function NewProductPage() {
       showToast('Please enter product name', 'error');
       return;
     }
-    
     if (!formData.price) {
       showToast('Please enter product price', 'error');
       return;
     }
-    
     if (!formData.stock) {
       showToast('Please enter stock quantity', 'error');
       return;
     }
-
     if (images.length === 0) {
       showToast('Please add at least one product image', 'error');
       return;
@@ -312,29 +299,14 @@ export default function NewProductPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Basic Information</h2>
           <div className="space-y-4">
-            <FormInput
-              label="Product Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="Enter product name"
-            />
-
+            <FormInput label="Product Name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter product name" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
+                <select name="category" value={formData.category} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                   <option value="">Select Category</option>
                   <option value="Electronics">Electronics</option>
                   <option value="Mobile Phones">Mobile Phones</option>
@@ -349,7 +321,6 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Pricing & Stock */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Pricing & Stock</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -359,244 +330,109 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* 🎯 PRODUCT VARIANTS - Toggle Switches */}
+        {/* Product Variants Toggles */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Product Variants</h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Color Toggle */}
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
-                <div className="flex items-center gap-2">
-                  <SwatchIcon className="w-5 h-5 text-purple-600" />
-                  <span className="font-medium text-gray-700">Enable Colors</span>
-                </div>
+                <div className="flex items-center gap-2"><SwatchIcon className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-700">Enable Colors</span></div>
                 <p className="text-xs text-gray-500 mt-1">Show color options for this product</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={enableColors}
-                  onChange={(e) => {
-                    setEnableColors(e.target.checked);
-                    if (!e.target.checked) {
-                      setFormData(prev => ({ ...prev, colors: [] }));
-                    }
-                  }}
-                  className="sr-only peer"
-                />
+                <input type="checkbox" checked={enableColors} onChange={(e) => { setEnableColors(e.target.checked); if (!e.target.checked) setFormData(prev => ({ ...prev, colors: [] })); }} className="sr-only peer" />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
               </label>
             </div>
-
-            {/* Size Toggle */}
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
-                <div className="flex items-center gap-2">
-                  <ArrowsRightLeftIcon className="w-5 h-5 text-purple-600" />
-                  <span className="font-medium text-gray-700">Enable Sizes</span>
-                </div>
+                <div className="flex items-center gap-2"><ArrowsRightLeftIcon className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-700">Enable Sizes</span></div>
                 <p className="text-xs text-gray-500 mt-1">Show size options for this product</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={enableSizes}
-                  onChange={(e) => {
-                    setEnableSizes(e.target.checked);
-                    if (!e.target.checked) {
-                      setFormData(prev => ({ ...prev, sizes: [] }));
-                    }
-                  }}
-                  className="sr-only peer"
-                />
+                <input type="checkbox" checked={enableSizes} onChange={(e) => { setEnableSizes(e.target.checked); if (!e.target.checked) setFormData(prev => ({ ...prev, sizes: [] })); }} className="sr-only peer" />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
               </label>
             </div>
           </div>
         </div>
 
-        {/* 🎯 COLORS SECTION - Only shows if enabled */}
+        {/* Colors Section */}
         {enableColors && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
-              <SwatchIcon className="w-5 h-5 text-purple-600" />
-              Colors
-            </h2>
-            
-            {/* Color Presets */}
+            <h2 className="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2"><SwatchIcon className="w-5 h-5 text-purple-600" /> Colors</h2>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Quick Color Presets</label>
               <div className="flex flex-wrap gap-2">
                 {colorPresets.map((color, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      const exists = formData.colors.some(c => c.name === color.name);
-                      if (!exists) {
-                        setFormData(prev => ({ 
-                          ...prev, 
-                          colors: [...prev.colors, { name: color.name, code: color.code }] 
-                        }));
-                        showToast(`${color.name} added`, 'success');
-                      } else {
-                        showToast(`${color.name} already added`, 'error');
-                      }
-                    }}
-                    className="w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform"
-                    style={{ backgroundColor: color.code }}
-                    title={color.name}
-                  />
+                  <button key={idx} type="button" onClick={() => { if (!formData.colors.some(c => c.name === color.name)) { setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: color.name, code: color.code }] })); showToast(`${color.name} added`, 'success'); } else { showToast(`${color.name} already added`, 'error'); } }} className="w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform" style={{ backgroundColor: color.code }} title={color.name} />
                 ))}
               </div>
             </div>
-
-            {/* Selected Colors */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Selected Colors ({formData.colors.length})</label>
               <div className="flex flex-wrap gap-2">
                 {formData.colors.map((color, index) => (
                   <div key={index} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
-                    <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: color.code }} />
-                    <span className="text-sm">{color.name}</span>
-                    <button type="button" onClick={() => removeColor(index)} className="text-red-500 hover:text-red-700">
-                      <TrashIcon className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: color.code }} /><span className="text-sm">{color.name}</span>
+                    <button type="button" onClick={() => removeColor(index)} className="text-red-500 hover:text-red-700"><TrashIcon className="w-3.5 h-3.5" /></button>
                   </div>
                 ))}
-                {formData.colors.length === 0 && (
-                  <p className="text-gray-500 text-sm">No colors selected. Click on color presets above to add.</p>
-                )}
+                {formData.colors.length === 0 && <p className="text-gray-500 text-sm">No colors selected.</p>}
               </div>
             </div>
-
-            {/* Add Custom Color */}
             <div className="flex gap-2">
-              <input
-                type="text"
-                id="colorName"
-                placeholder="Color name (e.g., Navy Blue)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <input
-                type="color"
-                id="colorCode"
-                className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-                defaultValue="#000000"
-              />
-              <button
-                type="button"
-                onClick={addColor}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-              >
-                Add
-              </button>
+              <input type="text" id="colorName" placeholder="Color name" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+              <input type="color" id="colorCode" className="w-12 h-10 border border-gray-300 rounded cursor-pointer" defaultValue="#000000" />
+              <button type="button" onClick={addColor} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Add</button>
             </div>
           </div>
         )}
 
-        {/* 🎯 SIZES SECTION - Only shows if enabled */}
+        {/* Sizes Section */}
         {enableSizes && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
-              <ArrowsRightLeftIcon className="w-5 h-5 text-purple-600" />
-              Sizes
-            </h2>
-            
-            {/* Size Presets */}
+            <h2 className="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2"><ArrowsRightLeftIcon className="w-5 h-5 text-purple-600" /> Sizes</h2>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Quick Size Presets</label>
               <div className="flex flex-wrap gap-2">
-                {["XS", "S", "M", "L", "XL", "XXL", "3XL", "6", "7", "8", "9", "10", "11", "12"].map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => {
-                      const exists = formData.sizes.includes(size);
-                      if (!exists) {
-                        setFormData(prev => ({ ...prev, sizes: [...prev.sizes, size] }));
-                        showToast(`${size} added`, 'success');
-                      } else {
-                        showToast(`${size} already added`, 'error');
-                      }
-                    }}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-purple-100"
-                  >
-                    {size}
-                  </button>
+                {["XS","S","M","L","XL","XXL","3XL","6","7","8","9","10","11","12"].map((size) => (
+                  <button key={size} type="button" onClick={() => { if (!formData.sizes.includes(size)) { setFormData(prev => ({ ...prev, sizes: [...prev.sizes, size] })); showToast(`${size} added`, 'success'); } else { showToast(`${size} already added`, 'error'); } }} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-purple-100">{size}</button>
                 ))}
               </div>
             </div>
-
-            {/* Selected Sizes */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Selected Sizes ({formData.sizes.length})</label>
               <div className="flex flex-wrap gap-2">
                 {formData.sizes.map((size, index) => (
                   <div key={index} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
                     <span className="text-sm">{size}</span>
-                    <button type="button" onClick={() => removeSize(index)} className="text-red-500 hover:text-red-700">
-                      <TrashIcon className="w-3.5 h-3.5" />
-                    </button>
+                    <button type="button" onClick={() => removeSize(index)} className="text-red-500 hover:text-red-700"><TrashIcon className="w-3.5 h-3.5" /></button>
                   </div>
                 ))}
-                {formData.sizes.length === 0 && (
-                  <p className="text-gray-500 text-sm">No sizes selected. Click on size presets above to add.</p>
-                )}
+                {formData.sizes.length === 0 && <p className="text-gray-500 text-sm">No sizes selected.</p>}
               </div>
             </div>
-
-            {/* Add Custom Size */}
             <div className="flex gap-2">
-              <input
-                type="text"
-                id="sizeName"
-                placeholder="Size (e.g., 2XL, 42, One Size)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <button
-                type="button"
-                onClick={addSize}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-              >
-                Add Size
-              </button>
+              <input type="text" id="sizeName" placeholder="Size (e.g., 2XL, 42)" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+              <button type="button" onClick={addSize} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Add Size</button>
             </div>
           </div>
         )}
 
-        {/* Product Images */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Product Images</h2>
           <ImageUploader images={images} onChange={setImages} maxImages={5} />
         </div>
 
-        {/* Description */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Description</h2>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="5"
-            placeholder="Detailed product description..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+          <textarea name="description" value={formData.description} onChange={handleChange} rows="5" placeholder="Detailed product description..." className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
         </div>
 
-        {/* Submit Buttons */}
         <div className="flex justify-end gap-4">
-          <Link href="/admin/products" className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-            Cancel
-          </Link>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg disabled:opacity-50"
-          >
-            {submitting ? 'Creating...' : 'Create Product'}
-          </button>
+          <Link href="/admin/products" className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</Link>
+          <button type="submit" disabled={submitting} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg disabled:opacity-50">{submitting ? 'Creating...' : 'Create Product'}</button>
         </div>
       </form>
     </div>

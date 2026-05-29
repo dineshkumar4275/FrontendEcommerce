@@ -59,8 +59,20 @@ export const Header = ({
   const router = useRouter();
   const dispatch = useDispatch();
   const { totalQuantity } = useCart();
-  const { wishlistCount } = useWishlist();
+  const { wishlistCount, getWishlist } = useWishlist();
   const { user, token } = useSelector((state) => state.auth);
+
+  // Load wishlist when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      getWishlist();
+    }
+  }, [isLoggedIn, getWishlist]);
+
+  // Debug log to check wishlist count
+  useEffect(() => {
+    console.log('Wishlist Count in Header:', wishlistCount);
+  }, [wishlistCount]);
 
   useEffect(() => {
     setMounted(true);

@@ -12,7 +12,6 @@ export const fetchWishlist = createAsyncThunk(
         return [];
       }
       const response = await getWishlist();
-      // Handle different response structures
       const data = response.data?.data || response.data || [];
       return Array.isArray(data) ? data : [];
     } catch (error) {
@@ -45,7 +44,6 @@ export const addToWishlistAsync = createAsyncThunk(
         duration: 2000,
       });
       
-      // Refresh wishlist after adding
       await dispatch(fetchWishlist());
       
       return response.data;
@@ -81,7 +79,6 @@ export const removeFromWishlistAsync = createAsyncThunk(
         duration: 2000,
       });
       
-      // Refresh wishlist after removing
       await dispatch(fetchWishlist());
       
       return { productId, ...response.data };
@@ -94,78 +91,77 @@ export const removeFromWishlistAsync = createAsyncThunk(
   }
 );
 
-// Helper function to check if product is in wishlist
-const isProductInWishlist = (items, productId) => {
-  if (!items || !Array.isArray(items)) return false;
-  return items.some(item => {
-    const itemId = item.product_id || item.productId || item.id || item._id;
-    return String(itemId) === String(productId);
-  });
+const initialState = {
+  items: [],
+  wishlist: [],        // ✅ ADD THIS - alias for items
+  wishlistIds: new Set(), // ✅ ADD THIS - Set of product IDs
+  loading: false,
+  error: null,
+  totalCount: 0,
 };
 
 const wishlistSlice = createSlice({
   name: 'wishlist',
-  initialState: {
-    items: [],
-    loading: false,
-    error: null,
-    totalCount: 0,
-  },
+  initialState,
   reducers: {
     clearWishlist: (state) => {
       state.items = [];
+      state.wishlist = [];
+      state.wishlistIds = new Set();
       state.error = null;
       state.totalCount = 0;
     },
-    // Optimistic update for UI - immediate visual feedback
+    // Optimistic update for UI
     addToWishlistLocal: (state, action) => {
       const product = action.payload;
       const productId = product.id || product._id || product.productId;
       
-      // Check if already exists
-      const exists = isProductInWishlist(state.items, productId);
+      const exists = state.wishlistIds.has(String(productId));
       
       if (!exists) {
-        // Add to wishlist locally
-        state.items.unshift({ 
+        state.wishlistIds.add(String(productId));
+        const newItem = { 
           product_id: productId,
           productId: productId,
           id: productId,
           name: product.name || '',
           price: product.price || 0,
           image_url: product.image_url || product.image,
-        });
+        };
+        state.items.unshift(newItem);
+        state.wishlist = state.items;
         state.totalCount = state.items.length;
       }
     },
     removeFromWishlistLocal: (state, action) => {
       const productId = action.payload;
-      
-      // Remove from wishlist locally
+      state.wishlistIds.delete(String(productId));
       state.items = state.items.filter(item => {
         const itemId = item.product_id || item.productId || item.id || item._id;
         return String(itemId) !== String(productId);
       });
+      state.wishlist = state.items;
       state.totalCount = state.items.length;
     },
     toggleWishlistLocal: (state, action) => {
       const productId = action.payload;
-      const exists = isProductInWishlist(state.items, productId);
+      const exists = state.wishlistIds.has(String(productId));
       
       if (exists) {
-        // Remove from wishlist locally
+        state.wishlistIds.delete(String(productId));
         state.items = state.items.filter(item => {
           const itemId = item.product_id || item.productId || item.id || item._id;
           return String(itemId) !== String(productId);
         });
       } else {
-        // Add to wishlist locally (with minimal info)
+        state.wishlistIds.add(String(productId));
         state.items.unshift({ 
           product_id: productId, 
           productId: productId,
           id: productId,
         });
       }
+      state.wishlist = state.items;
       state.totalCount = state.items.length;
     },
   },
@@ -179,20 +175,27 @@ const wishlistSlice = createSlice({
       .addCase(fetchWishlist.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload || [];
+        state.wishlist = state.items;  // ✅ UPDATE wishlist
+        state.wishlistIds = new Set((action.payload || []).map(item => 
+          String(item.product_id || item.productId || item.id || item._id)
+        ));  // ✅ UPDATE wishlistIds
         state.totalCount = (action.payload || []).length;
         state.error = null;
+        console.log('Wishlist loaded:', state.totalCount, 'items'); // Debug log
       })
       .addCase(fetchWishlist.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.items = [];
+        state.wishlist = [];
+        state.wishlistIds = new Set();
         state.totalCount = 0;
       })
       // Add to wishlist
       .addCase(addToWishlistAsync.pending, (state) => {
         state.loading = true;
       })
-      .addCase(addToWishlistAsync.fulfilled, (state, action) => {
+      .addCase(addToWishlistAsync.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(addToWishlistAsync.rejected, (state, action) => {
@@ -205,13 +208,14 @@ const wishlistSlice = createSlice({
       })
       .addCase(removeFromWishlistAsync.fulfilled, (state, action) => {
         state.loading = false;
-        // Remove the item from state immediately
         const productId = action.payload?.productId;
         if (productId) {
+          state.wishlistIds.delete(String(productId));
           state.items = state.items.filter(item => {
             const itemId = item.product_id || item.productId || item.id || item._id;
             return String(itemId) !== String(productId);
           });
+          state.wishlist = state.items;
           state.totalCount = state.items.length;
         }
       })
@@ -222,16 +226,12 @@ const wishlistSlice = createSlice({
   },
 });
 
-// Selector to check if product is in wishlist
+// Selectors
 export const selectIsInWishlist = (state, productId) => {
-  if (!state.wishlist?.items || !productId) return false;
-  return state.wishlist.items.some(item => {
-    const itemId = item.product_id || item.productId || item.id || item._id;
-    return String(itemId) === String(productId);
-  });
+  if (!state.wishlist?.wishlistIds) return false;
+  return state.wishlist.wishlistIds.has(String(productId));
 };
 
-// Selector to get wishlist count
 export const selectWishlistCount = (state) => state.wishlist?.totalCount || 0;
 
 export const { 

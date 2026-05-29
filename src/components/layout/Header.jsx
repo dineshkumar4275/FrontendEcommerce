@@ -50,7 +50,6 @@ export const Header = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   
-  // Local filter state
   const [tempCategory, setTempCategory] = useState(selectedCategory);
   const [tempMinPrice, setTempMinPrice] = useState(minPrice);
   const [tempMaxPrice, setTempMaxPrice] = useState(maxPrice);
@@ -61,7 +60,7 @@ export const Header = ({
   const dispatch = useDispatch();
   const { totalQuantity } = useCart();
   const { wishlistCount } = useWishlist();
-  const { user, token, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
 
   useEffect(() => {
     setMounted(true);
@@ -104,7 +103,6 @@ export const Header = ({
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [user, token]);
 
-  // Check if logged in user is admin
   const isAdmin = isLoggedIn && (userEmail === 'admin@example.com' || user?.role === 'admin');
 
   const handleLogout = () => {
@@ -160,28 +158,6 @@ export const Header = ({
     if (toast && toast.success) {
       toast.success('Filters applied');
     }
-  };
-
-  const handleSortChange = (value) => {
-    setTempSortBy(value);
-    if (setSortBy) setSortBy(value);
-    if (onFilterChange) {
-      onFilterChange({
-        category: tempCategory,
-        minPrice: tempMinPrice,
-        maxPrice: tempMaxPrice,
-        sortBy: value
-      });
-    }
-    
-    window.dispatchEvent(new CustomEvent('filterChange', {
-      detail: {
-        category: tempCategory,
-        minPrice: tempMinPrice,
-        maxPrice: tempMaxPrice,
-        sortBy: value
-      }
-    }));
   };
 
   const handleClearFilters = () => {
@@ -258,7 +234,7 @@ export const Header = ({
       }`}>
         <nav className="container mx-auto px-4 py-3">
           <div className="flex justify-between items-center gap-4">
-            {/* Logo */}
+            {/* Logo - Unchanged for desktop, adjusted for mobile */}
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
                 <SparklesIcon className="w-5 h-5 text-white" />
@@ -276,7 +252,7 @@ export const Header = ({
               />
             </div>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - Unchanged */}
             <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
@@ -294,9 +270,9 @@ export const Header = ({
               ))}
             </div>
 
-            {/* Desktop Icons */}
+            {/* Desktop Icons - Unchanged for desktop */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Search Icon for Mobile */}
+              {/* Mobile Search Icon - ONLY SHOWS ON MOBILE */}
               <button 
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
                 className="md:hidden p-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-purple-200"
@@ -306,7 +282,7 @@ export const Header = ({
                 </svg>
               </button>
 
-              {/* ✅ ADMIN ICON FOR DESKTOP */}
+              {/* Admin Icon - Desktop unchanged */}
               {isAdmin && (
                 <Link
                   href="/admin/dashboard"
@@ -334,7 +310,7 @@ export const Header = ({
                 )}
               </button>
 
-              {/* Login/User Button */}
+              {/* Login/User Button - Desktop unchanged */}
               {isLoggedIn ? (
                 <div className="relative">
                   <button
@@ -345,7 +321,6 @@ export const Header = ({
                       <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
                         {userName.charAt(0).toUpperCase()}
                       </div>
-                      {/* Admin Crown Badge */}
                       {isAdmin && (
                         <span className="absolute -top-1 -right-1 text-xs">👑</span>
                       )}
@@ -397,7 +372,6 @@ export const Header = ({
                             </Link>
                           ))}
                           
-                          {/* ✅ ADMIN OPTION IN USER DROPDOWN */}
                           {isAdmin && (
                             <>
                               <div className="border-t border-purple-500/20 my-1" />
@@ -435,18 +409,18 @@ export const Header = ({
                   <span className="hidden xs:inline text-sm">Login</span>
                 </Link>
               )}
-            </div>
 
-            {/* Mobile Menu Button */}
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)} 
-              className="lg:hidden p-2 hover:bg-purple-500/10 rounded-lg transition"
-            >
-              {isMenuOpen ? <XMarkIcon className="h-5 w-5 text-purple-300" /> : <Bars3Icon className="h-5 w-5 text-purple-300" />}
-            </button>
+              {/* Mobile Menu Button - ONLY SHOWS ON MOBILE */}
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                className="lg:hidden p-2 hover:bg-purple-500/10 rounded-lg transition"
+              >
+                {isMenuOpen ? <XMarkIcon className="h-5 w-5 text-purple-300" /> : <Bars3Icon className="h-5 w-5 text-purple-300" />}
+              </button>
+            </div>
           </div>
 
-          {/* Mobile Search Bar */}
+          {/* Mobile Search Bar - ONLY SHOWS ON MOBILE */}
           <AnimatePresence>
             {showMobileSearch && (
               <motion.div
@@ -466,7 +440,7 @@ export const Header = ({
             )}
           </AnimatePresence>
 
-          {/* Mobile Navigation Menu */}
+          {/* Mobile Navigation Menu - ONLY SHOWS ON MOBILE */}
           <AnimatePresence>
             {isMenuOpen && (
               <motion.div
@@ -491,7 +465,6 @@ export const Header = ({
                   </Link>
                 ))}
 
-                {/* ✅ Admin Button in Mobile (Already Working) */}
                 {isAdmin && (
                   <Link 
                     href="/admin/dashboard" 
@@ -507,7 +480,6 @@ export const Header = ({
                   </Link>
                 )}
 
-                {/* Filter Button in Mobile */}
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
@@ -539,25 +511,7 @@ export const Header = ({
                 </Link>
 
                 <div className="pt-3 border-t border-purple-500/20 mt-3">
-                  {isLoggedIn ? (
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="relative">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
-                          {userName.charAt(0).toUpperCase()}
-                        </div>
-                        {isAdmin && (
-                          <span className="absolute -top-1 -right-1 text-xs">👑</span>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-bold text-purple-100">{userName}</p>
-                        {isAdmin && (
-                          <p className="text-xs text-green-400">Administrator</p>
-                        )}
-                        <button onClick={handleLogout} className="text-sm text-red-400 font-medium">Sign Out</button>
-                      </div>
-                    </div>
-                  ) : (
+                  {!isLoggedIn && (
                     <Link 
                       href="/login" 
                       onClick={() => setIsMenuOpen(false)} 
@@ -573,7 +527,7 @@ export const Header = ({
         </nav>
       </header>
 
-      {/* Filter Drawer */}
+      {/* Filter Drawer - Mobile optimized */}
       <AnimatePresence>
         {isFilterOpen && (
           <>
@@ -583,23 +537,23 @@ export const Header = ({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30 }}
-              className="fixed right-0 top-0 h-full w-full max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
+              className="fixed right-0 top-0 h-full w-full max-w-[85%] sm:max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
-                <h2 className="text-xl font-bold text-purple-100">Filters</h2>
+              <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
+                <h2 className="text-base sm:text-xl font-bold text-purple-100">Filters</h2>
                 <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-purple-500/10 rounded-xl transition">
-                  <XMarkIcon className="w-6 h-6 text-purple-300" />
+                  <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
                 {categories.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-bold text-purple-300 uppercase tracking-wider mb-3">Categories</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Categories</h3>
+                    <div className="space-y-1.5 sm:space-y-2">
                       <button
                         onClick={() => setTempCategory('')}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
+                        className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
                         All Categories
                       </button>
@@ -607,7 +561,7 @@ export const Header = ({
                         <button
                           key={cat}
                           onClick={() => setTempCategory(cat)}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition capitalize ${tempCategory === cat ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
+                          className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition capitalize text-xs sm:text-sm ${tempCategory === cat ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                         >
                           {cat}
                         </button>
@@ -617,28 +571,28 @@ export const Header = ({
                 )}
 
                 <div>
-                  <h3 className="text-sm font-bold text-purple-300 uppercase tracking-wider mb-3">Price Range (₹)</h3>
-                  <div className="flex gap-3">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Price Range (₹)</h3>
+                  <div className="flex gap-2 sm:gap-3">
                     <input
                       type="number"
                       placeholder="Min Price"
                       value={tempMinPrice}
                       onChange={(e) => setTempMinPrice(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <input
                       type="number"
                       placeholder="Max Price"
                       value={tempMaxPrice}
                       onChange={(e) => setTempMaxPrice(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-bold text-purple-300 uppercase tracking-wider mb-3">Sort By</h3>
-                  <div className="space-y-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Sort By</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
                     {[
                       { value: 'newest', label: 'Newest First' },
                       { value: 'price_low', label: 'Price: Low to High' },
@@ -648,7 +602,7 @@ export const Header = ({
                       <button
                         key={option.value}
                         onClick={() => setTempSortBy(option.value)}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
+                        className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
                         {option.label}
                       </button>
@@ -657,17 +611,17 @@ export const Header = ({
                 </div>
               </div>
 
-              <div className="border-t border-purple-500/30 p-6 space-y-3">
+              <div className="border-t border-purple-500/30 p-4 sm:p-6 space-y-2 sm:space-y-3">
                 <button
                   onClick={handleApplyFilters}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition"
                 >
                   Apply Filters
                 </button>
                 {(tempCategory || tempMinPrice || tempMaxPrice || tempSortBy !== 'newest') && (
                   <button
                     onClick={handleClearFilters}
-                    className="w-full bg-slate-800 text-purple-300 py-3 rounded-xl font-semibold hover:bg-slate-700 transition"
+                    className="w-full bg-slate-800 text-purple-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-slate-700 transition"
                   >
                     Clear All Filters
                   </button>

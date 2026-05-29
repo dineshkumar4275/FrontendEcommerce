@@ -11,7 +11,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // shadcn/ui color system
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -1,6 +1,7 @@
 // app/faqs/page.js
 import Link from 'next/link';
 import { HelpCircle } from 'lucide-react';
+import FAQClient from './FAQClient';
 
 export const metadata = {
   title: 'FAQs - ShopHub',
@@ -33,9 +34,6 @@ const faqs = [
     a: "You can contact us via email at support@shophub.com, call us at +1 (800) 123-4567, or use our live chat feature."
   },
 ];
-
-// Client component for interactive FAQ
-import FAQClient from './FAQClient';
 
 export default function FAQsPage() {
   return <FAQClient faqs={faqs} />;

@@ -1,13 +1,10 @@
-// components/ProductCard.jsx (Updated with mobile-responsive wishlist)
+// components/ProductCard.jsx (Fixed - Heart icon always visible on mobile)
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HeartIcon, ShoppingCartIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
+import { motion } from 'framer-motion';
 
-// Product Card Component with Chevron Arrows & Multiple Images
 const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -31,7 +28,7 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Collect all 5 images
+  // Collect all images
   const productImages = [
     product.image_url,
     product.image_url_2,
@@ -66,7 +63,6 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
     setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
   };
 
-  // Drag handlers for manual rotation
   const handleDragStart = (e) => {
     if (!hasMultipleImages) return;
     setIsDragging(true);
@@ -101,9 +97,6 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
     setIsAdding(false);
   };
 
-  // Determine if wishlist button should be visible
-  const isWishlistVisible = isMobile ? true : isHovered;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -126,7 +119,6 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
             onMouseMove={handleDragMove}
             onMouseUp={handleDragEnd}
             onMouseLeave={handleDragEnd}
-            style={{ cursor: hasMultipleImages ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
           >
             {/* Stock Badge */}
             {product.stock === 0 && (
@@ -163,23 +155,29 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
               </div>
             )}
 
-            {/* Wishlist Button - FIXED FOR MOBILE */}
+            {/* ❤️ HEART BUTTON - FIXED FOR MOBILE ❤️ */}
+            {/* On mobile: ALWAYS VISIBLE. On desktop: Shows on hover */}
             <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onWishlistToggle(product.id, e);
               }}
-              className={`absolute top-2 right-2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isInWishlist
+              className={`
+                absolute top-2 right-2 z-10 
+                w-9 h-9 rounded-full 
+                flex items-center justify-center 
+                transition-all duration-300 
+                ${isInWishlist
                   ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/30 scale-110'
                   : 'bg-white/90 backdrop-blur-sm text-gray-500 shadow-md hover:shadow-lg'
-              } ${
-                // FIX: For mobile, always visible. For desktop, show on hover
-                isMobile 
+                }
+                /* 🔥 KEY FIX: Always visible on mobile, show on hover for desktop */
+                ${isMobile 
                   ? 'opacity-100 translate-y-0' 
-                  : `opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0`
-              }`}
+                  : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                }
+              `}
             >
               {isInWishlist ? (
                 <svg className="w-4 h-4 fill-current" fill="currentColor" viewBox="0 0 24 24">
@@ -192,53 +190,35 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
               )}
             </button>
 
-            {/* LEFT CHEVRON BUTTON */}
+            {/* Image Navigation Chevrons */}
             {hasMultipleImages && (isHovered || isMobile) && (
-              <button
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
-                style={{ opacity: isMobile ? 0.7 : undefined }}
-              >
-                <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            )}
-
-            {/* RIGHT CHEVRON BUTTON */}
-            {hasMultipleImages && (isHovered || isMobile) && (
-              <button
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
-                style={{ opacity: isMobile ? 0.7 : undefined }}
-              >
-                <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            )}
-
-            {/* Drag Instruction */}
-            {hasMultipleImages && isHovered && !isDragging && productImages.length > 1 && !isMobile && (
-              <div className="absolute bottom-2 left-2 z-20 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full text-white text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
-                ← Drag to rotate →
-              </div>
-            )}
-
-            {/* Quick View Overlay - Hide on mobile or adjust */}
-            {!isMobile && (
-              <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-4 transition-all duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                <span className="bg-white/95 backdrop-blur-sm text-gray-900 px-4 py-2 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2">
-                  👁️ Quick View
-                </span>
-              </div>
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-md transition-all duration-300"
+                  style={{ opacity: isMobile ? 0.7 : 0, ...(isHovered && !isMobile ? { opacity: 1 } : {}) }}
+                >
+                  <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-md transition-all duration-300"
+                  style={{ opacity: isMobile ? 0.7 : 0, ...(isHovered && !isMobile ? { opacity: 1 } : {}) }}
+                >
+                  <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
             )}
 
             {/* Product Image */}
             {!imageError ? (
               <img
                 src={mainImage}
-                alt={`${product.name} - Image ${currentImageIndex + 1}`}
+                alt={product.name}
                 className="w-full h-full object-contain p-4 transition-transform duration-500"
                 style={{ transform: isHovered && !isMobile ? 'scale(1.05)' : 'scale(1)' }}
                 onError={() => setImageError(true)}
@@ -267,7 +247,7 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
                     className={`h-1 rounded-full transition-all duration-300 ${
                       currentImageIndex === idx 
                         ? 'w-4 bg-white' 
-                        : 'w-1.5 bg-white/50 hover:bg-white/70'
+                        : 'w-1.5 bg-white/50'
                     }`}
                   />
                 ))}
@@ -338,7 +318,7 @@ const ProductCard = ({ product, onWishlistToggle, isInWishlist, onAddToCart }) =
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                Add to Cart
               </>
             )}
           </button>

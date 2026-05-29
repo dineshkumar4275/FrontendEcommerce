@@ -385,127 +385,6 @@ const FormInput = ({ label, name, value, onChange, type = "text", required = fal
   );
 };
 
-// Color Picker Component
-const ColorPicker = ({ colors, onChange }) => {
-  const [newColorName, setNewColorName] = useState('');
-  const [newColorCode, setNewColorCode] = useState('#000000');
-
-  const addColor = () => {
-    if (newColorName.trim()) {
-      onChange([...colors, { name: newColorName.trim(), code: newColorCode }]);
-      setNewColorName('');
-      setNewColorCode('#000000');
-    }
-  };
-
-  const removeColor = (index) => {
-    const newColors = colors.filter((_, i) => i !== index);
-    onChange(newColors);
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2 mb-3">
-        {colors.map((color, index) => (
-          <div
-            key={index}
-            className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1"
-          >
-            <div
-              className="w-5 h-5 rounded-full border border-gray-300"
-              style={{ backgroundColor: color.code }}
-            />
-            <span className="text-sm">{color.name}</span>
-            <button
-              type="button"
-              onClick={() => removeColor(index)}
-              className="text-red-500 hover:text-red-700"
-            >
-              <TrashIcon className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Color name (e.g., Navy Blue)"
-          value={newColorName}
-          onChange={(e) => setNewColorName(e.target.value)}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-        />
-        <input
-          type="color"
-          value={newColorCode}
-          onChange={(e) => setNewColorCode(e.target.value)}
-          className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-        />
-        <button
-          type="button"
-          onClick={addColor}
-          className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm"
-        >
-          Add
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// Size Picker Component
-const SizePicker = ({ sizes, onChange }) => {
-  const [newSize, setNewSize] = useState('');
-
-  const addSize = () => {
-    if (newSize.trim() && !sizes.includes(newSize.trim())) {
-      onChange([...sizes, newSize.trim()]);
-      setNewSize('');
-    }
-  };
-
-  const removeSize = (size) => {
-    onChange(sizes.filter(s => s !== size));
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2 mb-3">
-        {sizes.map((size, index) => (
-          <div
-            key={index}
-            className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1"
-          >
-            <span className="text-sm font-medium">{size}</span>
-            <button
-              type="button"
-              onClick={() => removeSize(size)}
-              className="text-red-500 hover:text-red-700"
-            >
-              <TrashIcon className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Size (e.g., L, 42, XL)"
-          value={newSize}
-          onChange={(e) => setNewSize(e.target.value)}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-        />
-        <button
-          type="button"
-          onClick={addSize}
-          className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm"
-        >
-          Add
-        </button>
-      </div>
-    </div>
-  );
-};
-
 // Main New Product Page
 export default function NewProductPage() {
   const router = useRouter();
@@ -578,6 +457,46 @@ export default function NewProductPage() {
     setFormData(prev => ({ ...prev, sizes: newSizes }));
   };
 
+  const addCustomColor = () => {
+    const colorNameInput = document.getElementById('customColorName');
+    const colorCodeInput = document.getElementById('customColorCode');
+    const colorName = colorNameInput?.value.trim();
+    const colorCode = colorCodeInput?.value;
+    
+    if (colorName) {
+      const newColors = [...formData.colors];
+      if (!newColors.some(c => c.name === colorName)) {
+        newColors.push({ name: colorName, code: colorCode });
+        handleColorsChange(newColors);
+        showToast(`${colorName} added`, 'success');
+        colorNameInput.value = '';
+      } else {
+        showToast(`${colorName} already added`, 'error');
+      }
+    } else {
+      showToast('Please enter a color name', 'error');
+    }
+  };
+
+  const addCustomSize = () => {
+    const sizeInput = document.getElementById('customSize');
+    const newSize = sizeInput?.value.trim();
+    
+    if (newSize) {
+      const newSizes = [...formData.sizes];
+      if (!newSizes.includes(newSize)) {
+        newSizes.push(newSize);
+        handleSizesChange(newSizes);
+        showToast(`${newSize} added`, 'success');
+        sizeInput.value = '';
+      } else {
+        showToast(`${newSize} already added`, 'error');
+      }
+    } else {
+      showToast('Please enter a size', 'error');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -643,6 +562,26 @@ export default function NewProductPage() {
   };
 
   const categories = Object.keys(CATEGORY_PRESETS).filter(key => key !== 'default');
+
+  // Color presets for quick add
+  const colorPresets = [
+    { name: "Red", code: "#FF0000" },
+    { name: "Blue", code: "#0000FF" },
+    { name: "Black", code: "#000000" },
+    { name: "White", code: "#FFFFFF" },
+    { name: "Green", code: "#00FF00" },
+    { name: "Yellow", code: "#FFFF00" },
+    { name: "Purple", code: "#800080" },
+    { name: "Pink", code: "#FFC0CB" },
+    { name: "Orange", code: "#FFA500" },
+    { name: "Brown", code: "#8B4513" },
+    { name: "Gray", code: "#808080" },
+    { name: "Navy", code: "#000080" },
+    { name: "Teal", code: "#008080" },
+    { name: "Maroon", code: "#800000" },
+    { name: "Gold", code: "#FFD700" },
+    { name: "Silver", code: "#C0C0C0" }
+  ];
 
   return (
     <div className="max-w-5xl mx-auto pb-10">
@@ -764,7 +703,7 @@ export default function NewProductPage() {
                   onChange={(e) => {
                     setEnableColors(e.target.checked);
                     if (!e.target.checked) {
-                      setFormData(prev => ({ ...prev, colors: [] }));
+                      handleColorsChange([]);
                     }
                   }}
                   className="sr-only peer"
@@ -791,7 +730,7 @@ export default function NewProductPage() {
                   onChange={(e) => {
                     setEnableSizes(e.target.checked);
                     if (!e.target.checked) {
-                      setFormData(prev => ({ ...prev, sizes: [] }));
+                      handleSizesChange([]);
                     }
                   }}
                   className="sr-only peer"
@@ -812,19 +751,87 @@ export default function NewProductPage() {
                 (Toggle off to disable colors)
               </span>
             </h2>
-            {autoColors.length > 0 ? (
-              <>
-                <p className="text-sm text-green-600 mb-3">
-                  ✓ Auto-filled based on category. You can add/remove colors below.
-                </p>
-                <ColorPicker
-                  colors={formData.colors}
-                  onChange={handleColorsChange}
+            
+            {/* Color Presets */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Quick Color Presets</label>
+              <div className="flex flex-wrap gap-2">
+                {colorPresets.map((color, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      const currentColors = formData.colors;
+                      if (!currentColors.some(c => c.name === color.name)) {
+                        handleColorsChange([...currentColors, { name: color.name, code: color.code }]);
+                        showToast(`${color.name} added`, 'success');
+                      } else {
+                        showToast(`${color.name} already added`, 'error');
+                      }
+                    }}
+                    className="w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform"
+                    style={{ backgroundColor: color.code }}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Selected Colors List */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Selected Colors</label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {formData.colors.map((color, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1"
+                  >
+                    <div
+                      className="w-5 h-5 rounded-full border border-gray-300"
+                      style={{ backgroundColor: color.code }}
+                    />
+                    <span className="text-sm">{color.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newColors = formData.colors.filter((_, i) => i !== index);
+                        handleColorsChange(newColors);
+                        showToast(`${color.name} removed`, 'success');
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <TrashIcon className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {formData.colors.length === 0 && (
+                  <p className="text-gray-500 text-sm">No colors selected. Click on color presets above to add.</p>
+                )}
+              </div>
+
+              {/* Add Custom Color */}
+              <div className="flex gap-2 mt-2">
+                <input
+                  type="text"
+                  placeholder="Custom color name"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                  id="customColorName"
                 />
-              </>
-            ) : (
-              <p className="text-gray-500 text-center py-4">No colors for this category</p>
-            )}
+                <input
+                  type="color"
+                  className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                  id="customColorCode"
+                  defaultValue="#000000"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomColor}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -838,19 +845,76 @@ export default function NewProductPage() {
                 (Toggle off to disable sizes)
               </span>
             </h2>
-            {autoSizes.length > 0 ? (
-              <>
-                <p className="text-sm text-green-600 mb-3">
-                  ✓ Auto-filled based on category. You can add/remove sizes below.
-                </p>
-                <SizePicker
-                  sizes={formData.sizes}
-                  onChange={handleSizesChange}
+            
+            {/* Size Presets */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Quick Size Presets</label>
+              <div className="flex flex-wrap gap-2">
+                {["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "6", "7", "8", "9", "10", "11", "12", "13", "28", "30", "32", "34", "36", "38", "40", "42", "44"].map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => {
+                      if (!formData.sizes.includes(size)) {
+                        handleSizesChange([...formData.sizes, size]);
+                        showToast(`${size} added`, 'success');
+                      } else {
+                        showToast(`${size} already added`, 'error');
+                      }
+                    }}
+                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-purple-100 transition"
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Selected Sizes List */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Selected Sizes</label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {formData.sizes.map((size, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1"
+                  >
+                    <span className="text-sm font-medium">{size}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newSizes = formData.sizes.filter((_, i) => i !== index);
+                        handleSizesChange(newSizes);
+                        showToast(`${size} removed`, 'success');
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <TrashIcon className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {formData.sizes.length === 0 && (
+                  <p className="text-gray-500 text-sm">No sizes selected. Click on size presets above to add.</p>
+                )}
+              </div>
+
+              {/* Add Custom Size */}
+              <div className="flex gap-2 mt-2">
+                <input
+                  type="text"
+                  placeholder="Custom size (e.g., 2XL, 42, One Size)"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                  id="customSize"
                 />
-              </>
-            ) : (
-              <p className="text-gray-500 text-center py-4">No sizes for this category</p>
-            )}
+                <button
+                  type="button"
+                  onClick={addCustomSize}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

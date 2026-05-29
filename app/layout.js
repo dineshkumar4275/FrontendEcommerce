@@ -1,7 +1,7 @@
 // app/layout.js
 import { Inter, Poppins } from 'next/font/google';
 import { Providers } from '../src/store/providers';
-import { Footer } from '@/src/components/layout/Footer'; // ✅ FIXED: Added '/layout' to the path
+import { Footer } from '../src/components/layout/Footer'; // ✅ FIXED: Added '/layout' to the path
 import '../src/styles/globals.css';
 
 const inter = Inter({ 

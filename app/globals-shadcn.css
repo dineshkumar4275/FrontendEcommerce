@@ -1,0 +1,51 @@
+/* app/globals-shadcn.css - for shadcn/ui components only */
+@layer base {
+  /* shadcn/ui additional styles */
+  .bg-card {
+    background-color: hsl(var(--card));
+  }
+  
+  .text-card-foreground {
+    color: hsl(var(--card-foreground));
+  }
+  
+  .bg-popover {
+    background-color: hsl(var(--popover));
+  }
+  
+  .text-popover-foreground {
+    color: hsl(var(--popover-foreground));
+  }
+  
+  .bg-muted {
+    background-color: hsl(var(--muted));
+  }
+  
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+  }
+  
+  .bg-accent {
+    background-color: hsl(var(--accent));
+  }
+  
+  .text-accent-foreground {
+    color: hsl(var(--accent-foreground));
+  }
+  
+  .bg-destructive {
+    background-color: hsl(var(--destructive));
+  }
+  
+  .text-destructive-foreground {
+    color: hsl(var(--destructive-foreground));
+  }
+  
+  .ring-ring {
+    --tw-ring-color: hsl(var(--ring));
+  }
+  
+  .focus:ring-ring {
+    --tw-ring-color: hsl(var(--ring));
+  }
+}

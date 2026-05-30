@@ -23,8 +23,8 @@ import {
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
 // ✅ CORRECTED IMPORTS - Using named imports to match your actual exports
-import { Header } from '../../../components/layout/Header';
-import { Footer } from '../../../components/layout/Footer';
+import { Header } from '../../../src/components/layout/Header';
+import { Footer } from '../../../src/components/layout/Footer';
 import { getProductById } from '../../../services/productService';
 import { useCart } from '../../../hooks/useCart';
 import {

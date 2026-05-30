@@ -19,15 +19,10 @@ import {
   ShareIcon,
   ScaleIcon,
   ClockIcon,
-  CurrencyDollarIcon,
-  MapPinIcon,
-  CalendarIcon,
-  RefreshIcon,
-  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-// Import your existing components
+// ✅ CORRECTED IMPORTS - Footer is also in layout folder
 import { Header } from '../../../src/components/layout/Header';
 import { Footer } from '../../../src/components/layout/Footer';
 import { getProductById } from '../../../src/services/productService';
@@ -117,7 +112,6 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState('description');
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [currentImage, setCurrentImage] = useState('');
-  const [shippingDate, setShippingDate] = useState('');
 
   const imageContainerRef = useRef(null);
   const rotationInterval = useRef(null);
@@ -134,14 +128,6 @@ export default function ProductDetailPage() {
   const wishlistIds = new Set(wishlistItems.map(item => item.product_id || item.id));
   const isInWishlist = wishlistIds.has(parseInt(productId));
 
-  // Calculate shipping date (3-5 business days from now)
-  useEffect(() => {
-    const date = new Date();
-    date.setDate(date.getDate() + 5);
-    const options = { weekday: 'short', month: 'short', day: 'numeric' };
-    setShippingDate(date.toLocaleDateString('en-US', options));
-  }, []);
-
   // Build image array from all available image fields
   const productImages = [
     product?.image_url,
@@ -154,10 +140,10 @@ export default function ProductDetailPage() {
   const hasMultipleImages = productImages.length > 1;
 
   const tabs = [
-    { id: 'description', label: 'Product Details' },
+    { id: 'description', label: 'Description' },
     { id: 'specifications', label: 'Specifications' },
-    { id: 'reviews', label: 'Customer Reviews' },
-    { id: 'shipping', label: 'Shipping Info' },
+    { id: 'reviews', label: 'Reviews' },
+    { id: 'shipping', label: 'Shipping' },
   ];
 
   useEffect(() => {
@@ -364,18 +350,19 @@ export default function ProductDetailPage() {
 
   const getColorCode = (colorName) => {
     const colorMap = {
-      'Black/Green': '#1a3a1a',
-      'Black/Blue': '#1a2a4a',
-      'Black/Red': '#4a1a1a',
-      'Black/Gold': '#4a3a1a',
-      'Silver/Black': '#c0c0c0',
-      'Green': '#228B22',
-      'Blue': '#4169E1',
-      'Red': '#DC143C',
-      'Black': '#1a1a1a',
-      'White': '#ffffff',
-      'Gold': '#FFD700',
-      'Silver': '#C0C0C0',
+      Red: '#ef4444',
+      Blue: '#3b82f6',
+      Black: '#1f2937',
+      White: '#ffffff',
+      Gold: '#fbbf24',
+      Silver: '#9ca3af',
+      Green: '#22c55e',
+      Purple: '#9333ea',
+      Pink: '#ec4899',
+      Yellow: '#eab308',
+      Orange: '#f97316',
+      Brown: '#78350f',
+      Gray: '#6b7280',
     };
     return colorMap[colorName] || '#cccccc';
   };
@@ -386,18 +373,18 @@ export default function ProductDetailPage() {
     const hasHalfStar = (rating || 4.5) - fullStars >= 0.5;
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
-        stars.push(<StarSolidIcon key={i} className="h-4 w-4 text-yellow-400" />);
+        stars.push(<StarSolidIcon key={i} className="h-5 w-5 text-yellow-400" />);
       } else if (i === fullStars + 1 && hasHalfStar) {
         stars.push(
           <div key={i} className="relative">
-            <StarSolidIcon className="h-4 w-4 text-yellow-400" />
+            <StarSolidIcon className="h-5 w-5 text-yellow-400" />
             <div className="absolute inset-0 overflow-hidden w-1/2">
-              <StarIcon className="h-4 w-4 text-gray-300" />
+              <StarIcon className="h-5 w-5 text-gray-300" />
             </div>
           </div>
         );
       } else {
-        stars.push(<StarIcon key={i} className="h-4 w-4 text-gray-300" />);
+        stars.push(<StarIcon key={i} className="h-5 w-5 text-gray-300" />);
       }
     }
     return stars;
@@ -407,15 +394,11 @@ export default function ProductDetailPage() {
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
     : 0;
 
-  // Calculate shipping & import charges
-  const shippingCharge = 27.55;
-  const totalPrice = product?.price ? (product.price + shippingCharge).toFixed(2) : 0;
-
   if (loading) {
     return (
       <>
         <Header categories={[]} />
-        <div className="min-h-screen bg-gray-50 pt-20 flex justify-center items-center">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         </div>
         <Footer />
@@ -427,7 +410,7 @@ export default function ProductDetailPage() {
     return (
       <>
         <Header categories={[]} />
-        <div className="min-h-screen bg-gray-50 pt-20 text-center py-20">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20 text-center py-20">
           <div className="text-6xl mb-4">🔍</div>
           <h2 className="text-2xl font-bold">Product Not Found</h2>
           <button
@@ -445,31 +428,28 @@ export default function ProductDetailPage() {
   return (
     <>
       <Header categories={[]} />
-      <div className="min-h-screen bg-gray-50 pt-20">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20">
+        <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
+          <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
             <a href="/" className="hover:text-purple-600">Home</a>
             <span>/</span>
             <a href="/products" className="hover:text-purple-600">Products</a>
             <span>/</span>
-            <a href="/products?category=watches" className="hover:text-purple-600">Watches</a>
-            <span>/</span>
             <span className="text-purple-600 font-medium">{product.name}</span>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Product Images Section - Left Column */}
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Product Images Section */}
             <div>
-              {/* Main Image with Zoom */}
               <div
-                className="relative bg-white rounded-xl overflow-hidden shadow-md border border-gray-200"
+                className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
                 <div
                   ref={imageContainerRef}
-                  className="relative h-96 md:h-[450px] overflow-hidden cursor-zoom-in"
+                  className="relative h-96 md:h-[500px] overflow-hidden cursor-zoom-in"
                   onMouseMove={handleMouseMove}
                   onMouseDown={handleDragStart}
                   onMouseMoveCapture={handleDragMove}
@@ -490,19 +470,24 @@ export default function ProductDetailPage() {
                   <img
                     src={currentImage || 'https://via.placeholder.com/500x500?text=No+Image'}
                     alt={product.name}
-                    className="w-full h-full object-contain p-6 transition-all duration-300"
+                    className="w-full h-full object-contain p-8 transition-all duration-300"
                     style={{ opacity: showZoom ? 0 : 1 }}
                     draggable={false}
                     key={currentImage}
                   />
-                  {/* Discount Badge */}
-                  {discountPercent > 0 && (
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm font-bold shadow-lg">
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    {discountPercent > 0 && (
+                      <span className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 text-white text-sm font-bold shadow-lg">
                         -{discountPercent}% OFF
                       </span>
-                    </div>
-                  )}
+                    )}
+                    {product.is_featured && (
+                      <span className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold shadow-lg">
+                        NEW ARRIVAL
+                      </span>
+                    )}
+                  </div>
                   {/* Navigation arrows */}
                   {hasMultipleImages && !showZoom && !selectedColorObj?.image && (
                     <>
@@ -512,9 +497,9 @@ export default function ProductDetailPage() {
                           setSelectedImage(newIndex);
                           setCurrentImage(productImages[newIndex]);
                         }}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md transition"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md transition"
                       >
-                        <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
+                        <ChevronLeftIcon className="w-6 h-6 text-gray-700" />
                       </button>
                       <button
                         onClick={() => {
@@ -522,25 +507,24 @@ export default function ProductDetailPage() {
                           setSelectedImage(newIndex);
                           setCurrentImage(productImages[newIndex]);
                         }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md transition"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md transition"
                       >
-                        <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+                        <ChevronRightIcon className="w-6 h-6 text-gray-700" />
                       </button>
                     </>
                   )}
                 </div>
               </div>
-              
               {/* Thumbnail Gallery */}
               {hasMultipleImages && !selectedColorObj?.image && (
-                <div className="flex gap-3 mt-4 justify-start overflow-x-auto pb-2">
+                <div className="flex gap-3 mt-4 justify-center overflow-x-auto pb-2">
                   {productImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleThumbnailClick(idx)}
-                      className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                      className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
                         selectedImage === idx
-                          ? 'border-purple-500 shadow-md scale-105'
+                          ? 'border-purple-500 shadow-lg scale-105'
                           : 'border-gray-200 hover:border-gray-400'
                       }`}
                     >
@@ -550,67 +534,85 @@ export default function ProductDetailPage() {
                 </div>
               )}
               {selectedColorObj?.image && (
-                <div className="text-center mt-3 text-sm text-purple-600">
+                <div className="text-center mt-4 text-sm text-purple-600">
                   Showing {selectedColor} variant
                 </div>
               )}
             </div>
 
-            {/* Product Info - Right Column */}
-            <div className="space-y-4">
-              {/* Brand */}
+            {/* Product Info */}
+            <div>
               {product.brand && (
-                <div>
+                <div className="mb-2">
                   <span className="text-sm text-purple-600 font-semibold">{product.brand}</span>
                 </div>
               )}
-              
-              {/* Title */}
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{product.name}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
 
               {/* Rating */}
-              <div className="flex items-center flex-wrap gap-3">
+              <div className="flex items-center flex-wrap gap-3 mb-4">
                 <div className="flex items-center gap-1">{renderStars(product.rating)}</div>
                 <span className="text-sm font-semibold text-amber-600">{product.rating || 4.5}</span>
-                <span className="text-sm text-blue-600 hover:underline cursor-pointer">{product.review_count || 128} ratings</span>
-                <span className="text-sm text-green-600">50+ bought in past month</span>
+                <span className="text-sm text-blue-600">{product.review_count || 128} ratings</span>
+                <div className="h-4 w-px bg-gray-300" />
+                <span className="text-sm text-green-600 flex items-center gap-1">
+                  <CheckIcon className="w-4 h-4" />
+                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                </span>
               </div>
 
-              {/* Price Section */}
-              <div className="space-y-2">
+              {/* Price */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-baseline gap-3 flex-wrap">
-                  {discountPercent > 0 && product.compare_price && (
-                    <span className="text-sm text-gray-500 line-through">
-                      ${product.compare_price?.toFixed(2)}
+                  <span className="text-3xl md:text-4xl font-bold text-purple-600">
+                    ₹{product.price?.toLocaleString()}
+                  </span>
+                  {product.compare_price && (
+                    <span className="text-lg text-gray-400 line-through">
+                      ₹{product.compare_price?.toLocaleString()}
                     </span>
                   )}
-                  <span className="text-2xl md:text-3xl font-bold text-gray-900">
-                    ${product.price?.toFixed(2)}
-                  </span>
                   {discountPercent > 0 && (
                     <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded">
                       Save {discountPercent}%
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-green-600 font-semibold">Low Price Guarantee</p>
+                <p className="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery</p>
               </div>
 
-              {/* Shipping & Import Charges */}
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">${shippingCharge.toFixed(2)} Shipping & Import Charges to India</span>
-                  <span className="text-xs text-gray-500">Details</span>
+              {/* Size Selector */}
+              {product.hasSizes && product.sizes && product.sizes.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <label className="text-sm font-semibold text-gray-700">Select Size</label>
+                    <button className="text-xs text-purple-600 hover:underline flex items-center gap-1">
+                      <ScaleIcon className="w-3 h-3" /> Size Chart
+                    </button>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => handleSizeChange(size)}
+                        className={`w-12 h-12 rounded-xl text-sm font-semibold transition-all ${
+                          selectedSize === size
+                            ? 'bg-purple-600 text-white shadow-md ring-2 ring-purple-300 ring-offset-2'
+                            : 'bg-gray-100 text-gray-700 hover:bg-purple-100 border border-gray-200'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedSize && <p className="text-xs text-gray-500 mt-2">Selected: {selectedSize}</p>}
                 </div>
-                <div className="text-sm text-gray-500">
-                  Available at a lower price from other sellers that may not offer free shipping.
-                </div>
-              </div>
+              )}
 
-              {/* Color Selector */}
+              {/* 🎨 COLOR SELECTOR - Changes image when clicked */}
               {product.hasColors && product.colors && product.colors.length > 0 && (
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Color: <span className="text-purple-600">{selectedColor}</span></label>
+                <div className="mb-6">
+                  <label className="text-sm font-semibold text-gray-700 mb-3 block">Select Color</label>
                   <div className="flex gap-3 flex-wrap">
                     {product.colors.map((color) => {
                       const colorName = typeof color === 'object' ? color.name : color;
@@ -621,81 +623,65 @@ export default function ProductDetailPage() {
                         <button
                           key={colorName}
                           onClick={() => handleColorChange(colorName, typeof color === 'object' ? color : null)}
-                          className={`relative transition-all ${
+                          className={`relative w-12 h-12 rounded-full transition-all ${
                             isSelected
-                              ? 'ring-2 ring-purple-600 ring-offset-2 scale-105'
+                              ? 'ring-2 ring-purple-600 ring-offset-2 scale-110'
                               : 'hover:scale-105'
                           }`}
+                          style={{ backgroundColor: colorCode }}
                           title={colorName}
                         >
-                          <div 
-                            className="w-8 h-8 rounded-full border-2 border-gray-300"
-                            style={{ backgroundColor: colorCode }}
-                          />
                           {isSelected && (
-                            <CheckIcon className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 text-white rounded-full p-0.5" />
+                            <CheckIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white drop-shadow" />
                           )}
                         </button>
                       );
                     })}
                   </div>
+                  {selectedColor && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Selected: {selectedColor}
+                      {selectedColorObj?.image && (
+                        <span className="text-green-600 ml-2">✓ Color image loaded</span>
+                      )}
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* Key Features */}
-              <div className="space-y-2">
-                <div className="text-sm text-gray-700">
-                  <span className="font-semibold">Stainless Steel Band, 100-meter water resistance</span>
-                </div>
-                <div className="text-sm text-gray-700">
-                  Resin Case and Resin Bezel, Triple-fold Clasp
-                </div>
-                <div className="text-sm text-gray-700">
-                  Timer Bezel, Resin Glass, Date, day display
-                </div>
-                <div className="text-sm text-gray-700">
-                  Analog: 3 hands (hour, minute, second), Approx. battery life: 3 years on SR6265W
+              {/* Quantity Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white transition"
+                    >
+                      <MinusIcon className="w-4 h-4" />
+                    </button>
+                    <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                      className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white transition"
+                    >
+                      <PlusIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <span className="text-sm text-gray-500">{product.stock - quantity} items left</span>
                 </div>
               </div>
 
-              {/* Delivery Date */}
-              <div className="flex items-center gap-2 text-sm">
-                <CalendarIcon className="w-4 h-4 text-gray-500" />
-                <span className="font-semibold">Delivery:</span>
-                <span className="text-green-700 font-semibold">{shippingDate}</span>
-              </div>
-
-              {/* Stock Status */}
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-green-700 font-semibold">In Stock</span>
-              </div>
-
-              {/* Quantity and Add to Cart */}
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white transition"
-                  >
-                    <MinusIcon className="w-3 h-3" />
-                  </button>
-                  <span className="w-10 text-center font-semibold">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                    className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white transition"
-                  >
-                    <PlusIcon className="w-3 h-3" />
-                  </button>
-                </div>
+              {/* Action Buttons */}
+              <div className="flex gap-4">
                 <button
                   onClick={handleAddToCart}
                   disabled={adding || product.stock === 0}
-                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 py-2.5 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition"
                 >
                   {adding ? (
                     <>
-                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+                      <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path
                           className="opacity-75"
@@ -707,26 +693,19 @@ export default function ProductDetailPage() {
                     </>
                   ) : (
                     <>
-                      <ShoppingCartIcon className="w-4 h-4" />
-                      Add to Cart
+                      <ShoppingCartIcon className="w-5 h-5" />
+                      {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                     </>
                   )}
-                </button>
-                <button
-                  onClick={handleAddToCart}
-                  disabled={adding || product.stock === 0}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold transition"
-                >
-                  Buy Now
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleWishlistToggle}
-                  className={`p-2.5 rounded-lg border-2 transition-all ${
+                  className={`p-3.5 rounded-xl border-2 transition-all ${
                     isInWishlist
-                      ? 'border-red-500 bg-red-500 text-white'
-                      : 'border-gray-300 hover:border-purple-300'
+                      ? 'border-red-500 bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md'
+                      : 'border-gray-200 hover:border-purple-300'
                   }`}
                 >
                   {isInWishlist ? <HeartSolidIcon className="h-5 w-5" /> : <HeartIcon className="h-5 w-5 text-gray-600" />}
@@ -734,14 +713,14 @@ export default function ProductDetailPage() {
                 <div className="relative">
                   <button
                     onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="p-2.5 rounded-lg border-2 border-gray-300 hover:border-purple-300 transition"
+                    className="p-3.5 rounded-xl border-2 border-gray-200 hover:border-purple-300 transition"
                   >
                     <ShareIcon className="h-5 w-5 text-gray-600" />
                   </button>
                   {showShareMenu && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowShareMenu(false)} />
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border z-50">
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border z-50">
                         <button
                           onClick={handleShare}
                           className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
@@ -754,154 +733,121 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              {/* Shipping/Seller Info */}
-              <div className="border-t pt-4 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping:</span>
-                  <span className="text-gray-900">Amazon.com</span>
+              {/* Delivery Info */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <TruckIcon className="h-5 w-5 text-purple-600" />
+                  <span className="font-semibold text-gray-800">Delivery Information</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Returns:</span>
-                  <span className="text-green-700">30-day refund/replacement</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Payment:</span>
-                  <span className="text-gray-900">Secure transaction</span>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-gray-500">Estimated Delivery</p>
+                    <p className="font-medium text-gray-800">3-5 business days</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Free Shipping</p>
+                    <p className="font-medium text-green-600">On orders above ₹500</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Return Policy</p>
+                    <p className="font-medium text-gray-800">7 days easy returns</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Cash on Delivery</p>
+                    <p className="font-medium text-gray-800">Available</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Add to List Link */}
-              <button className="text-blue-600 hover:underline text-sm flex items-center gap-1">
-                <HeartIcon className="w-4 h-4" />
-                Add to List
-              </button>
+              {/* Features */}
+              <div className="mt-6 flex gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <ShieldCheckIcon className="w-4 h-4 text-green-600" />
+                  <span className="text-gray-600">Secure Payment</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ArrowPathIcon className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">Easy Returns</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ClockIcon className="w-4 h-4 text-orange-600" />
+                  <span className="text-gray-600">24/7 Support</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Product Tabs Section */}
-          <div className="mt-12 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="border-b border-gray-200 flex flex-wrap gap-6 px-6">
+          {/* Product Tabs */}
+          <div className="mt-12">
+            <div className="border-b border-gray-200 flex flex-wrap gap-6">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-2 py-3 text-sm font-semibold transition-all ${
+                  className={`px-4 py-3 text-sm font-semibold transition-all ${
                     activeTab === tab.id
                       ? 'text-purple-600 border-b-2 border-purple-600'
-                      : 'text-gray-600 hover:text-purple-600'
+                      : 'text-gray-500 hover:text-purple-600'
                   }`}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
-            <div className="p-6">
-              {/* Product Details Tab */}
+            <div className="py-6">
+              {/* Description Tab */}
               {activeTab === 'description' && (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Top Highlights</h3>
-                    <ul className="list-disc list-inside text-gray-600 space-y-1">
-                      <li>Stainless Steel Band, 100-meter water resistance</li>
-                      <li>Resin Case and Resin Bezel, Triple-fold Clasp</li>
-                      <li>Timer Bezel, Resin Glass, Date, day display</li>
-                      <li>Analog: 3 hands (hour, minute, second), Approx. battery life: 3 years on SR6265W</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">About this item</h3>
-                    <p className="text-gray-600">{product.description || product.about || 'Casio MRW200H Series offers reliable timekeeping with 100m water resistance, making it perfect for daily wear and water activities.'}</p>
-                  </div>
+                <div className="prose max-w-none">
+                  <p className="text-gray-600">{product.description || 'No description available.'}</p>
                 </div>
               )}
 
               {/* Specifications Tab */}
               {activeTab === 'specifications' && (
                 <div className="grid md:grid-cols-2 gap-4">
+                  {product.brand && (
+                    <div className="flex py-2 border-b">
+                      <span className="w-32 text-gray-500">Brand</span>
+                      <span className="text-gray-800 font-medium">{product.brand}</span>
+                    </div>
+                  )}
                   <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Brand</span>
-                    <span className="text-gray-800 font-medium">{product.brand || 'Casio'}</span>
+                    <span className="w-32 text-gray-500">Category</span>
+                    <span className="text-gray-800 font-medium capitalize">{product.category}</span>
                   </div>
                   <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Model</span>
-                    <span className="text-gray-800 font-medium">{product.model || 'MRW200H'}</span>
-                  </div>
-                  <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Water Resistance</span>
-                    <span className="text-gray-800 font-medium">100 meters (330 feet)</span>
-                  </div>
-                  <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Band Material</span>
-                    <span className="text-gray-800 font-medium">Stainless Steel / Resin</span>
-                  </div>
-                  <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Case Material</span>
-                    <span className="text-gray-800 font-medium">Resin</span>
-                  </div>
-                  <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Display Type</span>
-                    <span className="text-gray-800 font-medium">Analog</span>
-                  </div>
-                  <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Battery Life</span>
-                    <span className="text-gray-800 font-medium">3 years</span>
-                  </div>
-                  <div className="flex py-2 border-b">
-                    <span className="w-40 text-gray-500">Warranty</span>
-                    <span className="text-gray-800 font-medium">{product.warranty || '1 Year Manufacturer Warranty'}</span>
+                    <span className="w-32 text-gray-500">Stock</span>
+                    <span className="text-gray-800 font-medium">{product.stock} units</span>
                   </div>
                 </div>
               )}
 
-              {/* Customer Reviews Tab */}
+              {/* Reviews Tab */}
               {activeTab === 'reviews' && (
                 <div>
-                  <div className="flex items-center gap-6 mb-6">
+                  <div className="flex items-center gap-4 mb-6">
                     <div className="text-center">
                       <div className="text-4xl font-bold text-gray-800">{product.rating || 4.5}</div>
                       <div className="flex items-center gap-1 mt-1">{renderStars(product.rating)}</div>
-                      <div className="text-sm text-gray-500 mt-1">{product.review_count || 128} global ratings</div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="space-y-1">
-                        {[5, 4, 3, 2, 1].map((star) => {
-                          const percentages = {5: 72, 4: 18, 3: 5, 2: 3, 1: 2};
-                          return (
-                            <div key={star} className="flex items-center gap-2">
-                              <span className="text-sm w-8">{star}★</span>
-                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-yellow-400 rounded-full"
-                                  style={{ width: `${percentages[star]}%` }}
-                                />
-                              </div>
-                              <span className="text-sm text-gray-500 w-12">{percentages[star]}%</span>
-                            </div>
-                          );
-                        })}
-                      </div>
+                      <div className="text-sm text-gray-500 mt-1">{product.review_count || 128} reviews</div>
                     </div>
                   </div>
-                  <button className="mt-4 px-6 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition">
+                  <button className="mt-6 px-6 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition">
                     Write a Review
                   </button>
                 </div>
               )}
 
-              {/* Shipping Info Tab */}
+              {/* Shipping Tab */}
               {activeTab === 'shipping' && (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Delivery Information</h3>
-                    <p className="text-gray-600">Free standard shipping on orders above $25. Delivery typically takes 3-5 business days.</p>
+                    <h3 className="font-semibold text-gray-800 mb-2">Shipping Information</h3>
+                    <p className="text-gray-600">Free standard shipping on all orders above ₹500. Delivery typically takes 3-5 business days.</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Returns Policy</h3>
-                    <p className="text-gray-600">Easy returns within 30 days of delivery. Items must be unused and in original packaging.</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">International Shipping</h3>
-                    <p className="text-gray-600">We ship worldwide. Shipping charges and import duties calculated at checkout.</p>
+                    <h3 className="font-semibold text-gray-800 mb-2">Return Policy</h3>
+                    <p className="text-gray-600">Easy returns within 7 days of delivery. Items must be unused and in original packaging.</p>
                   </div>
                 </div>
               )}

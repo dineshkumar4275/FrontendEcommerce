@@ -22,9 +22,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-// ✅ FIXED: Use named imports to match your actual exports
+// ✅ CORRECTED IMPORTS - Using named imports to match your actual exports
 import { Header } from '../../../components/layout/Header';
-import { Footer } from '../../../components/Footer';
+import { Footer } from '../../../components/layout/Footer';
 import { getProductById } from '../../../services/productService';
 import { useCart } from '../../../hooks/useCart';
 import {
@@ -43,7 +43,7 @@ const normalizeProduct = (product) => {
   let hasColors = false;
   let hasSizes = false;
 
-  // Normalize colors - handle array, JSON string, null, invalid JSON
+  // Normalize colors
   if (product.colors !== undefined && product.colors !== null) {
     if (Array.isArray(product.colors)) {
       colors = product.colors;
@@ -83,7 +83,6 @@ const normalizeProduct = (product) => {
     }
   }
 
-  // Handle snake_case from backend
   const backendHasColors = product.has_colors !== undefined ? product.has_colors : product.hasColors;
   const backendHasSizes = product.has_sizes !== undefined ? product.has_sizes : product.hasSizes;
 
@@ -175,9 +174,7 @@ export default function ProductDetailPage() {
       setSelectedColor(firstColorName);
       setSelectedColorObj(firstColorObj);
       
-      // Set initial image based on first color's image
       if (firstColorObj && firstColorObj.image) {
-        console.log('Initial color image:', firstColorObj.image);
         setCurrentImage(firstColorObj.image);
         setSelectedImage(-1);
       } else {
@@ -188,7 +185,7 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  // Auto-rotate images (only when not using color-specific images)
+  // Auto-rotate images
   useEffect(() => {
     const shouldAutoRotate = hasMultipleImages && !isDragging && !isRotating && !showZoom && !selectedColorObj?.image;
     if (shouldAutoRotate) {
@@ -232,29 +229,25 @@ export default function ProductDetailPage() {
     }
   };
 
-  // 🔥 COLOR CHANGE HANDLER - Changes image immediately
+  // Color change handler - changes image immediately
   const handleColorChange = (colorName, colorObj = null) => {
     console.log('Color selected:', colorName, colorObj);
     
     setSelectedColor(colorName);
     setSelectedColorObj(colorObj);
     
-    // Change image based on selected color
     if (colorObj && colorObj.image) {
-      console.log('✅ Changing to color-specific image:', colorObj.image);
+      console.log('Changing to color image:', colorObj.image);
       setCurrentImage(colorObj.image);
       setSelectedImage(-1);
     } else {
-      // Fallback: try to find image by color name in URLs
       const colorLower = colorName.toLowerCase();
       const matchingImage = productImages.find(img => 
         img && img.toLowerCase().includes(colorLower)
       );
       if (matchingImage) {
-        console.log('✅ Found matching image by name:', matchingImage);
         setCurrentImage(matchingImage);
       } else {
-        console.log('⚠️ No matching image, using default');
         setCurrentImage(productImages[0] || product?.image_url);
       }
     }
@@ -352,7 +345,7 @@ export default function ProductDetailPage() {
   const handleThumbnailClick = (index) => {
     setSelectedImage(index);
     setCurrentImage(productImages[index]);
-    setSelectedColorObj(null); // Clear color selection when manually selecting image
+    setSelectedColorObj(null);
   };
 
   const getColorCode = (colorName) => {
@@ -447,7 +440,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Product Images Gallery with Zoom */}
+            {/* Product Images Section */}
             <div>
               <div
                 className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg"
@@ -463,7 +456,6 @@ export default function ProductDetailPage() {
                   onMouseUp={handleDragEnd}
                   onMouseLeave={handleDragEnd}
                 >
-                  {/* Zoom overlay */}
                   {showZoom && (
                     <div
                       className="absolute inset-0 z-10 pointer-events-none"
@@ -541,7 +533,6 @@ export default function ProductDetailPage() {
                   ))}
                 </div>
               )}
-              {/* Color image indicator */}
               {selectedColorObj?.image && (
                 <div className="text-center mt-4 text-sm text-purple-600">
                   Showing {selectedColor} variant
@@ -626,7 +617,6 @@ export default function ProductDetailPage() {
                     {product.colors.map((color) => {
                       const colorName = typeof color === 'object' ? color.name : color;
                       const colorCode = typeof color === 'object' ? color.code : getColorCode(colorName);
-                      const colorImage = typeof color === 'object' ? color.image : undefined;
                       const isSelected = selectedColor === colorName;
                       
                       return (
@@ -809,16 +799,6 @@ export default function ProductDetailPage() {
               {activeTab === 'description' && (
                 <div className="prose max-w-none">
                   <p className="text-gray-600">{product.description || 'No description available.'}</p>
-                  {product.features && typeof product.features === 'string' && (
-                    <div className="mt-4">
-                      <h3 className="font-semibold text-gray-800 mb-2">Key Features</h3>
-                      <ul className="list-disc list-inside text-gray-600">
-                        {product.features.split(',').map((feature, idx) => (
-                          <li key={idx}>{feature.trim()}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -835,66 +815,10 @@ export default function ProductDetailPage() {
                     <span className="w-32 text-gray-500">Category</span>
                     <span className="text-gray-800 font-medium capitalize">{product.category}</span>
                   </div>
-                  {product.sub_category && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Sub Category</span>
-                      <span className="text-gray-800 font-medium capitalize">{product.sub_category}</span>
-                    </div>
-                  )}
-                  {product.model && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Model</span>
-                      <span className="text-gray-800 font-medium">{product.model}</span>
-                    </div>
-                  )}
-                  {product.material && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Material</span>
-                      <span className="text-gray-800 font-medium">{product.material}</span>
-                    </div>
-                  )}
-                  {product.weight && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Weight</span>
-                      <span className="text-gray-800 font-medium">{product.weight}</span>
-                    </div>
-                  )}
-                  {product.dimensions && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Dimensions</span>
-                      <span className="text-gray-800 font-medium">{product.dimensions}</span>
-                    </div>
-                  )}
-                  {product.warranty && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Warranty</span>
-                      <span className="text-gray-800 font-medium">{product.warranty}</span>
-                    </div>
-                  )}
-                  {product.hasSizes && product.sizes && product.sizes.length > 0 && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Sizes</span>
-                      <span className="text-gray-800 font-medium">{product.sizes.join(', ')}</span>
-                    </div>
-                  )}
-                  {product.hasColors && product.colors && product.colors.length > 0 && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Colors</span>
-                      <span className="text-gray-800 font-medium">
-                        {product.colors.map(c => (typeof c === 'object' ? c.name : c)).join(', ')}
-                      </span>
-                    </div>
-                  )}
                   <div className="flex py-2 border-b">
                     <span className="w-32 text-gray-500">Stock</span>
                     <span className="text-gray-800 font-medium">{product.stock} units</span>
                   </div>
-                  {product.sku && (
-                    <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">SKU</span>
-                      <span className="text-gray-800 font-medium">{product.sku}</span>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -907,43 +831,6 @@ export default function ProductDetailPage() {
                       <div className="flex items-center gap-1 mt-1">{renderStars(product.rating)}</div>
                       <div className="text-sm text-gray-500 mt-1">{product.review_count || 128} reviews</div>
                     </div>
-                    <div className="flex-1">
-                      <div className="space-y-2">
-                        {[5, 4, 3, 2, 1].map((star) => (
-                          <div key={star} className="flex items-center gap-2">
-                            <span className="text-sm w-8">{star}★</span>
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-yellow-400 rounded-full"
-                                style={{ width: `${star === 5 ? 70 : star === 4 ? 20 : star === 3 ? 5 : star === 2 ? 3 : 2}%` }}
-                              />
-                            </div>
-                            <span className="text-sm text-gray-500 w-12">
-                              {star === 5 ? '70%' : star === 4 ? '20%' : star === 3 ? '5%' : star === 2 ? '3%' : '2%'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((review) => (
-                      <div key={review} className="border-b pb-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                            <span className="text-purple-600 font-semibold text-sm">U</span>
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-800">User{review}</div>
-                            <div className="flex items-center gap-1">
-                              {renderStars(4 + (review % 2))}
-                              <span className="text-xs text-gray-400 ml-2">2 days ago</span>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-gray-600 text-sm">Great product! Exactly as described. Fast shipping and good quality.</p>
-                      </div>
-                    ))}
                   </div>
                   <button className="mt-6 px-6 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition">
                     Write a Review
@@ -961,10 +848,6 @@ export default function ProductDetailPage() {
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-2">Return Policy</h3>
                     <p className="text-gray-600">Easy returns within 7 days of delivery. Items must be unused and in original packaging.</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Cash on Delivery</h3>
-                    <p className="text-gray-600">COD available for orders up to ₹10,000. Small convenience fee may apply.</p>
                   </div>
                 </div>
               )}

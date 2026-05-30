@@ -22,17 +22,17 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-// ✅ CORRECTED IMPORTS - Using named imports to match your actual exports
+// ✅ CORRECTED IMPORTS - Adding 'src/' prefix to match your project structure
 import { Header } from '../../../src/components/layout/Header';
-import { Footer } from '../../../src/components/layout/Footer';
-import { getProductById } from '../../../services/productService';
-import { useCart } from '../../../hooks/useCart';
+import { Footer } from '../../../src/components/Footer';
+import { getProductById } from '../../../src/services/productService';
+import { useCart } from '../../../src/hooks/useCart';
 import {
   addToWishlistAsync,
   removeFromWishlistAsync,
   toggleWishlistLocal,
   fetchWishlist,
-} from '../../../store/slices/wishlistSlice';
+} from '../../../src/store/slices/wishlistSlice';
 
 // Helper function to normalize product data
 const normalizeProduct = (product) => {

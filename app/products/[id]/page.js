@@ -43,17 +43,28 @@ const normalizeProduct = (product) => {
   let hasColors = false;
   let hasSizes = false;
 
+  console.log('Raw product data:', {
+    colors_raw: product.colors,
+    sizes_raw: product.sizes,
+    has_colors_raw: product.has_colors,
+    hasColors_raw: product.hasColors,
+    has_sizes_raw: product.has_sizes,
+    hasSizes_raw: product.hasSizes
+  });
+
   // Normalize colors
   if (product.colors !== undefined && product.colors !== null) {
     if (Array.isArray(product.colors)) {
       colors = product.colors;
       hasColors = colors.length > 0;
+      console.log('Colors array detected:', colors);
     } else if (typeof product.colors === 'string') {
       try {
         const parsed = JSON.parse(product.colors);
         if (Array.isArray(parsed)) {
           colors = parsed;
           hasColors = colors.length > 0;
+          console.log('Colors string parsed:', colors);
         }
       } catch (e) {
         console.warn('Failed to parse colors JSON:', e);
@@ -68,12 +79,14 @@ const normalizeProduct = (product) => {
     if (Array.isArray(product.sizes)) {
       sizes = product.sizes;
       hasSizes = sizes.length > 0;
+      console.log('Sizes array detected:', sizes);
     } else if (typeof product.sizes === 'string') {
       try {
         const parsed = JSON.parse(product.sizes);
         if (Array.isArray(parsed)) {
           sizes = parsed;
           hasSizes = sizes.length > 0;
+          console.log('Sizes string parsed:', sizes);
         }
       } catch (e) {
         console.warn('Failed to parse sizes JSON:', e);
@@ -83,15 +96,26 @@ const normalizeProduct = (product) => {
     }
   }
 
+  // Handle snake_case from backend
   const backendHasColors = product.has_colors !== undefined ? product.has_colors : product.hasColors;
   const backendHasSizes = product.has_sizes !== undefined ? product.has_sizes : product.hasSizes;
+
+  const finalHasColors = hasColors || backendHasColors || false;
+  const finalHasSizes = hasSizes || backendHasSizes || false;
+
+  console.log('Final normalized values:', {
+    colors,
+    sizes,
+    hasColors: finalHasColors,
+    hasSizes: finalHasSizes
+  });
 
   return {
     ...product,
     colors,
     sizes,
-    hasColors: hasColors || backendHasColors || false,
-    hasSizes: hasSizes || backendHasSizes || false,
+    hasColors: finalHasColors,
+    hasSizes: finalHasSizes,
   };
 };
 
@@ -157,6 +181,12 @@ export default function ProductDetailPage() {
 
   // Initialize color selection and set current image
   useEffect(() => {
+    console.log('Product state changed:', {
+      hasColors: product?.hasColors,
+      colors: product?.colors,
+      colorsLength: product?.colors?.length
+    });
+    
     if (product && product.hasColors && product.colors && product.colors.length > 0) {
       let firstColorName = '';
       let firstColorObj = null;
@@ -185,6 +215,13 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
+  // Initialize size selection
+  useEffect(() => {
+    if (product && product.hasSizes && product.sizes && product.sizes.length > 0) {
+      setSelectedSize(product.sizes[0]);
+    }
+  }, [product]);
+
   // Auto-rotate images
   useEffect(() => {
     const shouldAutoRotate = hasMultipleImages && !isDragging && !isRotating && !showZoom && !selectedColorObj?.image;
@@ -210,14 +247,17 @@ export default function ProductDetailPage() {
     try {
       setLoading(true);
       const data = await getProductById(productId);
+      console.log('API Response:', data);
       if (data) {
         const normalized = normalizeProduct(data);
-        setProduct(normalized);
-        console.log('Product loaded:', { 
-          name: normalized.name, 
+        console.log('Normalized product:', {
+          name: normalized.name,
           colors: normalized.colors,
-          hasColors: normalized.hasColors 
+          sizes: normalized.sizes,
+          hasColors: normalized.hasColors,
+          hasSizes: normalized.hasSizes
         });
+        setProduct(normalized);
       } else {
         router.push('/products');
       }
@@ -390,8 +430,17 @@ export default function ProductDetailPage() {
     return stars;
   };
 
-  const discountPercent = product?.compare_price && product?.compare_price > product?.price
-    ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
+  // ✅ FIXED: Convert price to number safely
+  const productPrice = typeof product?.price === 'number' 
+    ? product.price 
+    : parseFloat(product?.price) || 0;
+  
+  const comparePriceValue = product?.compare_price 
+    ? (typeof product.compare_price === 'number' ? product.compare_price : parseFloat(product.compare_price) || 0)
+    : 0;
+
+  const discountPercent = comparePriceValue > productPrice
+    ? Math.round(((comparePriceValue - productPrice) / comparePriceValue) * 100)
     : 0;
 
   if (loading) {
@@ -565,11 +614,11 @@ export default function ProductDetailPage() {
               <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span className="text-3xl md:text-4xl font-bold text-purple-600">
-                    ₹{product.price?.toLocaleString()}
+                    ₹{productPrice.toLocaleString()}
                   </span>
-                  {product.compare_price && (
+                  {comparePriceValue > 0 && (
                     <span className="text-lg text-gray-400 line-through">
-                      ₹{product.compare_price?.toLocaleString()}
+                      ₹{comparePriceValue.toLocaleString()}
                     </span>
                   )}
                   {discountPercent > 0 && (
@@ -581,7 +630,7 @@ export default function ProductDetailPage() {
                 <p className="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery</p>
               </div>
 
-              {/* Size Selector */}
+              {/* ✅ SIZE SELECTOR - FIXED */}
               {product.hasSizes && product.sizes && product.sizes.length > 0 && (
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-3">
@@ -609,15 +658,20 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* 🎨 COLOR SELECTOR - Changes image when clicked */}
+              {/* ✅ COLOR SELECTOR - FIXED - Will show when colors exist */}
               {product.hasColors && product.colors && product.colors.length > 0 && (
                 <div className="mb-6">
-                  <label className="text-sm font-semibold text-gray-700 mb-3 block">Select Color</label>
+                  <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                    Select Color: <span className="text-purple-600">{selectedColor}</span>
+                  </label>
                   <div className="flex gap-3 flex-wrap">
                     {product.colors.map((color) => {
+                      // Handle both string and object formats
                       const colorName = typeof color === 'object' ? color.name : color;
-                      const colorCode = typeof color === 'object' ? color.code : getColorCode(colorName);
+                      const colorCode = typeof color === 'object' && color.code ? color.code : getColorCode(colorName);
                       const isSelected = selectedColor === colorName;
+                      
+                      console.log('Rendering color:', { colorName, colorCode, isSelected });
                       
                       return (
                         <button
@@ -634,18 +688,34 @@ export default function ProductDetailPage() {
                           {isSelected && (
                             <CheckIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white drop-shadow" />
                           )}
+                          <span className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-gray-600 whitespace-nowrap">
+                            {colorName}
+                          </span>
                         </button>
                       );
                     })}
                   </div>
                   {selectedColor && (
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-gray-500 mt-6">
                       Selected: {selectedColor}
                       {selectedColorObj?.image && (
                         <span className="text-green-600 ml-2">✓ Color image loaded</span>
                       )}
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* Debug info - Remove in production */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-gray-400 border-t pt-2 mt-2">
+                  <details>
+                    <summary>Debug Info (Admin Only)</summary>
+                    <p>hasColors: {product.hasColors ? 'true' : 'false'}</p>
+                    <p>Colors: {JSON.stringify(product.colors)}</p>
+                    <p>hasSizes: {product.hasSizes ? 'true' : 'false'}</p>
+                    <p>Sizes: {JSON.stringify(product.sizes)}</p>
+                  </details>
                 </div>
               )}
 

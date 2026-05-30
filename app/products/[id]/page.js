@@ -19,7 +19,11 @@ import {
   ShareIcon,
   ScaleIcon,
   ClockIcon,
+  CurrencyDollarIcon,
+  MapPinIcon,
   CalendarIcon,
+  RefreshIcon,
+  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
@@ -378,9 +382,8 @@ export default function ProductDetailPage() {
 
   const renderStars = (rating) => {
     const stars = [];
-    const numRating = typeof rating === 'number' ? rating : parseFloat(rating) || 4.5;
-    const fullStars = Math.floor(numRating);
-    const hasHalfStar = numRating - fullStars >= 0.5;
+    const fullStars = Math.floor(rating || 4.5);
+    const hasHalfStar = (rating || 4.5) - fullStars >= 0.5;
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
         stars.push(<StarSolidIcon key={i} className="h-4 w-4 text-yellow-400" />);
@@ -400,23 +403,13 @@ export default function ProductDetailPage() {
     return stars;
   };
 
-  // ✅ FIXED: Convert price to number safely
-  const productPrice = typeof product?.price === 'number' 
-    ? product.price 
-    : parseFloat(product?.price) || 0;
-  
-  const comparePriceValue = product?.compare_price 
-    ? (typeof product.compare_price === 'number' ? product.compare_price : parseFloat(product.compare_price) || 0)
+  const discountPercent = product?.compare_price && product?.compare_price > product?.price
+    ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
     : 0;
-  
-  const shippingCharge = 27.55;
-  const totalPrice = (productPrice + shippingCharge).toFixed(2);
-  const displayPrice = productPrice.toFixed(2);
-  const displayComparePrice = comparePriceValue > 0 ? comparePriceValue.toFixed(2) : null;
 
-  const discountPercent = comparePriceValue > productPrice
-    ? Math.round(((comparePriceValue - productPrice) / comparePriceValue) * 100)
-    : 0;
+  // Calculate shipping & import charges
+  const shippingCharge = 27.55;
+  const totalPrice = product?.price ? (product.price + shippingCharge).toFixed(2) : 0;
 
   if (loading) {
     return (
@@ -583,16 +576,16 @@ export default function ProductDetailPage() {
                 <span className="text-sm text-green-600">50+ bought in past month</span>
               </div>
 
-              {/* Price Section - FIXED */}
+              {/* Price Section */}
               <div className="space-y-2">
                 <div className="flex items-baseline gap-3 flex-wrap">
-                  {discountPercent > 0 && displayComparePrice && (
+                  {discountPercent > 0 && product.compare_price && (
                     <span className="text-sm text-gray-500 line-through">
-                      ${displayComparePrice}
+                      ${product.compare_price?.toFixed(2)}
                     </span>
                   )}
                   <span className="text-2xl md:text-3xl font-bold text-gray-900">
-                    ${displayPrice}
+                    ${product.price?.toFixed(2)}
                   </span>
                   {discountPercent > 0 && (
                     <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded">
@@ -603,14 +596,11 @@ export default function ProductDetailPage() {
                 <p className="text-sm text-green-600 font-semibold">Low Price Guarantee</p>
               </div>
 
-              {/* Shipping & Import Charges - FIXED */}
+              {/* Shipping & Import Charges */}
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">${shippingCharge.toFixed(2)} Shipping & Import Charges to India</span>
                   <span className="text-xs text-gray-500">Details</span>
-                </div>
-                <div className="text-sm text-gray-500">
-                  Total: ${totalPrice}
                 </div>
                 <div className="text-sm text-gray-500">
                   Available at a lower price from other sellers that may not offer free shipping.
@@ -820,7 +810,7 @@ export default function ProductDetailPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-2">About this item</h3>
-                    <p className="text-gray-600">{product.description || 'Casio MRW200H Series offers reliable timekeeping with 100m water resistance, making it perfect for daily wear and water activities.'}</p>
+                    <p className="text-gray-600">{product.description || product.about || 'Casio MRW200H Series offers reliable timekeeping with 100m water resistance, making it perfect for daily wear and water activities.'}</p>
                   </div>
                 </div>
               )}

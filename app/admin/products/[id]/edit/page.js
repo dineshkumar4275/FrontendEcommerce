@@ -1,4 +1,3 @@
-// app/admin/products/[id]/edit/page.jsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';

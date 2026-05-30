@@ -1,4 +1,3 @@
-// app/admin/products/new/page.jsx
 'use client';
 
 import { useState, useRef } from 'react';
@@ -283,6 +282,24 @@ const FormInput = ({ label, name, value, onChange, type = "text", required = fal
   </div>
 );
 
+// Color preset with image URLs
+const colorPresets = [
+  { name: "Red", code: "#FF0000", image: "https://i.pinimg.com/736x/6c/30/12/6c3012b08746c193716fd585726ef1c3.jpg" },
+  { name: "Blue", code: "#0000FF", image: "https://i.pinimg.com/736x/75/0a/99/750a9916c76c6792ec6afcc53459ef97.jpg" },
+  { name: "Black", code: "#000000", image: "https://i.pinimg.com/736x/01/3c/82/013c82c925dfc78df41e80c70096c5f7.jpg" },
+  { name: "White", code: "#FFFFFF", image: "" },
+  { name: "Green", code: "#00FF00", image: "" },
+  { name: "Purple", code: "#800080", image: "" },
+  { name: "Gold", code: "#FFD700", image: "" },
+  { name: "Silver", code: "#C0C0C0", image: "" },
+  { name: "Pink", code: "#FFC0CB", image: "" },
+  { name: "Orange", code: "#FFA500", image: "" },
+  { name: "Brown", code: "#8B4513", image: "" },
+  { name: "Gray", code: "#808080", image: "" }
+];
+
+const sizePresets = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "6", "7", "8", "9", "10", "11", "12", "13", "28", "30", "32", "34", "36", "38", "40", "42", "44"];
+
 // Main New Product Page
 export default function NewProductPage() {
   const router = useRouter();
@@ -300,15 +317,23 @@ export default function NewProductPage() {
     setFormData(prev => ({ ...prev, [name]: value })); 
   };
 
+  // ✅ FIXED: Add color with image URL
   const addColor = () => {
     const colorName = document.getElementById('colorName')?.value;
     const colorCode = document.getElementById('colorCode')?.value;
+    const colorImage = document.getElementById('colorImage')?.value;
+    
     if (colorName && colorCode) {
       const exists = formData.colors.some(c => c.name === colorName);
       if (!exists) {
-        setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: colorName, code: colorCode }] }));
+        const newColor = { name: colorName, code: colorCode };
+        if (colorImage && colorImage.trim()) {
+          newColor.image = colorImage.trim();
+        }
+        setFormData(prev => ({ ...prev, colors: [...prev.colors, newColor] }));
         showToast(`${colorName} added`, 'success');
         document.getElementById('colorName').value = '';
+        document.getElementById('colorImage').value = '';
       } else {
         showToast(`${colorName} already exists`, 'error');
       }
@@ -317,9 +342,27 @@ export default function NewProductPage() {
     }
   };
 
+  // ✅ FIXED: Add preset color with image
+  const addPresetColor = (color) => {
+    const exists = formData.colors.some(c => c.name === color.name);
+    if (!exists) {
+      setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: color.name, code: color.code, image: color.image || '' }] }));
+      showToast(`${color.name} added`, 'success');
+    } else {
+      showToast(`${color.name} already exists`, 'error');
+    }
+  };
+
   const removeColor = (index) => {
     setFormData(prev => ({ ...prev, colors: prev.colors.filter((_, i) => i !== index) }));
     showToast('Color removed', 'success');
+  };
+
+  const updateColorImage = (index, imageUrl) => {
+    const updatedColors = [...formData.colors];
+    updatedColors[index] = { ...updatedColors[index], image: imageUrl };
+    setFormData(prev => ({ ...prev, colors: updatedColors }));
+    showToast('Color image updated', 'success');
   };
 
   const addSize = () => {
@@ -387,21 +430,12 @@ export default function NewProductPage() {
     }
   };
 
-  const colorPresets = [
-    { name: "Red", code: "#FF0000" }, { name: "Blue", code: "#0000FF" }, { name: "Black", code: "#000000" },
-    { name: "White", code: "#FFFFFF" }, { name: "Green", code: "#00FF00" }, { name: "Gold", code: "#FFD700" },
-    { name: "Silver", code: "#C0C0C0" }, { name: "Purple", code: "#800080" }, { name: "Pink", code: "#FFC0CB" },
-    { name: "Orange", code: "#FFA500" }, { name: "Brown", code: "#8B4513" }, { name: "Gray", code: "#808080" }
-  ];
-  
-  const sizePresets = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "6", "7", "8", "9", "10", "11", "12", "13", "28", "30", "32", "34", "36", "38", "40", "42", "44"];
-
   return (
     <div className="max-w-5xl mx-auto pb-10 px-4">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Add New Product</h1>
-          <p className="text-gray-500 text-sm mt-1">Create a new product with colors, sizes, and images</p>
+          <p className="text-gray-500 text-sm mt-1">Create a new product with color images and sizes</p>
         </div>
         <Link href="/admin/products" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
           Back to Products
@@ -482,32 +516,25 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Colors Section */}
+        {/* Colors Section - FIXED with Image URL */}
         {enableColors && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
               <SwatchIcon className="w-5 h-5 text-purple-600" />
-              Colors
-              <span className="text-xs text-gray-400 font-normal ml-2">(Select colors for this product)</span>
+              Colors with Images
+              <span className="text-xs text-gray-400 font-normal ml-2">(Add images to change product image when color is selected)</span>
             </h2>
             
             {/* Color Presets */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Quick Color Presets</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Quick Color Presets (with images)</label>
               <div className="flex flex-wrap gap-2">
                 {colorPresets.map((color, idx) => (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => { 
-                      if (!formData.colors.some(c => c.name === color.name)) {
-                        setFormData(prev => ({ ...prev, colors: [...prev.colors, { name: color.name, code: color.code }] }));
-                        showToast(`${color.name} added`, 'success');
-                      } else {
-                        showToast(`${color.name} already added`, 'error');
-                      }
-                    }}
-                    className="w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform"
+                    onClick={() => addPresetColor(color)}
+                    className="w-10 h-10 rounded-full border-2 border-gray-300 hover:scale-110 transition-transform"
                     style={{ backgroundColor: color.code }}
                     title={color.name}
                   />
@@ -515,17 +542,32 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Selected Colors */}
+            {/* Selected Colors with Image Preview */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Selected Colors ({formData.colors.length})</label>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 {formData.colors.map((color, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
-                    <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: color.code }} />
-                    <span className="text-sm">{color.name}</span>
-                    <button type="button" onClick={() => removeColor(index)} className="text-red-500 hover:text-red-700">
-                      <TrashIcon className="w-3.5 h-3.5" />
-                    </button>
+                  <div key={index} className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
+                    <div className="w-8 h-8 rounded-full border" style={{ backgroundColor: color.code }} />
+                    <span className="text-sm font-medium w-20">{color.name}</span>
+                    {color.image ? (
+                      <div className="flex-1 flex items-center gap-2">
+                        <img src={color.image} alt={color.name} className="w-8 h-8 rounded object-cover" />
+                        <span className="text-xs text-gray-500 truncate max-w-xs">{color.image.substring(0, 40)}...</span>
+                      </div>
+                    ) : (
+                      <div className="flex-1 text-xs text-yellow-600">⚠️ No image URL set - product image won't change</div>
+                    )}
+                    <button type="button" onClick={() => {
+                      const newImageUrl = prompt('Enter image URL for this color:', color.image || 'https://');
+                      if (newImageUrl && newImageUrl.trim()) {
+                        const updatedColors = [...formData.colors];
+                        updatedColors[index] = { ...updatedColors[index], image: newImageUrl.trim() };
+                        setFormData(prev => ({ ...prev, colors: updatedColors }));
+                        showToast('Color image updated', 'success');
+                      }
+                    }} className="px-2 py-1 text-xs bg-purple-100 text-purple-600 rounded hover:bg-purple-200">Edit Image</button>
+                    <button type="button" onClick={() => removeColor(index)} className="text-red-500"><TrashIcon className="w-4 h-4" /></button>
                   </div>
                 ))}
                 {formData.colors.length === 0 && (
@@ -534,27 +576,37 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Add Custom Color */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                id="colorName"
-                placeholder="Custom color name (e.g., Navy Blue)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-              />
-              <input
-                type="color"
-                id="colorCode"
-                className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-                defaultValue="#000000"
-              />
-              <button
-                type="button"
-                onClick={addColor}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-              >
-                Add Color
-              </button>
+            {/* Add Custom Color with Image URL */}
+            <div className="border-t pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Add Custom Color</label>
+              <div className="flex flex-wrap gap-2">
+                <input
+                  type="text"
+                  id="colorName"
+                  placeholder="Color name (e.g., Navy Blue)"
+                  className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                />
+                <input
+                  type="color"
+                  id="colorCode"
+                  className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                  defaultValue="#000000"
+                />
+                <input
+                  type="text"
+                  id="colorImage"
+                  placeholder="Image URL (https://example.com/color-image.jpg)"
+                  className="flex-2 min-w-[250px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={addColor}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                >
+                  Add Color
+                </button>
+              </div>
+              <p className="text-xs text-blue-600 mt-2">💡 Tip: Add image URLs so the main product image changes when users select this color</p>
             </div>
           </div>
         )}

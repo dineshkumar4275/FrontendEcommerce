@@ -43,6 +43,7 @@
 
 // export const { setProducts, setFeaturedProducts, setProductDetails, setLoading, setError, setCategories } = productSlice.actions
 // export default productSlice.reducer
+
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {

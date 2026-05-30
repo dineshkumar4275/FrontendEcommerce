@@ -19,10 +19,28 @@ export const getProducts = async () => {
 export const getProductById = async (id) => {
   try {
     const response = await apiClient.get(`/products/${id}`);
-    if (response.data.success) {
-      return response.data.data;
+
+    if (!response.data.success) {
+      return null;
     }
-    return null;
+
+    const product = response.data.data;
+
+    return {
+      ...product,
+
+      hasColors: product.has_colors || false,
+      hasSizes: product.has_sizes || false,
+
+      colors: Array.isArray(product.colors)
+        ? product.colors
+        : [],
+
+      sizes: Array.isArray(product.sizes)
+        ? product.sizes
+        : []
+    };
+
   } catch (error) {
     console.error('Error fetching product:', error);
     throw error;

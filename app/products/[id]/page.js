@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ShoppingCartIcon,
   HeartIcon,
@@ -16,11 +16,9 @@ import {
   MinusIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  XMarkIcon,
   ShareIcon,
   ScaleIcon,
   ClockIcon,
-  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import Header from '../../../components/layout/Header';
@@ -42,7 +40,7 @@ const normalizeProduct = (product) => {
   let hasColors = false;
   let hasSizes = false;
 
-  // Normalize colors
+  // Normalize colors - handle array, JSON string, null, invalid JSON
   if (product.colors !== undefined && product.colors !== null) {
     if (Array.isArray(product.colors)) {
       colors = product.colors;
@@ -62,7 +60,7 @@ const normalizeProduct = (product) => {
     }
   }
 
-  // Normalize sizes
+  // Normalize sizes - handle array, JSON string, null, invalid JSON
   if (product.sizes !== undefined && product.sizes !== null) {
     if (Array.isArray(product.sizes)) {
       sizes = product.sizes;
@@ -82,7 +80,7 @@ const normalizeProduct = (product) => {
     }
   }
 
-  // Handle snake_case from backend
+  // Handle snake_case from backend (has_colors / hasColors)
   const backendHasColors = product.has_colors !== undefined ? product.has_colors : product.hasColors;
   const backendHasSizes = product.has_sizes !== undefined ? product.has_sizes : product.hasSizes;
 
@@ -96,7 +94,6 @@ const normalizeProduct = (product) => {
 };
 
 export default function ProductDetailPage() {
-  const [rawProduct, setRawProduct] = useState(null);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -109,8 +106,10 @@ export default function ProductDetailPage() {
   const [isRotating, setIsRotating] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [selectedColorObj, setSelectedColorObj] = useState(null);
   const [activeTab, setActiveTab] = useState('description');
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [colorImages, setColorImages] = useState({});
 
   const imageContainerRef = useRef(null);
   const rotationInterval = useRef(null);
@@ -127,6 +126,7 @@ export default function ProductDetailPage() {
   const wishlistIds = new Set(wishlistItems.map(item => item.product_id || item.id));
   const isInWishlist = wishlistIds.has(parseInt(productId));
 
+  // Build image array from all available image fields
   const productImages = [
     product?.image_url,
     product?.image_url_2,
@@ -136,7 +136,19 @@ export default function ProductDetailPage() {
   ].filter(img => img && img.trim() !== '');
 
   const hasMultipleImages = productImages.length > 1;
-  const mainImage = productImages[selectedImage] || product?.image_url;
+  
+  // Get current main image based on selected color
+  const getCurrentMainImage = () => {
+    if (selectedColorObj && selectedColorObj.image) {
+      return selectedColorObj.image;
+    }
+    if (colorImages[selectedColor]) {
+      return colorImages[selectedColor];
+    }
+    return productImages[selectedImage] || product?.image_url;
+  };
+  
+  const mainImage = getCurrentMainImage();
 
   const tabs = [
     { id: 'description', label: 'Description' },
@@ -154,20 +166,46 @@ export default function ProductDetailPage() {
     }
   }, [productId, dispatch, token, isAuthenticated]);
 
+  // Initialize color images mapping and set default selected color
   useEffect(() => {
-    if (product) {
-      if (product.hasSizes && product.sizes && product.sizes.length > 0) {
-        setSelectedSize(product.sizes[0]);
-      }
-      if (product.hasColors && product.colors && product.colors.length > 0) {
-        const firstColor = typeof product.colors[0] === 'object' ? product.colors[0].name : product.colors[0];
-        setSelectedColor(firstColor);
+    if (product && product.hasColors && product.colors && product.colors.length > 0) {
+      const imagesMap = {};
+      let firstColorName = '';
+      let firstColorObj = null;
+      
+      product.colors.forEach((color, index) => {
+        const colorName = typeof color === 'object' ? color.name : color;
+        const colorImage = typeof color === 'object' ? color.image : null;
+        const colorCode = typeof color === 'object' ? color.code : null;
+        
+        if (index === 0) {
+          firstColorName = colorName;
+          firstColorObj = typeof color === 'object' ? color : { name: colorName, code: null, image: null };
+        }
+        
+        if (colorImage) {
+          imagesMap[colorName] = colorImage;
+        } else {
+          // If no color-specific image, use the first product image as fallback
+          imagesMap[colorName] = productImages[0] || product?.image_url;
+        }
+      });
+      
+      setColorImages(imagesMap);
+      setSelectedColor(firstColorName);
+      setSelectedColorObj(firstColorObj);
+      
+      // If the first color has an image, update selected image index
+      if (firstColorObj && firstColorObj.image) {
+        setSelectedImage(-1); // Use -1 to indicate we're using color image
       }
     }
   }, [product]);
 
+  // Auto-rotate images (only when not using color-specific images)
   useEffect(() => {
-    if (hasMultipleImages && !isDragging && !isRotating && !showZoom) {
+    const shouldAutoRotate = hasMultipleImages && !isDragging && !isRotating && !showZoom && !selectedColorObj?.image;
+    if (shouldAutoRotate) {
       setIsRotating(true);
       rotationInterval.current = setInterval(() => {
         setSelectedImage((prev) => (prev + 1) % productImages.length);
@@ -179,14 +217,13 @@ export default function ProductDetailPage() {
     return () => {
       if (rotationInterval.current) clearInterval(rotationInterval.current);
     };
-  }, [isDragging, hasMultipleImages, productImages.length, showZoom]);
+  }, [isDragging, hasMultipleImages, productImages.length, showZoom, selectedColorObj?.image]);
 
   const fetchProduct = async () => {
     try {
       setLoading(true);
       const data = await getProductById(productId);
       if (data) {
-        setRawProduct(data);
         const normalized = normalizeProduct(data);
         setProduct(normalized);
       } else {
@@ -200,15 +237,20 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleColorChange = (colorName) => {
+  const handleColorChange = (colorName, colorObj = null) => {
     setSelectedColor(colorName);
-    const colorLower = colorName.toLowerCase();
-    const matchingIndex = productImages.findIndex((img, idx) => {
-      if (idx === 0) return false;
-      return img?.toLowerCase().includes(colorLower);
-    });
-    if (matchingIndex !== -1) {
-      setSelectedImage(matchingIndex);
+    setSelectedColorObj(colorObj);
+    
+    // Change image based on selected color
+    if (colorObj && colorObj.image) {
+      // If color has specific image, use it
+      setSelectedImage(-1); // Use -1 to indicate using color image
+    } else if (colorImages[colorName]) {
+      // If we have a mapped image for this color
+      setSelectedImage(-1);
+    } else {
+      // Fallback to first product image
+      setSelectedImage(0);
     }
   };
 
@@ -241,6 +283,7 @@ export default function ProductDetailPage() {
         quantity,
         selectedSize,
         selectedColor,
+        selectedColorImage: selectedColorObj?.image || null,
       });
     } finally {
       setAdding(false);
@@ -275,14 +318,14 @@ export default function ProductDetailPage() {
   };
 
   const handleDragStart = (e) => {
-    if (!hasMultipleImages || showZoom) return;
+    if (!hasMultipleImages || showZoom || selectedColorObj?.image) return;
     setIsDragging(true);
     setDragStart(e.clientX);
     if (rotationInterval.current) clearInterval(rotationInterval.current);
   };
 
   const handleDragMove = (e) => {
-    if (!isDragging || !hasMultipleImages || showZoom) return;
+    if (!isDragging || !hasMultipleImages || showZoom || selectedColorObj?.image) return;
     const diff = e.clientX - dragStart;
     if (Math.abs(diff) > 20) {
       if (diff > 0) {
@@ -359,6 +402,7 @@ export default function ProductDetailPage() {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20">
         <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
             <a href="/" className="hover:text-purple-600">Home</a>
             <span>/</span>
@@ -368,6 +412,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
+            {/* Product Images Gallery with Zoom */}
             <div>
               <div
                 className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg"
@@ -383,6 +428,7 @@ export default function ProductDetailPage() {
                   onMouseUp={handleDragEnd}
                   onMouseLeave={handleDragEnd}
                 >
+                  {/* Zoom overlay */}
                   {showZoom && (
                     <div
                       className="absolute inset-0 z-10 pointer-events-none"
@@ -400,7 +446,9 @@ export default function ProductDetailPage() {
                     className="w-full h-full object-contain p-8 transition-all duration-300"
                     style={{ opacity: showZoom ? 0 : 1 }}
                     draggable={false}
+                    key={mainImage} // Force re-render when image changes
                   />
+                  {/* Badges */}
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
                     {discountPercent > 0 && (
                       <span className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 text-white text-sm font-bold shadow-lg">
@@ -413,17 +461,18 @@ export default function ProductDetailPage() {
                       </span>
                     )}
                   </div>
-                  {hasMultipleImages && !showZoom && (
+                  {/* Navigation arrows - only show when not using color image and multiple images exist */}
+                  {hasMultipleImages && !showZoom && !selectedColorObj?.image && (
                     <>
                       <button
                         onClick={() => setSelectedImage((prev) => (prev - 1 + productImages.length) % productImages.length)}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md transition"
                       >
                         <ChevronLeftIcon className="w-6 h-6 text-gray-700" />
                       </button>
                       <button
                         onClick={() => setSelectedImage((prev) => (prev + 1) % productImages.length)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white shadow-md transition"
                       >
                         <ChevronRightIcon className="w-6 h-6 text-gray-700" />
                       </button>
@@ -431,7 +480,8 @@ export default function ProductDetailPage() {
                   )}
                 </div>
               </div>
-              {hasMultipleImages && (
+              {/* Thumbnail Gallery - only show when not using color image */}
+              {hasMultipleImages && !selectedColorObj?.image && (
                 <div className="flex gap-3 mt-4 justify-center overflow-x-auto pb-2">
                   {productImages.map((img, idx) => (
                     <button
@@ -448,8 +498,15 @@ export default function ProductDetailPage() {
                   ))}
                 </div>
               )}
+              {/* Show color image indicator when using color-specific image */}
+              {selectedColorObj?.image && (
+                <div className="text-center mt-4 text-sm text-purple-600">
+                  Showing {selectedColor} variant
+                </div>
+              )}
             </div>
 
+            {/* Product Info */}
             <div>
               {product.brand && (
                 <div className="mb-2">
@@ -458,10 +515,11 @@ export default function ProductDetailPage() {
               )}
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
 
+              {/* Rating */}
               <div className="flex items-center flex-wrap gap-3 mb-4">
                 <div className="flex items-center gap-1">{renderStars(product.rating)}</div>
                 <span className="text-sm font-semibold text-amber-600">{product.rating || 4.5}</span>
-                <span className="text-sm text-blue-600">128 ratings</span>
+                <span className="text-sm text-blue-600">{product.review_count || 128} ratings</span>
                 <div className="h-4 w-px bg-gray-300" />
                 <span className="text-sm text-green-600 flex items-center gap-1">
                   <CheckIcon className="w-4 h-4" />
@@ -469,6 +527,7 @@ export default function ProductDetailPage() {
                 </span>
               </div>
 
+              {/* Price */}
               <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span className="text-3xl md:text-4xl font-bold text-purple-600">
@@ -488,6 +547,7 @@ export default function ProductDetailPage() {
                 <p className="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery</p>
               </div>
 
+              {/* Size Selector - renders when sizes.length > 0 */}
               {product.hasSizes && product.sizes && product.sizes.length > 0 && (
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-3">
@@ -515,14 +575,16 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
+              {/* Color Selector - UPDATED with image switching support */}
               {product.hasColors && product.colors && product.colors.length > 0 && (
                 <div className="mb-6">
                   <label className="text-sm font-semibold text-gray-700 mb-3 block">Select Color</label>
                   <div className="flex gap-3 flex-wrap">
                     {product.colors.map((color) => {
+                      // Handle both string array and object array formats
                       const colorName = typeof color === 'object' ? color.name : color;
-                      const colorCode = typeof color === 'object'
-                        ? color.code
+                      const colorCode = typeof color === 'object' 
+                        ? color.code 
                         : {
                             Red: '#ef4444',
                             Blue: '#3b82f6',
@@ -532,44 +594,60 @@ export default function ProductDetailPage() {
                             Silver: '#9ca3af',
                             Green: '#22c55e',
                             Purple: '#9333ea',
+                            Pink: '#ec4899',
+                            Yellow: '#eab308',
+                            Orange: '#f97316',
+                            Brown: '#78350f',
+                            Gray: '#6b7280',
                           }[colorName] || '#cccccc';
+                      const colorImage = typeof color === 'object' ? color.image : null;
+                      const isSelected = selectedColor === colorName;
+                      
                       return (
                         <button
                           key={colorName}
-                          onClick={() => handleColorChange(colorName)}
+                          onClick={() => handleColorChange(colorName, typeof color === 'object' ? color : { name: colorName, code: colorCode, image: null })}
                           className={`relative w-12 h-12 rounded-full transition-all ${
-                            selectedColor === colorName
+                            isSelected
                               ? 'ring-2 ring-purple-600 ring-offset-2 scale-110'
                               : 'hover:scale-105'
                           }`}
                           style={{ backgroundColor: colorCode }}
                           title={colorName}
                         >
-                          {selectedColor === colorName && (
+                          {isSelected && (
                             <CheckIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white drop-shadow" />
                           )}
                         </button>
                       );
                     })}
                   </div>
-                  {selectedColor && <p className="text-xs text-gray-500 mt-2">Selected: {selectedColor}</p>}
+                  {selectedColor && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Selected: {selectedColor}
+                      {selectedColorObj?.image && (
+                        <span className="text-purple-600 ml-2">✓ Color image loaded</span>
+                      )}
+                    </p>
+                  )}
                 </div>
               )}
 
+              {/* Quantity Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white transition"
                     >
                       <MinusIcon className="w-4 h-4" />
                     </button>
                     <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
                     <button
                       onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                      className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white transition"
                     >
                       <PlusIcon className="w-4 h-4" />
                     </button>
@@ -578,11 +656,12 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex gap-4">
                 <button
                   onClick={handleAddToCart}
                   disabled={adding || product.stock === 0}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition"
                 >
                   {adding ? (
                     <>
@@ -618,7 +697,7 @@ export default function ProductDetailPage() {
                 <div className="relative">
                   <button
                     onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="p-3.5 rounded-xl border-2 border-gray-200 hover:border-purple-300"
+                    className="p-3.5 rounded-xl border-2 border-gray-200 hover:border-purple-300 transition"
                   >
                     <ShareIcon className="h-5 w-5 text-gray-600" />
                   </button>
@@ -638,6 +717,7 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
+              {/* Delivery Info */}
               <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <TruckIcon className="h-5 w-5 text-purple-600" />
@@ -663,6 +743,7 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
+              {/* Features */}
               <div className="mt-6 flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <ShieldCheckIcon className="w-4 h-4 text-green-600" />
@@ -680,6 +761,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
+          {/* Product Tabs */}
           <div className="mt-12">
             <div className="border-b border-gray-200 flex flex-wrap gap-6">
               {tabs.map((tab) => (
@@ -697,10 +779,11 @@ export default function ProductDetailPage() {
               ))}
             </div>
             <div className="py-6">
+              {/* Description Tab */}
               {activeTab === 'description' && (
                 <div className="prose max-w-none">
                   <p className="text-gray-600">{product.description || 'No description available.'}</p>
-                  {product.features && (
+                  {product.features && typeof product.features === 'string' && (
                     <div className="mt-4">
                       <h3 className="font-semibold text-gray-800 mb-2">Key Features</h3>
                       <ul className="list-disc list-inside text-gray-600">
@@ -712,6 +795,8 @@ export default function ProductDetailPage() {
                   )}
                 </div>
               )}
+
+              {/* Specifications Tab */}
               {activeTab === 'specifications' && (
                 <div className="grid md:grid-cols-2 gap-4">
                   {product.brand && (
@@ -786,6 +871,8 @@ export default function ProductDetailPage() {
                   )}
                 </div>
               )}
+
+              {/* Reviews Tab */}
               {activeTab === 'reviews' && (
                 <div>
                   <div className="flex items-center gap-4 mb-6">
@@ -837,6 +924,8 @@ export default function ProductDetailPage() {
                   </button>
                 </div>
               )}
+
+              {/* Shipping Tab */}
               {activeTab === 'shipping' && (
                 <div className="space-y-4">
                   <div>

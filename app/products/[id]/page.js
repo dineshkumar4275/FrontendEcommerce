@@ -22,9 +22,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-// ✅ CORRECTED IMPORTS - Adding 'src/' prefix to match your project structure
+// ✅ CORRECTED IMPORTS - Footer is also in layout folder
 import { Header } from '../../../src/components/layout/Header';
-import { Footer } from '../../../src/components/Footer';
+import { Footer } from '../../../src/components/layout/Footer';
 import { getProductById } from '../../../src/services/productService';
 import { useCart } from '../../../src/hooks/useCart';
 import {

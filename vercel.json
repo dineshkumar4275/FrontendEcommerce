@@ -1,14 +1,5 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install --legacy-peer-deps",
-  "functions": {
-    "api/**/*.js": {
-      "maxDuration": 10
-    }
-  },
-  "env": {
-   
-    "NEXT_PUBLIC_API_URL": "https://api.sombu.in"
-  }
+  "installCommand": "npm install --legacy-peer-deps"
 }

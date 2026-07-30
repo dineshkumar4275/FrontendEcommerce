@@ -43,28 +43,46 @@
 
 // module.exports = nextConfig;
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
-  reactStrictMode: true,
-  
   images: {
+    domains: ['images.unsplash.com', 'res.cloudinary.com'],
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       },
     ],
   },
+  
+  swcMinify: true,
+  reactStrictMode: true,
   
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
-  // Add turbopack config for Next.js 16
-  turbopack: {},
+  // Optimize bundle
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
+    },
+    'react-icons': {
+      transform: 'react-icons/{{member}}',
+    },
+  },
   
-  // Disable strict mode if needed
-  // reactStrictMode: false,
+  // Increase memory limit
+  experimental: {
+    optimizeCss: true,
+  },
+  
+  // Reduce build time
+  poweredByHeader: false,
 };
 
 module.exports = nextConfig;

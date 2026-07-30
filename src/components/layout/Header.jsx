@@ -18,15 +18,12 @@ import {
   CubeIcon,
   SparklesIcon,
   FunnelIcon,
-  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import { useCart } from '../../hooks/useCart';
 import { useWishlist } from '../../hooks/useWishlist';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import CartSidebar from '../layout/CartSidebar';
-import GlobalSelector from '../GlobalSelector';
-import { useApp } from '../../hooks/useApp';
 import toast from 'react-hot-toast';
 
 export const Header = ({ 
@@ -64,7 +61,6 @@ export const Header = ({
   const { totalQuantity } = useCart();
   const { wishlistCount, getWishlist } = useWishlist();
   const { user, token } = useSelector((state) => state.auth);
-  const { t, formatPrice } = useApp();
 
   // Load wishlist when logged in
   useEffect(() => {
@@ -72,6 +68,11 @@ export const Header = ({
       getWishlist();
     }
   }, [isLoggedIn, getWishlist]);
+
+  // Debug log to check wishlist count
+  useEffect(() => {
+    console.log('Wishlist Count in Header:', wishlistCount);
+  }, [wishlistCount]);
 
   useEffect(() => {
     setMounted(true);
@@ -210,10 +211,10 @@ export const Header = ({
   const activeFilterCount = (selectedCategory ? 1 : 0) + (minPrice || maxPrice ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
 
   const navLinks = [
-    { name: 'home', href: '/', icon: SparklesIcon },
-    { name: 'products', href: '/products', icon: CubeIcon },
-    { name: 'orders', href: '/orders', icon: TruckIcon },
-    { name: 'track', href: '/track', icon: TruckIcon },
+    { name: 'Home', href: '/', icon: SparklesIcon },
+    { name: 'Products', href: '/products', icon: CubeIcon },
+    { name: 'Orders', href: '/orders', icon: TruckIcon },
+    { name: 'Track Order', href: '/track', icon: TruckIcon },
   ];
 
   if (!mounted) {
@@ -251,14 +252,14 @@ export const Header = ({
                 <SparklesIcon className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-purple-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent hidden sm:block">
-                Sombustore
+                ShopHub
               </span>
             </Link>
 
             {/* Search Bar - Desktop */}
             <div className="hidden md:flex flex-1 max-w-2xl">
               <AutoSuggestSearch 
-                placeholder={t('search_products') || 'Search for products, brands, and categories...'}
+                placeholder="Search for products, brands, and categories..."
                 onSelect={handleSearchSelect}
               />
             </div>
@@ -276,18 +277,13 @@ export const Header = ({
                   }`}
                 >
                   <link.icon className="w-4 h-4" />
-                  {t(link.name)}
+                  {link.name}
                 </Link>
               ))}
             </div>
 
             {/* Desktop Icons */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Global Selector */}
-              <div className="hidden md:block">
-                <GlobalSelector />
-              </div>
-
               {/* Mobile Search Icon */}
               <button 
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
@@ -298,7 +294,7 @@ export const Header = ({
                 </svg>
               </button>
 
-              {/* Wishlist */}
+              {/* ✅ WISHLIST HEART WITH NUMBER ON TOP */}
               <Link 
                 href="/wishlist" 
                 className="relative p-2 hover:bg-pink-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-pink-300"
@@ -398,7 +394,7 @@ export const Header = ({
                               className="flex items-center gap-3 px-4 py-2 text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 transition-all text-sm"
                             >
                               <item.icon className="w-4 h-4" />
-                              {t(item.label)}
+                              {item.label}
                             </Link>
                           ))}
                           
@@ -426,7 +422,7 @@ export const Header = ({
                             className="flex items-center gap-3 w-full px-4 py-2 text-red-400 hover:bg-red-500/10 transition-all text-sm"
                           >
                             <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                            {t('logout')}
+                            Sign Out
                           </button>
                         </div>
                       </div>
@@ -436,7 +432,7 @@ export const Header = ({
               ) : (
                 <Link href="/login" className="px-3 sm:px-5 py-1.5 sm:py-2.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300 shadow-lg shadow-purple-500/25 flex items-center gap-1 sm:gap-2">
                   <UserIcon className="w-4 h-4" />
-                  <span className="hidden xs:inline text-sm">{t('login')}</span>
+                  <span className="hidden xs:inline text-sm">Login</span>
                 </Link>
               )}
 
@@ -460,7 +456,7 @@ export const Header = ({
                 className="md:hidden mt-3 pt-3 border-t border-purple-500/20"
               >
                 <AutoSuggestSearch 
-                  placeholder={t('search_products') || 'Search products...'}
+                  placeholder="Search products..."
                   onSelect={(searchTerm) => {
                     handleSearchSelect(searchTerm);
                     setShowMobileSearch(false);
@@ -479,11 +475,6 @@ export const Header = ({
                 exit={{ opacity: 0, height: 0 }}
                 className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
-                {/* Global Selector for Mobile */}
-                <div className="px-4 py-2 mb-2 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                  <GlobalSelector />
-                </div>
-
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -496,7 +487,7 @@ export const Header = ({
                     }`}
                   >
                     <link.icon className="w-5 h-5" />
-                    {t(link.name)}
+                    {link.name}
                   </Link>
                 ))}
 
@@ -523,7 +514,7 @@ export const Header = ({
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-purple-500/10 transition-all font-medium w-full"
                 >
                   <FunnelIcon className="w-5 h-5" />
-                  {t('filters') || 'Filters'}
+                  Filters
                   {hasActiveFilters && (
                     <span className="bg-purple-500 text-white text-xs font-bold rounded-full px-2 ml-auto">
                       {activeFilterCount}
@@ -537,7 +528,7 @@ export const Header = ({
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-pink-500/10 hover:text-pink-300 transition-all font-medium"
                 >
                   <HeartIcon className="w-5 h-5" />
-                  {t('wishlist')}
+                  Wishlist
                   {wishlistCount > 0 && (
                     <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-auto">
                       {wishlistCount}
@@ -552,7 +543,7 @@ export const Header = ({
                       onClick={() => setIsMenuOpen(false)} 
                       className="block w-full text-center py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25"
                     >
-                      {t('login')}
+                      Login
                     </Link>
                   )}
                 </div>
@@ -575,7 +566,7 @@ export const Header = ({
               className="fixed right-0 top-0 h-full w-full max-w-[85%] sm:max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
             >
               <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
-                <h2 className="text-base sm:text-xl font-bold text-purple-100">{t('filters') || 'Filters'}</h2>
+                <h2 className="text-base sm:text-xl font-bold text-purple-100">Filters</h2>
                 <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-purple-500/10 rounded-xl transition">
                   <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
                 </button>
@@ -584,13 +575,13 @@ export const Header = ({
               <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
                 {categories.length > 0 && (
                   <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('categories') || 'Categories'}</h3>
+                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Categories</h3>
                     <div className="space-y-1.5 sm:space-y-2">
                       <button
                         onClick={() => setTempCategory('')}
                         className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
-                        {t('all_categories') || 'All Categories'}
+                        All Categories
                       </button>
                       {categories.map((cat) => (
                         <button
@@ -606,18 +597,18 @@ export const Header = ({
                 )}
 
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('price_range') || 'Price Range (₹)'}</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Price Range (₹)</h3>
                   <div className="flex gap-2 sm:gap-3">
                     <input
                       type="number"
-                      placeholder={t('min_price') || 'Min Price'}
+                      placeholder="Min Price"
                       value={tempMinPrice}
                       onChange={(e) => setTempMinPrice(e.target.value)}
                       className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <input
                       type="number"
-                      placeholder={t('max_price') || 'Max Price'}
+                      placeholder="Max Price"
                       value={tempMaxPrice}
                       onChange={(e) => setTempMaxPrice(e.target.value)}
                       className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -626,20 +617,20 @@ export const Header = ({
                 </div>
 
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('sort_by') || 'Sort By'}</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Sort By</h3>
                   <div className="space-y-1.5 sm:space-y-2">
                     {[
-                      { value: 'newest', label: 'newest_first' },
-                      { value: 'price_low', label: 'price_low_to_high' },
-                      { value: 'price_high', label: 'price_high_to_low' },
-                      { value: 'name_asc', label: 'name_a_to_z' },
+                      { value: 'newest', label: 'Newest First' },
+                      { value: 'price_low', label: 'Price: Low to High' },
+                      { value: 'price_high', label: 'Price: High to Low' },
+                      { value: 'name_asc', label: 'Name: A to Z' },
                     ].map((option) => (
                       <button
                         key={option.value}
                         onClick={() => setTempSortBy(option.value)}
                         className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
-                        {t(option.label) || option.label.replace(/_/g, ' ')}
+                        {option.label}
                       </button>
                     ))}
                   </div>
@@ -651,14 +642,14 @@ export const Header = ({
                   onClick={handleApplyFilters}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition"
                 >
-                  {t('apply_filters') || 'Apply Filters'}
+                  Apply Filters
                 </button>
                 {(tempCategory || tempMinPrice || tempMaxPrice || tempSortBy !== 'newest') && (
                   <button
                     onClick={handleClearFilters}
                     className="w-full bg-slate-800 text-purple-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-slate-700 transition"
                   >
-                    {t('clear_all') || 'Clear All Filters'}
+                    Clear All Filters
                   </button>
                 )}
               </div>

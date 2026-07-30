@@ -11,7 +11,7 @@ export const metadata = {
     title: 'Products - Shop Premium Products |sombustore',
     description: 'Browse our premium collection of products.',
     url: 'https://www.sombustore.in/products',
-    siteName: 'Your Store',
+    siteName: 'sombustore',
     images: [{ url: '/images/og-products.jpg', width: 1200, height: 630 }],
     type: 'website',
   },

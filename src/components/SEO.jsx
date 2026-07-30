@@ -6,7 +6,7 @@ import {
   BreadcrumbJsonLd,
   OrganizationJsonLd,
   ArticleJsonLd,
-  FAQPageJsonLd,  // ✅ Changed from FAQJsonLd to FAQPageJsonLd
+  FAQPageJsonLd,
   LocalBusinessJsonLd
 } from 'next-seo';
 
@@ -24,8 +24,8 @@ export const SEO = ({
   faqs,
   localBusiness,
 }) => {
-  const siteName = 'Your Store';
-  const defaultTitle = 'Your Store - Premium Products';
+  const siteName = 'sombustore';
+  const defaultTitle = 'sombustore - Premium Products';
   const defaultDescription = 'Shop premium products with amazing offers. Free shipping & easy returns.';
   const defaultImage = '/images/og-image.jpg';
   const siteUrl = 'https://www.sombustore.in';
@@ -33,6 +33,15 @@ export const SEO = ({
   const seoTitle = title ? `${title} | ${siteName}` : defaultTitle;
   const seoDescription = description || defaultDescription;
   const seoImage = image || defaultImage;
+
+  // Generate keywords based on page type
+  const getKeywords = () => {
+    const baseKeywords = 'shop, premium products, online store, buy products, best deals';
+    if (pageType === 'product' && product) {
+      return `${product.name}, buy ${product.name}, ${product.category}, ${baseKeywords}`;
+    }
+    return baseKeywords;
+  };
 
   return (
     <>
@@ -66,7 +75,7 @@ export const SEO = ({
         additionalMetaTags={[
           {
             name: 'keywords',
-            content: 'shop, premium products, online store, buy products, best deals',
+            content: getKeywords(),
           },
           {
             name: 'viewport',
@@ -80,6 +89,10 @@ export const SEO = ({
             name: 'theme-color',
             content: '#7c3aed',
           },
+          {
+            name: 'author',
+            content: 'sombustore',
+          },
         ]}
       />
 
@@ -92,12 +105,14 @@ export const SEO = ({
           sameAs={organization.sameAs || [
             'https://facebook.com/sombustore',
             'https://instagram.com/sombustore',
+            'https://twitter.com/sombustore',
+            'https://youtube.com/sombustore',
           ]}
           contactPoint={[
             {
               telephone: organization.phone || '+91-9042909734',
               contactType: 'customer service',
-              availableLanguage: ['English', 'Hindi'],
+              availableLanguage: ['English', 'Tamil', 'Hindi'],
               areaServed: 'IN',
             },
           ]}
@@ -111,6 +126,7 @@ export const SEO = ({
           description={product.description}
           brand={product.brand || siteName}
           sku={product.sku || product.id}
+          mpn={product.mpn || `MPN-${product.id}`}
           offers={{
             price: product.price || 0,
             priceCurrency: 'INR',
@@ -121,6 +137,18 @@ export const SEO = ({
               : 'https://schema.org/OutOfStock',
             seller: {
               name: siteName,
+            },
+            shippingDetails: {
+              shippingRate: {
+                value: 0,
+                currency: 'INR',
+              },
+              shippingDestination: {
+                addressCountry: 'IN',
+              },
+              deliveryTime: {
+                businessDays: 5,
+              },
             },
           }}
           aggregateRating={product.rating ? {
@@ -156,7 +184,7 @@ export const SEO = ({
       )}
 
       {faqs && faqs.length > 0 && (
-        <FAQPageJsonLd  // ✅ Changed from FAQJsonLd to FAQPageJsonLd
+        <FAQPageJsonLd
           mainEntity={faqs.map((faq) => ({
             questionName: faq.question,
             acceptedAnswerText: faq.answer,
@@ -169,9 +197,9 @@ export const SEO = ({
           name={localBusiness.name || siteName}
           description={localBusiness.description || seoDescription}
           url={localBusiness.url || siteUrl}
-          telephone={localBusiness.phone || '+91-1234567890'}
+          telephone={localBusiness.phone || '+91-9042909734'}
           address={{
-            streetAddress: localBusiness.address || 'Your Store Address',
+            streetAddress: localBusiness.address || 'sombustore Address',
             addressLocality: localBusiness.city || 'Chennai',
             addressRegion: localBusiness.state || 'Tamil Nadu',
             postalCode: localBusiness.zip || '600001',
@@ -182,6 +210,18 @@ export const SEO = ({
             longitude: localBusiness.lng || '80.2707',
           }}
           priceRange={localBusiness.priceRange || '₹₹'}
+          openingHours={localBusiness.openingHours || [
+            {
+              days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+              opens: '09:00',
+              closes: '21:00',
+            },
+            {
+              days: ['Saturday', 'Sunday'],
+              opens: '10:00',
+              closes: '20:00',
+            },
+          ]}
         />
       )}
     </>

@@ -1323,7 +1323,7 @@ export default function ProductDetailPage() {
     images: productImages,
     price: productPrice,
     stock: product?.stock || 0,
-    brand: product?.brand || 'Your Store',
+    brand: product?.brand || 'sombustore',
     sku: product?.sku || `SKU-${product?.id}`,
     rating: product?.rating || 4.5,
     review_count: product?.review_count || 0,

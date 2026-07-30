@@ -22,27 +22,13 @@ export const metadata = {
     default: "Sombu Store | Premium Fashion & Clothing Online",
     template: "%s | Sombu Store",
   },
-    verification: {
-    google: "google-site-verification: googleb181e800db31c273.html",
+
+  verification: {
+    google: "mU95eQ4I6n2hX9jrd-kHnA5Dh_G5PMXmtUV2GD368l8",
   },
 
   description:
-    "Shop premium oversized t-shirts, hoodies, shirts, cargos and fashion essentials online. Fast delivery, secure payments and easy returns across India.",
-
-  keywords: [
-    "Sombu Store",
-    "online clothing store",
-    "oversized t shirts",
-    "premium fashion",
-    "men clothing",
-    "women clothing",
-    "streetwear",
-    "hoodies",
-    "shirts",
-    "cargo pants",
-    "fashion india",
-    "dressshop online",
-  ],
+    "Shop premium oversized t-shirts, hoodies, shirts, cargo pants and fashion essentials online. Fast delivery, secure payments and easy returns across India.",
 
   authors: [
     {
@@ -77,11 +63,11 @@ export const metadata = {
     siteName: "Sombu Store",
     title: "Sombu Store | Premium Fashion & Clothing Online",
     description:
-      "Shop premium oversized t-shirts, hoodies, shirts and fashion products online.",
+      "Shop premium oversized t-shirts, hoodies, shirts, cargo pants and fashion essentials online.",
 
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "https://www.sombustore.in/images/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Sombu Store",
@@ -95,7 +81,9 @@ export const metadata = {
     description:
       "Premium fashion & clothing online.",
 
-    images: ["/images/og-image.jpg"],
+    images: [
+      "https://www.sombustore.in/images/og-image.jpg",
+    ],
   },
 
   icons: {

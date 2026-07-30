@@ -16,7 +16,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://sombustore.in"),
+  metadataBase: new URL("https://www.sombustore.in"),
 
   title: {
     default: "Sombu Store | Premium Fashion & Clothing Online",
@@ -53,13 +53,13 @@ export const metadata = {
   },
 
   alternates: {
-    canonical: "https://sombustore.in",
+    canonical: "https://www.sombustore.in",
   },
 
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://sombustore.in",
+    url: "https://www.sombustore.in",
     siteName: "Sombu Store",
     title: "Sombu Store | Premium Fashion & Clothing Online",
     description:
@@ -67,7 +67,7 @@ export const metadata = {
 
     images: [
       {
-        url: "https://sombustore.in/images/og-image.jpg",
+        url: "https://www.sombustore.in/images/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Sombu Store",
@@ -82,7 +82,7 @@ export const metadata = {
       "Premium fashion & clothing online.",
 
     images: [
-      "https://sombustore.in/images/og-image.jpg",
+      "https://www.sombustore.in/images/og-image.jpg",
     ],
   },
 

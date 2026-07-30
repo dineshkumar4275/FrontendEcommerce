@@ -1,51 +1,52 @@
-// app/privacy/page.js
-import Link from 'next/link';
-import { Shield, Lock, Eye, Database } from 'lucide-react';
+import { Metadata } from 'next';
 
 export const metadata = {
-  title: 'Privacy Policy - Sombustore',
-  description: 'Learn how we protect your personal information',
+  title: 'Privacy Policy - Your Store',
+  description: 'Learn about our privacy policy. We value your privacy and protect your data.',
+  keywords: 'privacy policy, privacy, data protection',
+  alternates: { canonical: 'https://yourstore.com/privacy' },
+  robots: { index: true, follow: true },
 };
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 py-16">
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Privacy Policy
-          </h1>
-          <p className="text-gray-600 mt-2">Last updated: January 1, 2024</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-6">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
+          Privacy Policy
+        </h1>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+          <p className="text-gray-600">Last updated: July 2024</p>
+          <p className="text-gray-600">Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.</p>
+          
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-3">Information We Collect</h2>
-            <p className="text-gray-600">We collect information you provide directly to us, such as when you create an account, place an order, or contact us for support.</p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">How We Use Your Information</h2>
-            <ul className="list-disc list-inside text-gray-600 space-y-2">
-              <li>Process your orders and payments</li>
-              <li>Communicate with you about your orders</li>
-              <li>Improve our products and services</li>
-              <li>Send promotional emails (with your consent)</li>
+            <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
+              <li>Name and contact information</li>
+              <li>Payment information</li>
+              <li>Order history</li>
+              <li>Device and browser information</li>
             </ul>
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">Information Security</h2>
-            <p className="text-gray-600">We implement security measures to protect your personal information from unauthorized access.</p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">How We Use Your Information</h2>
+            <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
+              <li>Process your orders</li>
+              <li>Send order updates</li>
+              <li>Improve our services</li>
+              <li>Send promotional offers (with your consent)</li>
+            </ul>
           </div>
 
-          <div className="pt-4 text-center">
-            <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium">
-              ← Back to Home
-            </Link>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">Data Security</h2>
+            <p className="text-gray-600">We implement appropriate security measures to protect your personal information.</p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">Contact Us</h2>
+            <p className="text-gray-600">If you have any questions about this policy, please contact us at privacy@yourstore.com</p>
           </div>
         </div>
       </div>

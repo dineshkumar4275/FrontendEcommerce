@@ -352,7 +352,7 @@ export default function ProductDetailClient({ product: initialProduct, breadcrum
       <SEO
         title={product.name}
         description={product.description || `Buy ${product.name} online at best price.`}
-        canonicalUrl={`https://yourstore.com/products/${productId}`}
+        canonicalUrl={`https://www.sombu.in//products/${productId}`}
         image={product.image_url || '/images/og-product.jpg'}
         product={productSchema}
         breadcrumbs={breadcrumbs}

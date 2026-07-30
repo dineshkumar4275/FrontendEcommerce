@@ -5,11 +5,9 @@ import {
   ProductJsonLd, 
   BreadcrumbJsonLd,
   OrganizationJsonLd,
-  WebSiteJsonLd,
   ArticleJsonLd,
-  FAQPageJsonLd,
-  LocalBusinessJsonLd,
-  CollectionPageJsonLd
+  FAQPageJsonLd,  // ✅ Changed from FAQJsonLd to FAQPageJsonLd
+  LocalBusinessJsonLd
 } from 'next-seo';
 
 export const SEO = ({
@@ -20,16 +18,14 @@ export const SEO = ({
   noIndex = false,
   pageType = 'website',
   organization,
-  website,
   product,
   breadcrumbs,
   article,
   faqs,
   localBusiness,
-  collection,
 }) => {
-  const siteName = 'Sombustore';
-  const defaultTitle = 'Sombustore - Premium Products';
+  const siteName = 'Your Store';
+  const defaultTitle = 'Your Store - Premium Products';
   const defaultDescription = 'Shop premium products with amazing offers. Free shipping & easy returns.';
   const defaultImage = '/images/og-image.jpg';
   const siteUrl = 'https://www.sombustore.in';
@@ -60,13 +56,11 @@ export const SEO = ({
           ],
           site_name: siteName,
           type: pageType === 'product' ? 'product' : 
-                pageType === 'article' ? 'article' : 
-                pageType === 'faq' ? 'website' : 
-                pageType === 'localbusiness' ? 'website' : 'website',
+                pageType === 'article' ? 'article' : 'website',
         }}
         twitter={{
-          handle: '@yourstore',
-          site: '@yourstore',
+          handle: '@sombustore',
+          site: '@sombustore',
           cardType: 'summary_large_image',
         }}
         additionalMetaTags={[
@@ -96,29 +90,17 @@ export const SEO = ({
           url={organization.url || siteUrl}
           description={organization.description || seoDescription}
           sameAs={organization.sameAs || [
-            'https://facebook.com/yourstore',
-            'https://instagram.com/yourstore',
+            'https://facebook.com/sombustore',
+            'https://instagram.com/sombustore',
           ]}
           contactPoint={[
             {
-              telephone: organization.phone || '+91-1234567890',
+              telephone: organization.phone || '+91-9042909734',
               contactType: 'customer service',
               availableLanguage: ['English', 'Hindi'],
               areaServed: 'IN',
             },
           ]}
-        />
-      )}
-
-      {website && (
-        <WebSiteJsonLd
-          name={website.name || siteName}
-          description={website.description || seoDescription}
-          url={website.url || siteUrl}
-          potentialAction={{
-            target: `${website.url || siteUrl}/search?q={search_term_string}`,
-            queryInput: 'required name=search_term_string',
-          }}
         />
       )}
 
@@ -174,7 +156,7 @@ export const SEO = ({
       )}
 
       {faqs && faqs.length > 0 && (
-        <FAQPageJsonLd
+        <FAQPageJsonLd  // ✅ Changed from FAQJsonLd to FAQPageJsonLd
           mainEntity={faqs.map((faq) => ({
             questionName: faq.question,
             acceptedAnswerText: faq.answer,
@@ -189,7 +171,7 @@ export const SEO = ({
           url={localBusiness.url || siteUrl}
           telephone={localBusiness.phone || '+91-1234567890'}
           address={{
-            streetAddress: localBusiness.address || 'Sombustore Address',
+            streetAddress: localBusiness.address || 'Your Store Address',
             addressLocality: localBusiness.city || 'Chennai',
             addressRegion: localBusiness.state || 'Tamil Nadu',
             postalCode: localBusiness.zip || '600001',
@@ -200,14 +182,6 @@ export const SEO = ({
             longitude: localBusiness.lng || '80.2707',
           }}
           priceRange={localBusiness.priceRange || '₹₹'}
-        />
-      )}
-
-      {collection && (
-        <CollectionPageJsonLd
-          name={collection.name || 'Product Collection'}
-          description={collection.description || seoDescription}
-          url={collection.url || canonicalUrl || siteUrl}
         />
       )}
     </>

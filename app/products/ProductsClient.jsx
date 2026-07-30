@@ -217,9 +217,9 @@ const ProductCard = ({ product, isInWishlist }) => {
   );
 };
 
-export default function ProductsClient({ products: initialProducts, categories: initialCategories, breadcrumbs }) {
+export default function ProductsClient({ products: initialProducts, categories: initialCategories, breadcrumbs, error }) {
   const [products, setProducts] = useState(initialProducts || []);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!initialProducts || initialProducts.length === 0);
   const [searching, setSearching] = useState(false);
   const [categories] = useState(initialCategories || []);
   
@@ -243,6 +243,24 @@ export default function ProductsClient({ products: initialProducts, categories: 
     }
   }, [dispatch, token, isAuthenticated]);
 
+  // If there's an error or no products, try fetching again on client side
+  useEffect(() => {
+    if (error || (initialProducts && initialProducts.length === 0)) {
+      const fetchProducts = async () => {
+        try {
+          setLoading(true);
+          const data = await getProducts();
+          setProducts(data || []);
+        } catch (err) {
+          console.error('Client-side fetch failed:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProducts();
+    }
+  }, [error, initialProducts]);
+
   const hasActiveFilters = searchQuery || selectedCategory || minPrice || maxPrice;
 
   return (
@@ -250,7 +268,7 @@ export default function ProductsClient({ products: initialProducts, categories: 
       <SEO
         title="Premium Products Collection"
         description="Shop our premium collection of products at the best prices. Free shipping on all orders."
-        canonicalUrl="https://www.sombu.in//products"
+        canonicalUrl="https://www.sombustore.in/products"
         breadcrumbs={breadcrumbs}
         image="/images/og-products.jpg"
       />
@@ -331,7 +349,13 @@ export default function ProductsClient({ products: initialProducts, categories: 
             </div>
           </div>
 
-          {products.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <ProductSkeleton key={i} />
+              ))}
+            </div>
+          ) : products.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
               <div className="text-6xl mb-4">🚀</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Coming Soon!</h3>

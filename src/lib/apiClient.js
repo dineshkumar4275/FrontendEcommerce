@@ -1,6 +1,6 @@
 // lib/apiClient.js
 import axios from 'axios';
-import Router from 'next/router';
+// import {useRouter}  from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-ecommerce-brown.vercel.app/api';
 
@@ -60,8 +60,8 @@ apiClient.interceptors.response.use(
           localStorage.setItem('redirectAfterLogin', currentPath);
         }
         
-        // 重定向到登录页
-        Router.push('/login');
+        // 使用 window.location 进行重定向（适用于 App Router）
+        window.location.href = '/login';
       }
     }
     

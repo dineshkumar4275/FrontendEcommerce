@@ -1,48 +1,95 @@
-// UI Components
-export { Button } from './ui/Button';
-export { Card, CardHeader, CardBody, CardFooter } from './ui/Card';
-export { Modal } from './ui/Modal';
-export { Loader, Skeleton } from './ui/Loader';
-export { Toast } from './ui/Toast';
-export { Badge } from './ui/Badge';
-export { Input, TextArea } from './ui/Input';
-export { HeroSection } from './ui/HeroSection';
+// src/components/LanguageSelector.jsx
+'use client';
 
-// Layout Components
-export { Header } from './layout/Header';
-export { Footer } from './layout/Footer';
-export { Sidebar } from './layout/Sidebar';
-export { default as CartSidebar } from './layout/CartSidebar';
+import { useState, useEffect, useRef } from 'react';
+import { useApp } from '../hooks/useApp';
+import { languages } from '../data/languages';
 
-// Auth Components
-export { LoginForm } from './auth/LoginForm';
-export { RegisterForm } from './auth/RegisterForm';
-export { EmailOTPLogin } from './auth/EmailOTPLogin';
-export { ProtectedRoute } from './auth/ProtectedRoute';
+export default function LanguageSelector() {
+  const { language, setLanguage, t } = useApp();
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const dropdownRef = useRef(null);
 
-// Product Components
-export { ProductCard } from './products/ProductCard';
-export { ProductList } from './products/ProductList';
-export { ProductDetails } from './products/ProductDetails';
-export { ProductFilters } from './products/ProductFilters';
-export { ProductSearch } from './products/ProductSearch';
-export { AutoSuggestSearch } from './products/AutoSuggestSearch';
+  const selectedLanguage = languages.find(l => l.code === language);
 
-// Cart Components
-export { CartItems } from './cart/CartItems';
-export { CheckoutForm } from './cart/CheckoutForm';
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-// Order Components
-export { OrderCard } from './orders/OrderCard';
-export { OrderTable } from './orders/OrderTable';
-export { TrackingTimeline } from './orders/TrackingTimeline';
+  const handleSelect = (languageCode) => {
+    setLanguage(languageCode);
+    setIsOpen(false);
+    setSearch('');
+  };
 
-// Admin Components
-export { AdminSidebar } from './admin/AdminSidebar';
-export { AdminTracking } from './admin/AdminTracking';
-export { DriversManagement } from './admin/DriversManagement';
-export { ProductForm } from './admin/ProductForm';
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-purple-500 dark:hover:border-purple-400 transition-colors bg-white dark:bg-gray-800 w-full"
+        aria-label="Select language"
+      >
+        <span className="text-xl">{selectedLanguage?.flag}</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          {selectedLanguage?.nativeName}
+        </span>
+        <svg className={`w-4 h-4 text-gray-500 transition-transform ml-auto ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
 
-// Common Components
-export { SessionTimer } from './common/SessionTimer';
-export { ToastProvider } from './common/ToastProvider';
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 flex flex-col">
+          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={t('search') || 'Search...'}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="overflow-y-auto flex-1">
+            {languages.filter(l =>
+              l.name.toLowerCase().includes(search.toLowerCase()) ||
+              l.nativeName.toLowerCase().includes(search.toLowerCase()) ||
+              l.code.toLowerCase().includes(search.toLowerCase())
+            ).map((l) => (
+              <button
+                key={l.code}
+                onClick={() => handleSelect(l.code)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors ${
+                  language === l.code ? 'bg-purple-50 dark:bg-purple-900/30' : ''
+                }`}
+              >
+                <span className="text-xl">{l.flag}</span>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{l.nativeName}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{l.name}</p>
+                </div>
+                {language === l.code && (
+                  <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

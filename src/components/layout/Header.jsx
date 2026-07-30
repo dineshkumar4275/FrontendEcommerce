@@ -25,7 +25,7 @@ import { useWishlist } from '../../hooks/useWishlist';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import CartSidebar from '../layout/CartSidebar';
-import { GlobalSelector } from '../GlobalSelector';
+import GlobalSelector from '../GlobalSelector';
 import { useApp } from '../../hooks/useApp';
 import toast from 'react-hot-toast';
 

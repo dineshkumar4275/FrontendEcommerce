@@ -108,11 +108,12 @@
 //   );
 // }
 // app/layout.jsx
+
 import { Inter, Poppins } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Providers } from "../src/store/providers";
-import { AppProvider } from "../src/providers/Appprovider";
-import { GlobalSelector } from "../src/components/GlobalSelector";
+import AppProvider from "../src/providers/Appprovider";  // ✅ Default import, correct case
+import GlobalSelector from "../src/components/GlobalSelector";  // ✅ Default import (check this too)
 import "../src/styles/globals.css";
 
 const inter = Inter({

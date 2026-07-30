@@ -8,7 +8,8 @@ import { formatPrice } from '../../src/utils/formatters';
 import apiClient from '../../src/lib/apiClient';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { ArrowLeft, CreditCard, Shield, Truck, Clock, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, CreditCard, Shield, Truck, Wallet,   
+  ShieldCheck , Clock, ShoppingBag } from 'lucide-react';
 import { Header } from '../../src/components/layout/Header';
 import { Footer } from '../../src/components/layout/Footer';
 

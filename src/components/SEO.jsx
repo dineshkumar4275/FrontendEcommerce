@@ -1,20 +1,38 @@
-import { NextSeo, ProductJsonLd, ReviewJsonLd, BreadcrumbJsonLd } from 'next-seo';
+'use client';
+
+import { 
+  NextSeo, 
+  ProductJsonLd, 
+  BreadcrumbJsonLd,
+  OrganizationJsonLd,
+  WebSiteJsonLd,
+  ArticleJsonLd,
+  FAQPageJsonLd,
+  LocalBusinessJsonLd,
+  CollectionPageJsonLd
+} from 'next-seo';
 
 export const SEO = ({
   title,
   description,
   canonicalUrl,
   image,
+  noIndex = false,
+  pageType = 'website',
+  organization,
+  website,
   product,
   breadcrumbs,
-  category,
-  noIndex = false,
+  article,
+  faqs,
+  localBusiness,
+  collection,
 }) => {
-  // Default SEO values
-  const siteName = 'sombustore';
-  const defaultTitle = 'Premium Products - sombu store';
+  const siteName = 'Sombustore';
+  const defaultTitle = 'Sombustore - Premium Products';
   const defaultDescription = 'Shop premium products with amazing offers. Free shipping & easy returns.';
   const defaultImage = '/images/og-image.jpg';
+  const siteUrl = 'https://www.sombustore.in';
 
   const seoTitle = title ? `${title} | ${siteName}` : defaultTitle;
   const seoDescription = description || defaultDescription;
@@ -26,8 +44,10 @@ export const SEO = ({
         title={seoTitle}
         description={seoDescription}
         canonical={canonicalUrl}
+        noindex={noIndex}
+        nofollow={noIndex}
         openGraph={{
-          url: canonicalUrl,
+          url: canonicalUrl || siteUrl,
           title: seoTitle,
           description: seoDescription,
           images: [
@@ -39,18 +59,20 @@ export const SEO = ({
             },
           ],
           site_name: siteName,
+          type: pageType === 'product' ? 'product' : 
+                pageType === 'article' ? 'article' : 
+                pageType === 'faq' ? 'website' : 
+                pageType === 'localbusiness' ? 'website' : 'website',
         }}
         twitter={{
-          handle: '@Sombustore',
-          site: '@Sombustore',
+          handle: '@yourstore',
+          site: '@yourstore',
           cardType: 'summary_large_image',
         }}
-        noindex={noIndex}
-        nofollow={noIndex}
         additionalMetaTags={[
           {
             name: 'keywords',
-            content: 'shop, premium products, online store, buy products',
+            content: 'shop, premium products, online store, buy products, best deals',
           },
           {
             name: 'viewport',
@@ -60,25 +82,57 @@ export const SEO = ({
             name: 'robots',
             content: noIndex ? 'noindex, nofollow' : 'index, follow',
           },
+          {
+            name: 'theme-color',
+            content: '#7c3aed',
+          },
         ]}
       />
 
-      {/* Product Schema */}
+      {organization && (
+        <OrganizationJsonLd
+          name={organization.name || siteName}
+          logo={organization.logo || `${siteUrl}/logo.png`}
+          url={organization.url || siteUrl}
+          description={organization.description || seoDescription}
+          sameAs={organization.sameAs || [
+            'https://facebook.com/yourstore',
+            'https://instagram.com/yourstore',
+          ]}
+          contactPoint={[
+            {
+              telephone: organization.phone || '+91-1234567890',
+              contactType: 'customer service',
+              availableLanguage: ['English', 'Hindi'],
+              areaServed: 'IN',
+            },
+          ]}
+        />
+      )}
+
+      {website && (
+        <WebSiteJsonLd
+          name={website.name || siteName}
+          description={website.description || seoDescription}
+          url={website.url || siteUrl}
+          potentialAction={{
+            target: `${website.url || siteUrl}/search?q={search_term_string}`,
+            queryInput: 'required name=search_term_string',
+          }}
+        />
+      )}
+
       {product && (
         <ProductJsonLd
           productName={product.name}
-          images={product.images || [product.image]}
+          images={product.images || [product.image_url]}
           description={product.description}
           brand={product.brand || siteName}
           sku={product.sku || product.id}
-          gtin8={product.gtin}
-          mpn={product.mpn}
-          material={product.material}
-          color={product.color}
           offers={{
-            price: product.price,
+            price: product.price || 0,
             priceCurrency: 'INR',
-            priceValidUntil: product.priceValidUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             itemCondition: 'https://schema.org/NewCondition',
             availability: product.stock > 0
               ? 'https://schema.org/InStock'
@@ -89,31 +143,71 @@ export const SEO = ({
           }}
           aggregateRating={product.rating ? {
             ratingValue: product.rating,
-            reviewCount: product.reviewCount || 0,
+            reviewCount: product.review_count || 0,
           } : undefined}
-          reviews={product.reviews ? product.reviews.map((review, index) => ({
-            author: {
-              type: 'Person',
-              name: review.author || 'Customer',
-            },
-            datePublished: review.date || new Date().toISOString(),
-            reviewBody: review.body || review.text,
-            reviewRating: {
-              ratingValue: review.rating || 5,
-              bestRating: 5,
-            },
-          })) : undefined}
         />
       )}
 
-      {/* Breadcrumb Schema */}
-      {breadcrumbs && breadcrumbs.length > 0 && (
+      {breadcrumbs && breadcrumbs.length > 1 && (
         <BreadcrumbJsonLd
           itemListElements={breadcrumbs.map((item, index) => ({
             position: index + 1,
             name: item.name,
             item: item.url,
           }))}
+        />
+      )}
+
+      {article && (
+        <ArticleJsonLd
+          url={article.url || canonicalUrl || siteUrl}
+          headline={article.headline || seoTitle}
+          description={article.description || seoDescription}
+          image={article.image || seoImage}
+          datePublished={article.datePublished || new Date().toISOString()}
+          dateModified={article.dateModified || new Date().toISOString()}
+          authorName={article.authorName || siteName}
+          publisherName={article.publisherName || siteName}
+          publisherLogo={article.publisherLogo || `${siteUrl}/logo.png`}
+          isAccessibleForFree={true}
+        />
+      )}
+
+      {faqs && faqs.length > 0 && (
+        <FAQPageJsonLd
+          mainEntity={faqs.map((faq) => ({
+            questionName: faq.question,
+            acceptedAnswerText: faq.answer,
+          }))}
+        />
+      )}
+
+      {localBusiness && (
+        <LocalBusinessJsonLd
+          name={localBusiness.name || siteName}
+          description={localBusiness.description || seoDescription}
+          url={localBusiness.url || siteUrl}
+          telephone={localBusiness.phone || '+91-1234567890'}
+          address={{
+            streetAddress: localBusiness.address || 'Sombustore Address',
+            addressLocality: localBusiness.city || 'Chennai',
+            addressRegion: localBusiness.state || 'Tamil Nadu',
+            postalCode: localBusiness.zip || '600001',
+            addressCountry: 'IN',
+          }}
+          geo={{
+            latitude: localBusiness.lat || '13.0827',
+            longitude: localBusiness.lng || '80.2707',
+          }}
+          priceRange={localBusiness.priceRange || '₹₹'}
+        />
+      )}
+
+      {collection && (
+        <CollectionPageJsonLd
+          name={collection.name || 'Product Collection'}
+          description={collection.description || seoDescription}
+          url={collection.url || canonicalUrl || siteUrl}
         />
       )}
     </>

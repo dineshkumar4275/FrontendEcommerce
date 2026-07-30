@@ -5,6 +5,32 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+// Replace these imports
+import { 
+  Home,
+  ShoppingBag,
+  ClipboardList,
+  Users,
+  Truck,
+  LogOut,
+  Plus,
+  Menu,
+  X,
+  Sparkles,
+  BarChart3,
+  Bell,
+  Search,
+  Settings,
+  HelpCircle,
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Gauge,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
+
+// With these (using icons that exist)
 import { 
   Home,
   ShoppingBag,

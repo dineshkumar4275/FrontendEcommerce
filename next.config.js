@@ -11,14 +11,15 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
+  // Disable modularize imports for lucide-react to avoid issues
   modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{member}}',
-    },
+    // Remove or comment out lucide-react from here
+    // 'lucide-react': {
+    //   transform: 'lucide-react/dist/esm/icons/{{member}}',
+    // },
   },
   
-  // Enable static exports if you don't need server features
-  // output: 'export',
+  transpilePackages: ['lucide-react'],
 };
 
 module.exports = nextConfig;

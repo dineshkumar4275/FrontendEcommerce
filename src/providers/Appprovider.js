@@ -1,4 +1,6 @@
 // src/providers/AppProvider.jsx
+'use client';
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { AppContext } from '../context/AppContext';
 import { storage, STORAGE_KEYS } from '../lib/storage';
@@ -79,16 +81,10 @@ export const AppProvider = ({ children }) => {
     }
   }, [language]);
 
-  // Fetch exchange rates (mock - in production, fetch from API)
+  // Fetch exchange rates
   useEffect(() => {
-    // Simulate API call
     const fetchRates = async () => {
       try {
-        // In production, fetch from an API like exchangerate-api.com
-        // const response = await fetch(`https://api.exchangerate-api.com/v4/latest/INR`);
-        // const data = await response.json();
-        // setExchangeRates(data.rates);
-        
         // Mock rates for demo
         setExchangeRates({
           USD: 0.012,

@@ -138,7 +138,7 @@
 //       <div className="flex justify-between items-center mb-6">
 //         <div>
 //           <h1 className="text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
-//           <p className="text-gray-500 text-sm mt-1">Track your store performance</p>
+//           <p className="text-gray-500 text-sm mt-1">Track Sombustore performance</p>
 //         </div>
 //         <div className="flex gap-3">
 //           <select
@@ -373,7 +373,7 @@ export default function AnalyticsPage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Track your store performance</p>
+          <p className="text-sm text-gray-500 mt-1">Track Sombustore performance</p>
         </div>
         <div className="flex gap-3">
           {/* Period Selector - Mobile Friendly */}

@@ -1323,7 +1323,7 @@
 //     images: productImages,
 //     price: productPrice,
 //     stock: product?.stock || 0,
-//     brand: product?.brand || 'Your Store',
+//     brand: product?.brand || 'Sombustore',
 //     sku: product?.sku || `SKU-${product?.id}`,
 //     rating: product?.rating || 4.5,
 //     review_count: product?.review_count || 0,
@@ -1835,22 +1835,22 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: `${product.name} - Buy Online | Your Store`,
+    title: `${product.name} - Buy Online | Sombustore`,
     description: product.description || `Buy ${product.name} online at best price. Premium quality product with free shipping.`,
     keywords: `${product.name}, buy ${product.name}, ${product.category}, product details, online shopping`,
     alternates: { canonical: `https://www.sombu.in//products/${params.id}` },
     openGraph: {
-      title: `${product.name} - Buy Online | Your Store`,
+      title: `${product.name} - Buy Online | Sombustore`,
       description: product.description || `Buy ${product.name} online at best price.`,
       url: `https://www.sombu.in//products/${params.id}`,
-      siteName: 'Your Store',
+      siteName: 'Sombustore',
       images: [{ url: product.image_url || '/images/og-product.jpg', width: 1200, height: 630 }],
       type: 'product',
       locale: 'en_IN',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${product.name} - Buy Online | Your Store`,
+      title: `${product.name} - Buy Online | Sombustore`,
       description: product.description || `Buy ${product.name} online at best price.`,
       images: [product.image_url || '/images/og-product.jpg'],
     },

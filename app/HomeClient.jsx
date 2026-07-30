@@ -15,7 +15,7 @@ import {
 
 export default function HomeClient() {
   const organizationData = {
-    name: 'Your Store',
+    name: 'Sombustore',
     description: 'India\'s premium online shopping destination',
     url: 'https://www.sombu.in/',
     logo: 'https://www.sombu.in//logo.png',
@@ -24,7 +24,7 @@ export default function HomeClient() {
   };
 
   const websiteData = {
-    name: 'Your Store',
+    name: 'Sombustore',
     description: 'India\'s premium online shopping destination',
     url: 'https://www.sombu.in/',
   };
@@ -33,8 +33,8 @@ export default function HomeClient() {
     <>
       <SEO
         pageType="website"
-        title="Your Store - Premium Products & Amazing Offers"
-        description="Welcome to Your Store - India's premium online shopping destination."
+        title="Sombustore - Premium Products & Amazing Offers"
+        description="Welcome to Sombustore - India's premium online shopping destination."
         canonicalUrl="https://www.sombu.in/"
         organization={organizationData}
         website={websiteData}

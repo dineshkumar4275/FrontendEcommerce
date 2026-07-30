@@ -2,21 +2,21 @@ import { Metadata } from 'next';
 import FAQClient from './FAQClient';
 
 export const metadata = {
-  title: 'FAQ - Frequently Asked Questions | Your Store',
+  title: 'FAQ - Frequently Asked Questions | Sombustore',
   description: 'Find answers to frequently asked questions about shipping, returns, payments, and more.',
   keywords: 'faq, frequently asked questions, help, support',
-  alternates: { canonical: 'https://yourstore.com/faqs' },
+  alternates: { canonical: 'https://www.sombu.in//faqs' },
   openGraph: {
-    title: 'FAQ - Frequently Asked Questions | Your Store',
+    title: 'FAQ - Frequently Asked Questions | Sombustore',
     description: 'Find answers to frequently asked questions.',
-    url: 'https://yourstore.com/faqs',
-    siteName: 'Your Store',
+    url: 'https://www.sombu.in//faqs',
+    siteName: 'Sombustore',
     images: [{ url: '/images/og-faq.jpg', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FAQ - Frequently Asked Questions | Your Store',
+    title: 'FAQ - Frequently Asked Questions | Sombustore',
     description: 'Find answers to frequently asked questions.',
     images: ['/images/og-faq.jpg'],
   },

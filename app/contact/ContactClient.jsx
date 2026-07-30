@@ -6,9 +6,9 @@ import { Mail, Phone, MapPin, MessageCircle, Clock, Send } from 'lucide-react';
 
 export default function ContactClient() {
   const localBusinessData = {
-    name: 'Your Store',
+    name: 'Sombustore',
     description: 'Premium products store in Chennai',
-    url: 'https://yourstore.com',
+    url: 'https://www.sombu.in/',
     phone: '+91-1234567890',
     address: '123, Anna Salai, Chennai',
     city: 'Chennai',
@@ -24,17 +24,17 @@ export default function ContactClient() {
   };
 
   const breadcrumbs = [
-    { name: 'Home', url: 'https://yourstore.com' },
-    { name: 'Contact', url: 'https://yourstore.com/contact' },
+    { name: 'Home', url: 'https://www.sombu.in/' },
+    { name: 'Contact', url: 'https://www.sombu.in//contact' },
   ];
 
   return (
     <>
       <SEO
         pageType="localbusiness"
-        title="Contact Us - Your Store | Get in Touch"
-        description="Get in touch with Your Store."
-        canonicalUrl="https://yourstore.com/contact"
+        title="Contact Us - Sombustore | Get in Touch"
+        description="Get in touch with Sombustore."
+        canonicalUrl="https://www.sombu.in//contact"
         localBusiness={localBusinessData}
         breadcrumbs={breadcrumbs}
       />

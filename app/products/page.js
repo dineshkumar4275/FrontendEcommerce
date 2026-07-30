@@ -1677,21 +1677,21 @@ import ProductsClient from './ProductsClient';
 import { getProducts, getCategories } from '../../src/services/productService';
 
 export const metadata = {
-  title: 'Products - Shop Premium Products | Your Store',
+  title: 'Products - Shop Premium Products | Sombustore',
   description: 'Browse our premium collection of products. Shop from 10,000+ items with free shipping.',
   keywords: 'products, shop online, buy products, premium products',
   alternates: { canonical: 'https://www.sombu.in//products' },
   openGraph: {
-    title: 'Products - Shop Premium Products | Your Store',
+    title: 'Products - Shop Premium Products | Sombustore',
     description: 'Browse our premium collection of products.',
     url: 'https://www.sombu.in//products',
-    siteName: 'Your Store',
+    siteName: 'Sombustore',
     images: [{ url: '/images/og-products.jpg', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Products - Shop Premium Products | Your Store',
+    title: 'Products - Shop Premium Products | Sombustore',
     description: 'Browse our premium collection of products.',
     images: ['/images/og-products.jpg'],
   },

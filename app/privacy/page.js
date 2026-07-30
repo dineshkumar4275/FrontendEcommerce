@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata = {
-  title: 'Privacy Policy - Your Store',
+  title: 'Privacy Policy - Sombustore',
   description: 'Learn about our privacy policy. We value your privacy and protect your data.',
   keywords: 'privacy policy, privacy, data protection',
-  alternates: { canonical: 'https://yourstore.com/privacy' },
+  alternates: { canonical: 'https://www.sombu.in//privacy' },
   robots: { index: true, follow: true },
 };
 

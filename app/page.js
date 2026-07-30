@@ -193,23 +193,23 @@ import { Metadata } from 'next';
 import HomeClient from './HomeClient';
 
 export const metadata = {
-  title: 'Your Store - Premium Products & Amazing Offers',
-  description: 'Welcome to Your Store - India\'s premium online shopping destination. Shop from 10,000+ products with free shipping.',
+  title: 'Sombustore - Premium Products & Amazing Offers',
+  description: 'Welcome to Sombustore - India\'s premium online shopping destination. Shop from 10,000+ products with free shipping.',
   keywords: 'online store, premium products, shop india, buy products, best deals',
   alternates: { canonical: 'https://www.sombu.in/' },
   openGraph: {
-    title: 'Your Store - Premium Products & Amazing Offers',
-    description: 'Welcome to Your Store - India\'s premium online shopping destination.',
+    title: 'Sombustore - Premium Products & Amazing Offers',
+    description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
     url: 'https://www.sombu.in/',
-    siteName: 'Your Store',
+    siteName: 'Sombustore',
     images: [{ url: '/images/og-home.jpg', width: 1200, height: 630 }],
     locale: 'en_IN',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Your Store - Premium Products',
-    description: 'Welcome to Your Store - India\'s premium online shopping destination.',
+    title: 'Sombustore - Premium Products',
+    description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
     images: ['/images/og-home.jpg'],
   },
   robots: { index: true, follow: true },

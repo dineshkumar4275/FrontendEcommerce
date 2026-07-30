@@ -10,17 +10,17 @@ export default function FAQClient({ faqs }) {
   const [openIndex, setOpenIndex] = useState(null);
 
   const breadcrumbs = [
-    { name: 'Home', url: 'https://yourstore.com' },
-    { name: 'FAQ', url: 'https://yourstore.com/faqs' },
+    { name: 'Home', url: 'https://www.sombu.in/' },
+    { name: 'FAQ', url: 'https://www.sombu.in//faqs' },
   ];
 
   return (
     <>
       <SEO
         pageType="faq"
-        title="FAQ - Frequently Asked Questions | Your Store"
+        title="FAQ - Frequently Asked Questions | Sombustore"
         description="Find answers to frequently asked questions about shipping, returns, payments, and more."
-        canonicalUrl="https://yourstore.com/faqs"
+        canonicalUrl="https://www.sombu.in//faqs"
         faqs={faqs}
         breadcrumbs={breadcrumbs}
       />

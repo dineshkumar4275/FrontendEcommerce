@@ -6,7 +6,7 @@ import { Sparkles } from 'lucide-react';
 
 export default function AboutClient() {
   const organizationData = {
-    name: 'Your Store',
+    name: 'Sombustore',
     description: 'India\'s premium online shopping destination since 2020',
     url: 'https://www.sombu.in/',
     logo: 'https://www.sombu.in//logo.png',
@@ -23,8 +23,8 @@ export default function AboutClient() {
     <>
       <SEO
         pageType="website"
-        title="About Us - Your Store | Premium Products"
-        description="Learn about Your Store - India's premium online shopping destination."
+        title="About Us - Sombustore | Premium Products"
+        description="Learn about Sombustore - India's premium online shopping destination."
         canonicalUrl="https://www.sombu.in//about"
         organization={organizationData}
         breadcrumbs={breadcrumbs}
@@ -51,7 +51,7 @@ export default function AboutClient() {
               <div>
                 <h2 className="text-2xl font-semibold text-gray-800 mb-3">Our Story</h2>
                 <p className="text-gray-600 leading-relaxed">
-                  Welcome to Your Store, your trusted online shopping destination. 
+                  Welcome to Sombustore, your trusted online shopping destination. 
                   We started with a simple mission: to provide high-quality products at affordable prices, 
                   with exceptional customer service.
                 </p>

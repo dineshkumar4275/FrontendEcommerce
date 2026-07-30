@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import CartClient from './CartClient';
 
 export const metadata = {
-  title: 'Cart - Your Store',
+  title: 'Cart - Sombustore',
   description: 'View your shopping cart.',
-  alternates: { canonical: 'https://yourstore.com/cart' },
+  alternates: { canonical: 'https://www.sombu.in//cart' },
   robots: { index: false, follow: false }, // Noindex
 };
 

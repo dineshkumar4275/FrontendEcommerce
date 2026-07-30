@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                 <span className="text-sm font-semibold text-purple-600 uppercase tracking-wider">Dashboard</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Welcome back, Admin</h1>
-              <p className="text-gray-500 mt-1">Here's what's happening with your store today.</p>
+              <p className="text-gray-500 mt-1">Here's what's happening with Sombustore today.</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-gray-100">

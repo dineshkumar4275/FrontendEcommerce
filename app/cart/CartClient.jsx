@@ -72,8 +72,8 @@ export default function CartClient() {
 
   // Breadcrumb for SEO
   const breadcrumbs = [
-    { name: 'Home', url: 'https://yourstore.com' },
-    { name: 'Cart', url: 'https://yourstore.com/cart' },
+    { name: 'Home', url: 'https://www.sombu.in/' },
+    { name: 'Cart', url: 'https://www.sombu.in//cart' },
   ];
 
   if (items.length === 0) {
@@ -81,9 +81,9 @@ export default function CartClient() {
       <>
         <Header />
         <SEO
-          title="Cart - Your Store"
+          title="Cart - Sombustore"
           description="View your shopping cart."
-          canonicalUrl="https://yourstore.com/cart"
+          canonicalUrl="https://www.sombu.in//cart"
           noIndex={true}
           breadcrumbs={breadcrumbs}
         />
@@ -127,9 +127,9 @@ export default function CartClient() {
   return (
     <>
       <SEO
-        title="Cart - Your Store"
+        title="Cart - Sombustore"
         description="View your shopping cart. Review items and proceed to checkout."
-        canonicalUrl="https://yourstore.com/cart"
+        canonicalUrl="https://www.sombu.in//cart"
         noIndex={true}
         breadcrumbs={breadcrumbs}
       />

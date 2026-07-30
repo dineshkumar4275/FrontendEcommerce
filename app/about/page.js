@@ -75,22 +75,22 @@ import { Metadata } from 'next';
 import AboutClient from './AboutClient';
 
 export const metadata = {
-  title: 'About Us - Your Store | Premium Products',
-  description: 'Learn about Your Store - India\'s premium online shopping destination. Discover our story, mission, and values.',
+  title: 'About Us - Sombustore | Premium Products',
+  description: 'Learn about Sombustore - India\'s premium online shopping destination. Discover our story, mission, and values.',
   keywords: 'about us, our story, mission, vision, values',
   alternates: { canonical: 'https://www.sombu.in//about' },
   openGraph: {
-    title: 'About Us - Your Store | Premium Products',
-    description: 'Learn about Your Store - India\'s premium online shopping destination.',
+    title: 'About Us - Sombustore | Premium Products',
+    description: 'Learn about Sombustore - India\'s premium online shopping destination.',
     url: 'https://www.sombu.in//about',
-    siteName: 'Your Store',
+    siteName: 'Sombustore',
     images: [{ url: '/images/og-about.jpg', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About Us - Your Store | Premium Products',
-    description: 'Learn about Your Store - India\'s premium online shopping destination.',
+    title: 'About Us - Sombustore | Premium Products',
+    description: 'Learn about Sombustore - India\'s premium online shopping destination.',
     images: ['/images/og-about.jpg'],
   },
   robots: { index: true, follow: true },

@@ -4,13 +4,15 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { AppContext } from '../context/AppContext';
 import { storage, STORAGE_KEYS } from '../lib/storage';
-import { convertCurrency, formatCurrency, getExchangeRate } from '../lib/currency';
+// import { convertCurrency, formatCurrency, getExchangeRate } from '../lib/currency';
+import {convertCurrency ,formatCurrency,getExchangeRate} from '../lib/currency'
 import { translate } from '../lib/translate';
 import { detectCountry } from '../utils/detectCountry';
 import { detectLanguage } from '../utils/detectLanguage';
 import { countries } from '../data/countries';
 import { currencies } from '../data/currencies';
 import { languages } from '../data/languages';
+import { format } from 'path';
 
 export const AppProvider = ({ children }) => {
   // Initialize with stored values or detected values

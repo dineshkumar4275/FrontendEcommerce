@@ -1,6 +1,6 @@
 // app/gdpr/page.js
 import Link from 'next/link';
-import { Shield, UserCheck, Database, Eye, Trash2, FileText } from 'lucide-react';
+import { Shield, User, Database, Eye, Trash, FileText } from 'lucide-react';
 
 export const metadata = {
   title: 'GDPR Compliance - Sombustore',

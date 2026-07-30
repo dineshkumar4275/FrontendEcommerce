@@ -23,7 +23,7 @@ export const metadata = {
     template: "%s | Sombu Store",
   },
     verification: {
-    google: "googleb181e800db31c273.html",
+    google: "google-site-verification: googleb181e800db31c273.html",
   },
 
   description:

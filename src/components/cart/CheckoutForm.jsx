@@ -59,7 +59,7 @@
 //                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
 //                 amount: data.razorpayOrder.amount,
 //                 currency: 'INR',
-//                 name: 'ShopHub',
+//                 name: 'Sombustore',
 //                 description: `Order ${data.order.order_number}`,
 //                 order_id: data.razorpayOrder.id,
 //                 handler: async (response) => {

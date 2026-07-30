@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Shield, UserCheck, Database, Eye, Trash2, FileText } from 'lucide-react';
 
 export const metadata = {
-  title: 'GDPR Compliance - ShopHub',
+  title: 'GDPR Compliance - Sombustore',
   description: 'Your data protection rights under GDPR',
 };
 
@@ -69,8 +69,8 @@ export default function GDPRPage() {
             </h2>
             <p className="text-gray-600">
               To exercise any of your GDPR rights, please contact us at{' '}
-              <a href="mailto:privacy@shophub.com" className="text-blue-600 hover:text-blue-700">
-                privacy@shophub.com
+              <a href="mailto:privacy@Sombustore.com" className="text-blue-600 hover:text-blue-700">
+                privacy@Sombustore.com
               </a>
               . We will respond to your request within 30 days.
             </p>
@@ -79,10 +79,10 @@ export default function GDPRPage() {
           <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
             <h3 className="font-semibold text-blue-800 mb-2">Data Controller Information</h3>
             <p className="text-sm text-blue-700">
-              ShopHub Inc.<br />
+              Sombustore Inc.<br />
               123 E-commerce Street<br />
               New York, NY 10001<br />
-              Email: dpo@shophub.com
+              Email: dpo@Sombustore.com
             </p>
           </div>
 

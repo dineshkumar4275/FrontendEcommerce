@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Cookie, Shield, Eye, Database } from 'lucide-react';
 
 export const metadata = {
-  title: 'Cookie Policy - ShopHub',
+  title: 'Cookie Policy - Sombustore',
   description: 'Learn about how we use cookies on our website',
 };
 

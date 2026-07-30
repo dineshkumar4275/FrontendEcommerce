@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { FileText, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const metadata = {
-  title: 'Terms of Service - ShopHub',
+  title: 'Terms of Service - Sombustore',
   description: 'Read our terms and conditions',
 };
 

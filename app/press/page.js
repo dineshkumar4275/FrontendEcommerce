@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Newspaper, Calendar, User, ExternalLink } from 'lucide-react';
 
 export const metadata = {
-  title: 'Press & Media - ShopHub',
+  title: 'Press & Media - Sombustore',
   description: 'Latest news and press releases',
 };
 
@@ -11,7 +11,7 @@ export const metadata = {
 const pressArticles = [
   {
     id: 1,
-    title: 'ShopHub Raises $10M in Series A Funding',
+    title: 'Sombustore Raises $10M in Series A Funding',
     date: 'March 15, 2024',
     author: 'TechCrunch',
     excerpt: 'The e-commerce platform continues to grow rapidly with new funding round led by leading venture capital firms.',
@@ -27,7 +27,7 @@ const pressArticles = [
   },
   {
     id: 3,
-    title: 'ShopHub Named Best Startup of 2024',
+    title: 'Sombustore Named Best Startup of 2024',
     date: 'January 10, 2024',
     author: 'Business Insider',
     excerpt: 'Recognized for innovation in e-commerce and exceptional customer satisfaction ratings.',
@@ -85,8 +85,8 @@ export default function PressPage() {
           <h3 className="font-semibold text-gray-800 mb-2">Media Inquiries</h3>
           <p className="text-gray-600 text-sm">
             For press-related questions, please contact us at:<br />
-            <a href="mailto:press@shophub.com" className="text-purple-600 hover:text-purple-700">
-              press@shophub.com
+            <a href="mailto:press@Sombustore.com" className="text-purple-600 hover:text-purple-700">
+              press@Sombustore.com
             </a>
           </p>
         </div>

@@ -61,7 +61,7 @@ export const Footer = () => {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                ShopHub
+                Sombustore
               </span>
             </Link>
             <p className="text-gray-400 mb-4 text-sm">
@@ -101,7 +101,7 @@ export const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">&copy; {currentYear} ShopHub. All rights reserved.</p>
+            <p className="text-gray-400 text-sm">&copy; {currentYear} Sombustore. All rights reserved.</p>
             <div className="flex gap-3">
               <span className="text-gray-400 text-xs">Visa</span>
               <span className="text-gray-400 text-xs">Mastercard</span>

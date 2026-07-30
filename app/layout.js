@@ -16,7 +16,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: 'ShopHub - Premium E-Commerce',
+  title: 'Sombustore - Premium E-Commerce',
   description: 'Your one-stop shop for quality products at best prices',
 };
 

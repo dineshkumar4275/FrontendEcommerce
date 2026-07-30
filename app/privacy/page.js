@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Shield, Lock, Eye, Database } from 'lucide-react';
 
 export const metadata = {
-  title: 'Privacy Policy - ShopHub',
+  title: 'Privacy Policy - Sombustore',
   description: 'Learn how we protect your personal information',
 };
 

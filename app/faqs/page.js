@@ -2,7 +2,7 @@
 import FAQClient from './FAQClient';
 
 export const metadata = {
-  title: 'FAQs - ShopHub',
+  title: 'FAQs - Sombustore',
   description: 'Frequently asked questions',
 };
 

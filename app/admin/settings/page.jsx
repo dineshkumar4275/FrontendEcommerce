@@ -30,8 +30,8 @@ export default function AdminSettingsPage() {
     confirmPassword: ''
   });
   const [storeSettings, setStoreSettings] = useState({
-    storeName: 'ShopHub',
-    storeEmail: 'support@shophub.com',
+    storeName: 'Sombustore',
+    storeEmail: 'support@Sombustore.com',
     storePhone: '+91 9876543210',
     storeAddress: '123 Business Street, Mumbai, India',
     currency: 'INR',

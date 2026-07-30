@@ -931,6 +931,9 @@
 // }
 
 
+
+
+// SEO ---------------------------
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -957,6 +960,7 @@ import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroico
 
 import { Header } from '../../../src/components/layout/Header';
 import { Footer } from '../../../src/components/layout/Footer';
+import { SEO } from '../../../src/components/SEO';
 import { getProductById } from '../../../src/services/productService';
 import { useCart } from '../../../src/hooks/useCart';
 import {
@@ -1195,24 +1199,6 @@ export default function ProductDetailPage() {
   // 🚀 NO SALE MODE - Disabled Add to Cart
   const handleAddToCart = async () => {
     // Disabled - Coming Soon
-    // if (!token && !isAuthenticated) {
-    //   localStorage.setItem('redirectAfterLogin', `/products/${productId}`);
-    //   router.push('/login');
-    //   return;
-    // }
-    // if (product.stock <= 0) return;
-    // setAdding(true);
-    // try {
-    //   addToCart({
-    //     ...product,
-    //     quantity,
-    //     selectedSize,
-    //     selectedColor,
-    //     selectedColorImage: selectedColorObj?.image || null,
-    //   });
-    // } finally {
-    //   setAdding(false);
-    // }
   };
 
   const handleWishlistToggle = async () => {
@@ -1328,6 +1314,31 @@ export default function ProductDetailPage() {
     ? Math.round(((comparePriceValue - productPrice) / comparePriceValue) * 100)
     : 0;
 
+  // Prepare product schema for SEO
+  const productSchema = {
+    id: product?.id,
+    name: product?.name,
+    description: product?.description || '',
+    image_url: product?.image_url || '',
+    images: productImages,
+    price: productPrice,
+    stock: product?.stock || 0,
+    brand: product?.brand || 'Your Store',
+    sku: product?.sku || `SKU-${product?.id}`,
+    rating: product?.rating || 4.5,
+    review_count: product?.review_count || 0,
+    reviews: product?.reviews || [],
+    color: product?.color || '',
+    material: product?.material || '',
+  };
+
+  // Generate breadcrumb schema
+  const breadcrumbs = [
+    { name: 'Home', url: 'https://yourstore.com' },
+    { name: 'Products', url: 'https://yourstore.com/products' },
+    { name: product?.name || 'Product', url: `https://yourstore.com/products/${productId}` },
+  ];
+
   if (loading) {
     return (
       <>
@@ -1361,6 +1372,16 @@ export default function ProductDetailPage() {
 
   return (
     <>
+      {/* ✅ SEO Component with Product Schema */}
+      <SEO
+        title={product.name}
+        description={product.description || `Buy ${product.name} online at best price. Premium quality product with free shipping.`}
+        canonicalUrl={`https://yourstore.com/products/${productId}`}
+        image={product.image_url || '/images/og-product.jpg'}
+        product={productSchema}
+        breadcrumbs={breadcrumbs}
+      />
+
       <Header categories={[]} />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20">
         <div className="container mx-auto px-4 py-8">

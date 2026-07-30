@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Calendar, User, Clock, BookOpen } from 'lucide-react';
 
 export const metadata = {
-  title: 'Blog - ShopHub',
+  title: 'Blog - Sombustore',
   description: 'Latest news, tips, and updates from our team',
 };
 

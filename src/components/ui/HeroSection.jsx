@@ -17,7 +17,7 @@ export const HeroSection = () => {
           className="text-center"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Welcome to ShopHub
+            Welcome to Sombustore
           </h1>
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
             Discover amazing products at unbeatable prices. Free shipping on orders over ₹999!

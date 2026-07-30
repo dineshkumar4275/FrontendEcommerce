@@ -252,7 +252,7 @@ export const Header = ({
                 <SparklesIcon className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-purple-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent hidden sm:block">
-                ShopHub
+                Sombustore
               </span>
             </Link>
 

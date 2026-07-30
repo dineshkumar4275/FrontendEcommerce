@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { AlertTriangle, Info, Shield, FileWarning } from 'lucide-react';
 
 export const metadata = {
-  title: 'Disclaimer - ShopHub',
+  title: 'Disclaimer - Sombustore',
   description: 'Legal disclaimer and terms of use',
 };
 
@@ -38,7 +38,7 @@ export default function DisclaimerPage() {
             </h2>
             <p className="text-gray-600">
               The content on this website is provided "as is" without any representations or warranties, 
-              express or implied. ShopHub makes no representations or warranties in relation to the 
+              express or implied. Sombustore makes no representations or warranties in relation to the 
               completeness, accuracy, reliability, suitability, or availability of the information contained on this website.
             </p>
           </div>
@@ -72,7 +72,7 @@ export default function DisclaimerPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-3">Limitation of Liability</h2>
             <p className="text-gray-600">
-              To the fullest extent permitted by law, ShopHub shall not be liable for any indirect, incidental, 
+              To the fullest extent permitted by law, Sombustore shall not be liable for any indirect, incidental, 
               special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred 
               directly or indirectly, or any loss of data, use, goodwill, or other intangible losses.
             </p>

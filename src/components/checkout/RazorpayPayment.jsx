@@ -71,7 +71,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, buttonText = "Pa
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency || 'INR',
-        name: 'ShopHub',
+        name: 'Sombustore',
         description: `Order #${orderId}`,
         image: '/logo.png',
         order_id: orderData.orderId,
@@ -81,7 +81,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, buttonText = "Pa
           contact: user.phone || '',
         },
         notes: {
-          address: 'Order from ShopHub',
+          address: 'Order from Sombustore',
         },
         theme: {
           color: '#3B82F6',

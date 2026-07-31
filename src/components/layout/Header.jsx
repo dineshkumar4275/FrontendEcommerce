@@ -913,12 +913,15 @@ export const Header = ({
           <div className="flex justify-between items-center gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <SparklesIcon className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-purple-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent hidden sm:block">
-                Sombustore
-              </span>
+             <img 
+        src="/logo.jpeg" // or your logo path
+        alt="Sombu Store Logo"
+        className="w-10 h-10 object-contain rounded-xl"
+        width={40}
+        height={40}
+      />
+            
+           
             </Link>
 
             {/* Search Bar - Desktop */}

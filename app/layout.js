@@ -112,7 +112,7 @@ import { Inter, Poppins } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Providers } from "../src/store/providers";
 import AppProvider from "../src/providers/Appprovider";
-import { Header } from "../src/components/layout/Header";  // ✅ Named import
+import { Header } from "../src/components/layout/Header";
 import "../src/styles/globals.css";
 
 const inter = Inter({
@@ -132,7 +132,56 @@ export const metadata = {
     default: "Sombu Store | Premium Fashion & Clothing Online",
     template: "%s | Sombu Store",
   },
-  // ... rest of your metadata
+  description: "Discover premium fashion and clothing at Sombu Store. Shop the latest trends in ethnic wear, western wear, and accessories.",
+  keywords: "fashion, clothing, ethnic wear, western wear, accessories, online shopping",
+  authors: [{ name: "Sombu Store" }],
+  creator: "Sombu Store",
+  publisher: "Sombu Store",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://www.sombustore.in",
+    siteName: "Sombu Store",
+    title: "Sombu Store | Premium Fashion & Clothing Online",
+    description: "Discover premium fashion and clothing at Sombu Store. Shop the latest trends in ethnic wear, western wear, and accessories.",
+    images: [
+      {
+        url: "/logo.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "Sombu Store - Premium Fashion & Clothing",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sombu Store | Premium Fashion & Clothing Online",
+    description: "Discover premium fashion and clothing at Sombu Store. Shop the latest trends in ethnic wear, western wear, and accessories.",
+    images: ["/twitter-image.jpg"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+// ✅ ADD THIS VIEWPORT EXPORT
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({ children }) {
@@ -143,7 +192,7 @@ export default function RootLayout({ children }) {
       >
         <AppProvider>
           <Providers>
-            <Header />  {/* ✅ Now works with GlobalSelector and useApp */}
+            <Header />
             <main className="flex-1">{children}</main>
             <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-auto">
               <div className="container mx-auto px-4 py-6">

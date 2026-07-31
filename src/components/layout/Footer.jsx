@@ -57,12 +57,15 @@ export const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 inline-flex mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Sombustore
-              </span>
+              <Image 
+    src="/logo.png"  // Your logo image in public folder
+    alt="Sombu Store Logo"
+    width={40}
+    height={40}
+    className="object-contain"
+    priority
+  />
+             
             </Link>
             <p className="text-gray-400 mb-4 text-sm">
               Your one-stop destination for all your shopping needs. Quality products, best prices, and fast delivery.

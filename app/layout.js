@@ -108,6 +108,7 @@
 //   );
 // }
 // app/layout.jsx
+
 import { Inter, Poppins } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Providers } from "../src/store/providers";
@@ -157,7 +158,7 @@ export const metadata = {
     description: "Discover premium fashion and clothing at Sombu Store. Shop the latest trends in ethnic wear, western wear, and accessories.",
     images: [
       {
-        url: "/favicon.ico",
+        url: "/new-logo.png",
         width: 1200,
         height: 630,
         alt: "Sombu Store - Premium Fashion & Clothing",
@@ -171,8 +172,8 @@ export const metadata = {
     images: ["/twitter-image.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "/new-logo.png",
+    apple: "/new-logo.png",
   },
 };
 

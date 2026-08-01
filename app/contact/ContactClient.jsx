@@ -66,8 +66,8 @@ export default function ContactClient() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
-                      <a href="mailto:support@yourstore.com" className="text-gray-800 hover:text-purple-600">
-                        support@yourstore.com
+                      <a href="mailto:support@sombustore.com" className="text-gray-800 hover:text-purple-600">
+                        support@sombustore.com
                       </a>
                     </div>
                   </div>

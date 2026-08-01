@@ -20,7 +20,7 @@ export default function HomeClient() {
     url: 'https://www.sombu.in/',
     logo: '/logo.png',
     phone: '+91-1234567890',
-    sameAs: ['https://facebook.com/yourstore', 'https://instagram.com/yourstore'],
+    sameAs: ['https://facebook.com/sombustore', 'https://instagram.com/sombustore'],
   };
 
   const websiteData = {

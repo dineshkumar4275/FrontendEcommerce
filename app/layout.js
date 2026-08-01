@@ -157,7 +157,7 @@ export const metadata = {
     description: "Discover premium fashion and clothing at Sombu Store. Shop the latest trends in ethnic wear, western wear, and accessories.",
     images: [
       {
-        url: "/logo.jpeg",
+        url: "/favicon.ico",
         width: 1200,
         height: 630,
         alt: "Sombu Store - Premium Fashion & Clothing",
@@ -171,8 +171,8 @@ export const metadata = {
     images: ["/twitter-image.jpg"],
   },
   icons: {
-    icon: "/logo.jpeg",
-    apple: "/logo.jpeg",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 

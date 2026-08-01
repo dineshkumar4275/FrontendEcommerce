@@ -59,7 +59,7 @@ export const Footer = () => {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 inline-flex mb-4">
               <Image 
-    src="/logo.jpeg"  // Your logo image in public folder
+    src="/favicon.ico"  // Your logo image in public folder
     alt="Sombu Store Logo"
     width={40}
     height={40}

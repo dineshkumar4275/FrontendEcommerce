@@ -46,7 +46,7 @@ export default function PrivacyPage() {
 
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-3">Contact Us</h2>
-            <p className="text-gray-600">If you have any questions about this policy, please contact us at privacy@yourstore.com</p>
+            <p className="text-gray-600">If you have any questions about this policy, please contact us at privacy@sombustore.com</p>
           </div>
         </div>
       </div>

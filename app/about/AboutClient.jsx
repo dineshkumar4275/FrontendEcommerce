@@ -11,7 +11,7 @@ export default function AboutClient() {
     url: 'https://www.sombu.in/',
     logo: 'https://www.sombu.in//logo.png',
     phone: '+91-1234567890',
-    sameAs: ['https://facebook.com/yourstore', 'https://instagram.com/yourstore'],
+    sameAs: ['https://facebook.com/sombustore', 'https://instagram.com/sombustore'],
   };
 
   const breadcrumbs = [

@@ -914,7 +914,7 @@ export const Header = ({
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
              <img 
-        src="/logo.jpeg" // or your logo path
+        src="/favicon.ico" // or your logo path
         alt="Sombu Store Logo"
         className="w-10 h-10 object-contain rounded-xl"
         width={40}

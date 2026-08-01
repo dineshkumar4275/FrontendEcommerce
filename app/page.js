@@ -202,7 +202,7 @@ export const metadata = {
     description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
     url: 'https://www.sombu.in/',
     siteName: 'Sombustore',
-    images: [{ url: '/images/og-home.jpg', width: 1200, height: 630 }],
+    images: [{ url: '/favicon.ico', width: 1200, height: 630 }],
     locale: 'en_IN',
     type: 'website',
   },
@@ -210,7 +210,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Sombustore - Premium Products',
     description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
-    images: ['/images/og-home.jpg'],
+    images: ['/favicon.ico'],
   },
   robots: { index: true, follow: true },
 };

@@ -18,8 +18,8 @@ export default function HomeClient() {
     name: 'Sombustore',
     description: 'India\'s premium online shopping destination',
     url: 'https://www.sombu.in/',
-    logo: '/logo.png',
-    phone: '+91-1234567890',
+    logo: '/favicon.ico',
+    phone: '+91-9042909734',
     sameAs: ['https://facebook.com/sombustore', 'https://instagram.com/sombustore'],
   };
 

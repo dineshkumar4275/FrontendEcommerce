@@ -11,14 +11,14 @@ export const metadata = {
     description: 'Find answers to frequently asked questions.',
     url: 'https://www.sombu.in//faqs',
     siteName: 'Sombustore',
-    images: [{ url: '/images/og-faq.jpg', width: 1200, height: 630 }],
+    images: [{ url: '/favicon.ico', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'FAQ - Frequently Asked Questions | Sombustore',
     description: 'Find answers to frequently asked questions.',
-    images: ['/images/og-faq.jpg'],
+    images: ['/favicon.ico'],
   },
   robots: { index: true, follow: true },
 };

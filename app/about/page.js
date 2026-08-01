@@ -84,14 +84,14 @@ export const metadata = {
     description: 'Learn about Sombustore - India\'s premium online shopping destination.',
     url: 'https://www.sombu.in//about',
     siteName: 'Sombustore',
-    images: [{ url: '/images/og-about.jpg', width: 1200, height: 630 }],
+    images: [{ url: '/favicon.ico', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'About Us - Sombustore | Premium Products',
     description: 'Learn about Sombustore - India\'s premium online shopping destination.',
-    images: ['/images/og-about.jpg'],
+    images: ['/favicon.ico'],
   },
   robots: { index: true, follow: true },
 };

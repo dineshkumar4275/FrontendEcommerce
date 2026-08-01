@@ -1377,7 +1377,7 @@ export default function ProductDetailPage() {
         title={`${product.name} - Premium Quality | Sombu Store`}
         description={product.description || `Buy ${product.name} online at best price. Premium quality product with free shipping and easy returns.`}
         canonicalUrl={`https://www.sombu.in/products/${productId}`}
-        image={product.image_url || '/images/og-product.jpg'}
+        image={product.image_url || '/favicon.ico'}
         product={productSchema}
         breadcrumbs={breadcrumbs}
         pageType="product"

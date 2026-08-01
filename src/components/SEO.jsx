@@ -27,7 +27,7 @@ export const SEO = ({
   const siteName = 'sombustore';
   const defaultTitle = 'sombustore - Premium Products';
   const defaultDescription = 'Shop premium products with amazing offers. Free shipping & easy returns.';
-  const defaultImage = '/images/og-image.jpg';
+  const defaultImage = '/favicon.ico';
   const siteUrl = 'https://www.sombustore.in';
 
   const seoTitle = title ? `${title} | ${siteName}` : defaultTitle;

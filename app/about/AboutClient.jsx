@@ -9,8 +9,8 @@ export default function AboutClient() {
     name: 'Sombustore',
     description: 'India\'s premium online shopping destination since 2020',
     url: 'https://www.sombu.in/',
-    logo: 'https://www.sombu.in//logo.png',
-    phone: '+91-1234567890',
+    logo: 'https://www.sombu.in//favicon.ico',
+    phone: '+91-9042909734',
     sameAs: ['https://facebook.com/sombustore', 'https://instagram.com/sombustore'],
   };
 

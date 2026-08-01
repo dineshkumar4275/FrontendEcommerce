@@ -78,7 +78,7 @@ export const Footer = () => {
               <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors" aria-label="Twitter">
                 <FaTwitter size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-pink-500 transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/sombustore/" className="text-gray-400 hover:text-pink-500 transition-colors" aria-label="Instagram">
                 <FaInstagram size={20} />
               </a>
               <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label="LinkedIn">

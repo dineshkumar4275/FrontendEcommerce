@@ -9,7 +9,7 @@ export default function ContactClient() {
     name: 'Sombustore',
     description: 'Premium products store in Chennai',
     url: 'https://www.sombu.in/',
-    phone: '+91-1234567890',
+    phone: '+91-9042909734',
     address: '123, Anna Salai, Chennai',
     city: 'Chennai',
     state: 'Tamil Nadu',
@@ -66,8 +66,8 @@ export default function ContactClient() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
-                      <a href="mailto:support@sombustore.com" className="text-gray-800 hover:text-purple-600">
-                        support@sombustore.com
+                      <a href="mailto:support@sombustore.in" className="text-gray-800 hover:text-purple-600">
+                        support@sombustore.in
                       </a>
                     </div>
                   </div>
@@ -77,7 +77,7 @@ export default function ContactClient() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Phone</p>
-                      <a href="tel:+18001234567" className="text-gray-800 hover:text-purple-600">
+                      <a href="tel:+9042909734" className="text-gray-800 hover:text-purple-600">
                         +1 (800) 123-4567
                       </a>
                     </div>

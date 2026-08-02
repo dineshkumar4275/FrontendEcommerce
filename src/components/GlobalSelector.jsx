@@ -743,7 +743,7 @@ import {
   CurrencyDollarIcon,
   LanguageIcon
 } from '@heroicons/react/24/outline';
-import { useApp } from '../providers/AppProvider';
+import { useApp } from '../providers/Appprovider';
 import toast from 'react-hot-toast';
 
 const GlobalSelector = () => {

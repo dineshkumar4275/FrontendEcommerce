@@ -2357,7 +2357,7 @@ import {
 import { MapPinIcon as MapPinSolid } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
-import { useApp } from '../../providers/AppProvider';
+import { useApp } from '../../providers/Appprovider';
 const LocationDisplay = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -130,7 +130,7 @@ const LocationDisplay = () => {
     try {
       console.log(`📍 Getting address from: lat=${lat}, lng=${lng}`);
       
-      const url = `${API_URL}/api/location/reverse?lat=${lat}&lng=${lng}`;
+      const url = `${API_URL}/location/reverse?lat=${lat}&lng=${lng}`;
       console.log('📤 Request URL:', url);
 
       const response = await fetch(url, {
@@ -191,7 +191,7 @@ const LocationDisplay = () => {
   const detectLocationByIP = async () => {
     try {
       console.log('📍 Detecting via IP...');
-      const response = await fetch(`${API_URL}/api/location/detect`, {
+      const response = await fetch(`${API_URL}/location/detect`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -326,7 +326,7 @@ const LocationDisplay = () => {
     setSearching(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/location/search/${encodeURIComponent(query)}`,
+        `${API_URL}/location/search/${encodeURIComponent(query)}`,
         {
           method: 'GET',
           credentials: 'include',

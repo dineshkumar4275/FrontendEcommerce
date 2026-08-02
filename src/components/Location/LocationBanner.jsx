@@ -21,7 +21,7 @@ const LocationBanner = () => {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/location/detect`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/location/detect`);
       const data = await response.json();
       
       if (data.success && data.data) {

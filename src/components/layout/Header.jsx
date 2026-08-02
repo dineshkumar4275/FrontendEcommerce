@@ -1349,6 +1349,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
+import { useApp } from '../../providers/Appprovider';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocationDisplay } from '../Location';
@@ -1408,6 +1409,9 @@ export const Header = ({
   const { totalQuantity } = useCart();
   const { wishlistCount, getWishlist } = useWishlist();
   const { user, token } = useSelector((state) => state.auth);
+
+  // ✅ Use App Context for translations
+  const { t, formatPrice, currency } = useApp();
 
   // Load wishlist when logged in
   useEffect(() => {
@@ -1469,7 +1473,7 @@ export const Header = ({
     setUserEmail('');
     setIsUserMenuOpen(false);
     if (toast && toast.success) {
-      toast.success('Logged out successfully');
+      toast.success(t('logout') || 'Logged out successfully');
     }
     router.push('/');
     router.refresh();
@@ -1510,7 +1514,7 @@ export const Header = ({
     
     setIsFilterOpen(false);
     if (toast && toast.success) {
-      toast.success('Filters applied');
+      toast.success(t('apply_filters') || 'Filters applied');
     }
   };
 
@@ -1545,18 +1549,19 @@ export const Header = ({
     
     setIsFilterOpen(false);
     if (toast && toast.success) {
-      toast.success('All filters cleared');
+      toast.success(t('clear_all') || 'All filters cleared');
     }
   };
 
   const hasActiveFilters = selectedCategory || minPrice || maxPrice || sortBy !== 'newest';
   const activeFilterCount = (selectedCategory ? 1 : 0) + (minPrice || maxPrice ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
 
+  // ✅ Navigation links with translation
   const navLinks = [
-    { name: 'Home', href: '/', icon: SparklesIcon },
-    { name: 'Products', href: '/products', icon: CubeIcon },
-    { name: 'Orders', href: '/orders', icon: TruckIcon },
-    { name: 'Track Order', href: '/track', icon: TruckIcon },
+    { name: 'home', href: '/', icon: SparklesIcon },
+    { name: 'products', href: '/products', icon: CubeIcon },
+    { name: 'orders', href: '/orders', icon: TruckIcon },
+    { name: 'track', href: '/track', icon: TruckIcon },
   ];
 
   if (!mounted) {
@@ -1602,7 +1607,7 @@ export const Header = ({
             {/* Search Bar - Desktop */}
             <div className="hidden md:flex flex-1 max-w-2xl">
               <AutoSuggestSearch 
-                placeholder="Search for products, brands, and categories..."
+                placeholder={t('search_products')}
                 onSelect={handleSearchSelect}
               />
             </div>
@@ -1620,19 +1625,19 @@ export const Header = ({
                   }`}
                 >
                   <link.icon className="w-4 h-4" />
-                  {link.name}
+                  {t(link.name)}
                 </Link>
               ))}
             </div>
 
             {/* Desktop Icons */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* ✅ Location Display - Amazon Style */}
+              {/* ✅ Location Display */}
               <div className="hidden md:block">
                 <LocationDisplay />
               </div>
 
-              {/* ✅ Global Selector - Language, Country, Currency */}
+              {/* ✅ Global Selector - Language, Currency */}
               <div className="hidden md:block">
                 <GlobalSelector />
               </div>
@@ -1651,7 +1656,7 @@ export const Header = ({
               <Link 
                 href="/wishlist" 
                 className="relative p-2 hover:bg-pink-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-pink-300"
-                aria-label="Wishlist"
+                aria-label={t('wishlist')}
               >
                 <HeartIcon className="w-5 h-5" />
                 {wishlistCount > 0 && (
@@ -1666,7 +1671,7 @@ export const Header = ({
                 <Link
                   href="/admin/dashboard"
                   className="relative p-2 hover:bg-green-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-green-400"
-                  title="Admin Dashboard"
+                  title={t('admin_dashboard')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -1727,7 +1732,7 @@ export const Header = ({
                               <p className="text-xs text-purple-400">{userEmail}</p>
                               {isAdmin && (
                                 <span className="text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded mt-1 inline-block">
-                                  Administrator
+                                  {t('admin') || 'Administrator'}
                                 </span>
                               )}
                             </div>
@@ -1735,10 +1740,10 @@ export const Header = ({
                         </div>
                         <div className="py-2">
                           {[
-                            { href: '/profile', icon: UserIcon, label: 'Your Profile' },
-                            { href: '/orders', icon: TruckIcon, label: 'Your Orders' },
-                            { href: '/track', icon: TruckIcon, label: 'Track Order' },
-                            { href: '/wishlist', icon: HeartIcon, label: 'Wishlist' },
+                            { href: '/profile', icon: UserIcon, label: 'your_profile' },
+                            { href: '/orders', icon: TruckIcon, label: 'your_orders' },
+                            { href: '/track', icon: TruckIcon, label: 'track_order' },
+                            { href: '/wishlist', icon: HeartIcon, label: 'wishlist' },
                           ].map((item) => (
                             <Link
                               key={item.href}
@@ -1747,7 +1752,7 @@ export const Header = ({
                               className="flex items-center gap-3 px-4 py-2 text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 transition-all text-sm"
                             >
                               <item.icon className="w-4 h-4" />
-                              {item.label}
+                              {t(item.label)}
                             </Link>
                           ))}
                           
@@ -1763,7 +1768,7 @@ export const Header = ({
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                Admin Dashboard
+                                {t('admin_dashboard')}
                                 <span className="ml-auto text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded">Admin</span>
                               </Link>
                             </>
@@ -1775,7 +1780,7 @@ export const Header = ({
                             className="flex items-center gap-3 w-full px-4 py-2 text-red-400 hover:bg-red-500/10 transition-all text-sm"
                           >
                             <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                            Sign Out
+                            {t('logout')}
                           </button>
                         </div>
                       </div>
@@ -1785,7 +1790,7 @@ export const Header = ({
               ) : (
                 <Link href="/login" className="px-3 sm:px-5 py-1.5 sm:py-2.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300 shadow-lg shadow-purple-500/25 flex items-center gap-1 sm:gap-2">
                   <UserIcon className="w-4 h-4" />
-                  <span className="hidden xs:inline text-sm">Login</span>
+                  <span className="hidden xs:inline text-sm">{t('login')}</span>
                 </Link>
               )}
 
@@ -1809,7 +1814,7 @@ export const Header = ({
                 className="md:hidden mt-3 pt-3 border-t border-purple-500/20"
               >
                 <AutoSuggestSearch 
-                  placeholder="Search products..."
+                  placeholder={t('search_products')}
                   onSelect={(searchTerm) => {
                     handleSearchSelect(searchTerm);
                     setShowMobileSearch(false);
@@ -1828,12 +1833,12 @@ export const Header = ({
                 exit={{ opacity: 0, height: 0 }}
                 className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
-                {/* ✅ Location Display - Mobile */}
+                {/* Location Display - Mobile */}
                 <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
                   <LocationDisplay />
                 </div>
 
-                {/* ✅ Global Selector - Mobile */}
+                {/* Global Selector - Mobile */}
                 <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
                   <GlobalSelector />
                 </div>
@@ -1850,7 +1855,7 @@ export const Header = ({
                     }`}
                   >
                     <link.icon className="w-5 h-5" />
-                    {link.name}
+                    {t(link.name)}
                   </Link>
                 ))}
 
@@ -1864,7 +1869,7 @@ export const Header = ({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Admin Panel
+                    {t('admin_dashboard')}
                     <span className="ml-auto text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded">Admin</span>
                   </Link>
                 )}
@@ -1877,7 +1882,7 @@ export const Header = ({
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-purple-500/10 transition-all font-medium w-full"
                 >
                   <FunnelIcon className="w-5 h-5" />
-                  Filters
+                  {t('filters')}
                   {hasActiveFilters && (
                     <span className="bg-purple-500 text-white text-xs font-bold rounded-full px-2 ml-auto">
                       {activeFilterCount}
@@ -1891,7 +1896,7 @@ export const Header = ({
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-pink-500/10 hover:text-pink-300 transition-all font-medium"
                 >
                   <HeartIcon className="w-5 h-5" />
-                  Wishlist
+                  {t('wishlist')}
                   {wishlistCount > 0 && (
                     <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-auto">
                       {wishlistCount}
@@ -1906,7 +1911,7 @@ export const Header = ({
                       onClick={() => setIsMenuOpen(false)} 
                       className="block w-full text-center py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25"
                     >
-                      Login
+                      {t('login')}
                     </Link>
                   )}
                 </div>
@@ -1929,7 +1934,7 @@ export const Header = ({
               className="fixed right-0 top-0 h-full w-full max-w-[85%] sm:max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
             >
               <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
-                <h2 className="text-base sm:text-xl font-bold text-purple-100">Filters</h2>
+                <h2 className="text-base sm:text-xl font-bold text-purple-100">{t('filters')}</h2>
                 <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-purple-500/10 rounded-xl transition">
                   <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
                 </button>
@@ -1938,13 +1943,13 @@ export const Header = ({
               <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
                 {categories.length > 0 && (
                   <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Categories</h3>
+                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('categories')}</h3>
                     <div className="space-y-1.5 sm:space-y-2">
                       <button
                         onClick={() => setTempCategory('')}
                         className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
-                        All Categories
+                        {t('all_categories')}
                       </button>
                       {categories.map((cat) => (
                         <button
@@ -1960,18 +1965,18 @@ export const Header = ({
                 )}
 
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Price Range (₹)</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('price_range')}</h3>
                   <div className="flex gap-2 sm:gap-3">
                     <input
                       type="number"
-                      placeholder="Min Price"
+                      placeholder={t('min_price')}
                       value={tempMinPrice}
                       onChange={(e) => setTempMinPrice(e.target.value)}
                       className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <input
                       type="number"
-                      placeholder="Max Price"
+                      placeholder={t('max_price')}
                       value={tempMaxPrice}
                       onChange={(e) => setTempMaxPrice(e.target.value)}
                       className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -1980,20 +1985,20 @@ export const Header = ({
                 </div>
 
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">Sort By</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('sort_by')}</h3>
                   <div className="space-y-1.5 sm:space-y-2">
                     {[
-                      { value: 'newest', label: 'Newest First' },
-                      { value: 'price_low', label: 'Price: Low to High' },
-                      { value: 'price_high', label: 'Price: High to Low' },
-                      { value: 'name_asc', label: 'Name: A to Z' },
+                      { value: 'newest', label: 'newest_first' },
+                      { value: 'price_low', label: 'price_low_to_high' },
+                      { value: 'price_high', label: 'price_high_to_low' },
+                      { value: 'name_asc', label: 'name_a_to_z' },
                     ].map((option) => (
                       <button
                         key={option.value}
                         onClick={() => setTempSortBy(option.value)}
                         className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
-                        {option.label}
+                        {t(option.label)}
                       </button>
                     ))}
                   </div>
@@ -2005,14 +2010,14 @@ export const Header = ({
                   onClick={handleApplyFilters}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition"
                 >
-                  Apply Filters
+                  {t('apply_filters')}
                 </button>
                 {(tempCategory || tempMinPrice || tempMaxPrice || tempSortBy !== 'newest') && (
                   <button
                     onClick={handleClearFilters}
                     className="w-full bg-slate-800 text-purple-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-slate-700 transition"
                   >
-                    Clear All Filters
+                    {t('clear_all')}
                   </button>
                 )}
               </div>

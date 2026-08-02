@@ -2357,7 +2357,7 @@ import {
 import { MapPinIcon as MapPinSolid } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
-
+import { useApp } from '../../providers/Appprovider';
 const LocationDisplay = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -2378,7 +2378,7 @@ const LocationDisplay = () => {
   const [toastShown, setToastShown] = useState(false);
   const [locationSet, setLocationSet] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
+const { t } = useApp();
   // ✅ Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
@@ -2696,7 +2696,7 @@ const LocationDisplay = () => {
     setSearchQuery('');
     setSearchResults([]);
     
-    toast.success(`📍 ${displayStreet} selected`);
+    // toast.success(`📍 ${displayStreet} selected`);
   };
 
   // ✅ Handle currency change

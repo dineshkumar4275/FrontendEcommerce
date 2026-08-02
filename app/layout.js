@@ -209,7 +209,6 @@ export default function RootLayout({ children }) {
             <main className="flex-1">{children}</main>
           </Providers>
         </AppProvider>
-
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
       </body>
     </html>

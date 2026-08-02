@@ -799,25 +799,24 @@ export const AppProvider = ({ children }) => {
   // ✅ Get current currency object
   const currentCurrency = currency;
 
-  const value = {
-    language,
-    currency,
-    country,
-    currentLanguage,
-    currentCurrency,
-    changeLanguage,
-    changeCurrency,
-    changeCountry,
-    setLanguage,
-    setCurrency,
-    setCountry,
-    t,
-    formatPrice,
-    languages,
-    currencies,
-    isLoaded,
-  };
-
+const value = {
+  language,
+  currency,
+  country,
+  currentLanguage,
+  currentCurrency,
+  changeLanguage,  // ✅ Make sure this is included
+  changeCurrency,  // ✅ Make sure this is included
+  changeCountry,   // ✅ Make sure this is included
+  setLanguage,
+  setCurrency,
+  setCountry,
+  t,
+  formatPrice,
+  languages,
+  currencies,
+  isLoaded,
+};
   return (
     <AppContext.Provider value={value}>
       {children}

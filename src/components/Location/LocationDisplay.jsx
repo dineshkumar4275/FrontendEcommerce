@@ -2497,7 +2497,7 @@ const { t } = useApp();
           updateCurrenciesAndLanguages(locData);
           
           if (!toastShown && !locationSet) {
-            toast.success(`📍 ${displayStreet} found`);
+            // toast.success(`📍 ${displayStreet} found`);
             setToastShown(true);
             setLocationSet(true);
           }

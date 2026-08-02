@@ -203,6 +203,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-gray-100 min-h-screen flex flex-col`}
       >
+        {/* ✅ AppProvider must wrap everything */}
         <AppProvider>
           <Providers>
             <Header />

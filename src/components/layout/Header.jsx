@@ -2325,7 +2325,7 @@ export const Header = ({
 
             {/* Desktop Icons */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* ✅ Location Display */}
+              {/* ✅ Location Display - Desktop */}
               <div className="hidden md:block">
                 <LocationDisplay />
               </div>
@@ -2497,8 +2497,14 @@ export const Header = ({
             </div>
           </div>
 
-          {/* ✅ Mobile Search Bar - Amazon Style (Only on mobile) */}
-          <div className="md:hidden mt-2 pb-2">
+          {/* ✅ MOBILE SECTION - Amazon Style (Only on mobile) */}
+          <div className="lg:hidden mt-2 space-y-2">
+            {/* ✅ Location Display - Mobile (Amazon Style) */}
+            <div className="flex items-center">
+              <LocationDisplay />
+            </div>
+
+            {/* Search Bar - Mobile (Amazon Style) */}
             <div className="relative">
               <input
                 type="text"
@@ -2522,18 +2528,13 @@ export const Header = ({
                 <MagnifyingGlassIcon className="w-5 h-5 text-[#131921]" />
               </button>
             </div>
-          </div>
 
-          {/* ✅ Mobile Location & Categories - Amazon Style (Only on mobile) */}
-          <div className="lg:hidden flex items-center justify-between gap-2 mt-1">
-            <div className="flex-1">
-              <LocationDisplay />
-            </div>
-            <div className="flex items-center gap-3 text-xs text-white/70">
-              <span className="text-white font-medium">Shop By</span>
-              <span className="hover:text-white transition-colors cursor-pointer">Category</span>
-              <span className="hover:text-white transition-colors cursor-pointer">Deals</span>
-              <span className="hover:text-white transition-colors cursor-pointer">Sell</span>
+            {/* Categories Row - Mobile */}
+            <div className="flex items-center gap-4 text-xs text-white/70 overflow-x-auto pb-1">
+              <span className="text-white font-medium whitespace-nowrap">Shop By</span>
+              <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Category</span>
+              <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Deals</span>
+              <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Sell</span>
             </div>
           </div>
 
@@ -2546,12 +2547,12 @@ export const Header = ({
                 exit={{ opacity: 0, height: 0 }}
                 className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
-                {/* Location Display - Mobile */}
+                {/* Location Display - Mobile Menu */}
                 <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
                   <LocationDisplay />
                 </div>
 
-                {/* Global Selector - Mobile */}
+                {/* Global Selector - Mobile Menu */}
                 <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
                   <GlobalSelector />
                 </div>

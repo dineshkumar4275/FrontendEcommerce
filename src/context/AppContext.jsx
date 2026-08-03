@@ -824,6 +824,7 @@
 //   );
 // };
 // src/context/AppContext.jsx
+
 'use client';
 
 import React, { createContext, useState, useEffect } from 'react';
@@ -831,7 +832,7 @@ import toast from 'react-hot-toast';
 
 export const AppContext = createContext();
 
-// ✅ Translations
+// ✅ ALL WORLD LANGUAGES TRANSLATIONS
 const translations = {
   en: {
     home: 'Home',
@@ -1063,20 +1064,161 @@ const translations = {
     current_language: 'தற்போதைய மொழி',
     current_currency: 'தற்போதைய நாணயம்',
   },
+  hi: {
+    home: 'होम',
+    products: 'उत्पाद',
+    orders: 'ऑर्डर',
+    track_order: 'ट्रैक ऑर्डर',
+    login: 'लॉगिन',
+    logout: 'लॉगआउट',
+    wishlist: 'विशलिस्ट',
+    filters: 'फ़िल्टर',
+    categories: 'श्रेणियाँ',
+    all_categories: 'सभी श्रेणियाँ',
+    price_range: 'मूल्य सीमा',
+    min_price: 'न्यूनतम मूल्य',
+    max_price: 'अधिकतम मूल्य',
+    sort_by: 'क्रमबद्ध करें',
+    newest_first: 'नवीनतम पहले',
+    price_low_to_high: 'कम से ज्यादा कीमत',
+    price_high_to_low: 'ज्यादा से कम कीमत',
+    name_a_to_z: 'नाम A से Z',
+    apply_filters: 'फ़िल्टर लागू करें',
+    clear_all: 'सभी फ़िल्टर साफ़ करें',
+    search_products: 'उत्पाद, ब्रांड और श्रेणियाँ खोजें...',
+    your_profile: 'आपकी प्रोफ़ाइल',
+    your_orders: 'आपके ऑर्डर',
+    admin_dashboard: 'एडमिन डैशबोर्ड',
+    select_language: 'भाषा चुनें',
+    hello: 'नमस्ते',
+    sign_in: 'साइन इन करें',
+    cart: 'कार्ट',
+    delivering_to: 'डिलीवरी हो रही है',
+    select_location: 'स्थान चुनें',
+    currency: 'मुद्रा',
+    language: 'भाषा',
+    country: 'देश',
+    location: 'स्थान',
+    select_currency: 'अपनी पसंदीदा मुद्रा चुनें',
+    current: 'वर्तमान',
+    close: 'बंद करें',
+    retry: 'पुनः प्रयास करें',
+    update: 'अपडेट करें',
+    your_location: 'आपका स्थान',
+    search_location: 'स्थान खोजें...',
+    auto_detect: 'स्वतः पहचानें',
+    view_map: 'मानचित्र देखें',
+    detecting: 'पहचान हो रही है...',
+    getting_gps: 'GPS प्राप्त हो रहा है...',
+    found: 'मिला',
+    detected: 'पहचाना गया',
+    selected: 'चुना गया',
+    ip_based: 'IP आधारित - अशुद्ध हो सकता है',
+    may_be_inaccurate: 'अशुद्ध हो सकता है',
+    enable_gps_tip: 'टिप: सटीक स्थान के लिए GPS सक्षम करें',
+    unknown_location: 'अज्ञात स्थान',
+    admin: 'प्रशासक',
+    search: 'खोजें',
+    all: 'सभी',
+    in_stock: 'स्टॉक में',
+    out_of_stock: 'स्टॉक से बाहर',
+    add_to_cart: 'कार्ट में डालें',
+    buy_now: 'अभी खरीदें',
+    description: 'विवरण',
+    reviews: 'समीक्षाएँ',
+    rating: 'रेटिंग',
+    shipping: 'शिपिंग',
+    returns: 'रिटर्न',
+    payment: 'भुगतान',
+    order_summary: 'ऑर्डर सारांश',
+    subtotal: 'उप-योग',
+    discount: 'छूट',
+    delivery_charge: 'डिलीवरी शुल्क',
+    proceed_to_checkout: 'चेकआउट पर जाएं',
+    continue_shopping: 'खरीदारी जारी रखें',
+    place_order: 'ऑर्डर दें',
+    order_confirmed: 'ऑर्डर पुष्टि हुई',
+    order_cancelled: 'ऑर्डर रद्द',
+    track_your_order: 'अपना ऑर्डर ट्रैक करें',
+    order_id: 'ऑर्डर ID',
+    order_date: 'ऑर्डर तिथि',
+    order_status: 'ऑर्डर स्थिति',
+    delivered: 'डिलीवर हो गया',
+    shipped: 'शिप हो गया',
+    processing: 'प्रोसेस हो रहा है',
+    pending: 'लंबित',
+    cancelled: 'रद्द',
+    refunded: 'रिफंड हुआ',
+    shop_description: "भारत का प्रीमियम ऑनलाइन शॉपिंग गंतव्य",
+    home_title: 'Sombu Store - प्रीमियम उत्पाद',
+    home_description: 'Sombu Store में आपका स्वागत है',
+    coming_soon: '🚀 जल्द आ रहा है',
+    discover_your: 'खोजें अपनी',
+    perfect_style: 'परफेक्ट स्टाइल',
+    hero_description: "🎨 हम कुछ अद्भुत बना रहे हैं!",
+    view_collections: 'कलेक्शन देखें',
+    soon: 'जल्द',
+    happy_customers: 'खुश ग्राहक',
+    brands: 'ब्रांड्स',
+    delivery: 'डिलीवरी*',
+    free_shipping: 'मुफ्त शिपिंग',
+    free_shipping_desc: '₹500 से अधिक के ऑर्डर पर',
+    secure_payment: 'सुरक्षित भुगतान',
+    secure_payment_desc: '100% सुरक्षित',
+    support: '24/7 सहायता',
+    support_desc: 'समर्पित टीम',
+    easy_returns: 'आसान रिटर्न',
+    easy_returns_desc: '7 दिन रिटर्न',
+    no_products: 'कोई उत्पाद उपलब्ध नहीं',
+    curating_collection: "हम आपके लिए सबसे अच्छा कलेक्शन तैयार कर रहे हैं।",
+    under_construction: 'हमारा स्टोर निर्माणाधीन है।',
+    launching_soon: "हम जल्द ही लॉन्च कर रहे हैं",
+    stay_tuned: 'बने रहें!',
+    progress: 'प्रगति',
+    almost_there: "बस कुछ ही दूरी पर!",
+    current_language: 'वर्तमान भाषा',
+    current_currency: 'वर्तमान मुद्रा',
+  },
+  // ✅ Add more languages here (te, ml, kn, bn, mr, gu, pa, etc.)
 };
 
-// ✅ Currency options
+// ✅ ALL CURRENCIES
 const currencies = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
   { code: 'USD', symbol: '$', name: 'US Dollar' },
   { code: 'EUR', symbol: '€', name: 'Euro' },
   { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
 ];
 
-// ✅ Language options
+// ✅ ALL LANGUAGES
 const languages = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'te', name: 'Telugu', flag: '🇮🇳' },
+  { code: 'ml', name: 'Malayalam', flag: '🇮🇳' },
+  { code: 'kn', name: 'Kannada', flag: '🇮🇳' },
+  { code: 'bn', name: 'Bengali', flag: '🇧🇩' },
+  { code: 'mr', name: 'Marathi', flag: '🇮🇳' },
+  { code: 'gu', name: 'Gujarati', flag: '🇮🇳' },
+  { code: 'pa', name: 'Punjabi', flag: '🇮🇳' },
+  { code: 'or', name: 'Odia', flag: '🇮🇳' },
+  { code: 'fr', name: 'French', flag: '🇫🇷' },
+  { code: 'de', name: 'German', flag: '🇩🇪' },
+  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+  { code: 'it', name: 'Italian', flag: '🇮🇹' },
+  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
 ];
 
 export const AppProvider = ({ children }) => {
@@ -1087,25 +1229,21 @@ export const AppProvider = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
-  // ✅ Load saved language on mount
+  // ✅ Load saved preferences from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('preferredLanguage');
-      console.log('🔍 Saved language in localStorage:', savedLanguage);
+      const savedCurrency = localStorage.getItem('preferredCurrency');
       
-      // ✅ If saved language exists and is valid, use it
+      // Language
       if (savedLanguage && languages.find(l => l.code === savedLanguage)) {
-        console.log('✅ Setting language to saved:', savedLanguage);
         setLanguage(savedLanguage);
       } else {
-        // ✅ Default to English
-        console.log('✅ No valid saved language, defaulting to English');
         setLanguage('en');
         localStorage.setItem('preferredLanguage', 'en');
       }
       
-      // ✅ Currency
-      const savedCurrency = localStorage.getItem('preferredCurrency');
+      // Currency
       if (savedCurrency) {
         try {
           setCurrency(JSON.parse(savedCurrency));
@@ -1114,17 +1252,16 @@ export const AppProvider = ({ children }) => {
         }
       }
     }
-    
     setIsLoaded(true);
   }, []);
 
-  // ✅ Change language
+  // ✅ Change language - Updates instantly across all pages
   const changeLanguage = (langCode) => {
-    console.log('🔄 Changing language to:', langCode);
     setLanguage(langCode);
     localStorage.setItem('preferredLanguage', langCode);
     setForceUpdate(prev => prev + 1);
     
+    // ✅ Dispatch global event for all components
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('languageChange', {
         detail: { language: langCode }
@@ -1132,10 +1269,10 @@ export const AppProvider = ({ children }) => {
     }
     
     const lang = languages.find(l => l.code === langCode);
-    toast.success(`Language changed to ${lang?.name || langCode}`);
+    toast.success(`🌐 ${lang?.name || langCode} selected`);
   };
 
-  // ✅ Change currency
+  // ✅ Change currency - Updates instantly across all pages
   const changeCurrency = (currencyData) => {
     setCurrency(currencyData);
     localStorage.setItem('preferredCurrency', JSON.stringify(currencyData));
@@ -1146,15 +1283,18 @@ export const AppProvider = ({ children }) => {
         detail: { currency: currencyData }
       }));
     }
+    
+    toast.success(`💱 ${currencyData.symbol} ${currencyData.code} selected`);
   };
 
-  // ✅ Translation function
+  // ✅ Translation function - Returns translated text
   const t = (key) => {
     const translation = translations[language]?.[key];
     if (translation) return translation;
     return translations.en[key] || key;
   };
 
+  // ✅ Format price with currency symbol
   const formatPrice = (amount) => {
     const symbol = currency.symbol || '₹';
     return `${symbol} ${Number(amount).toFixed(2)}`;

@@ -1,15 +1,41 @@
-// src/providers/Appprovider.jsx
+// src/providers/AppProvider.jsx
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import toast from 'react-hot-toast';
 
-// ✅ Translations
+// ✅ Create and export the context
+export const AppContext = createContext();
+
+// ✅ Export languages
+export const languages = [
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
+  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', flag: '🇮🇳' },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', flag: '🇧🇩' },
+  { code: 'mr', name: 'Marathi', nativeName: 'मराठी', flag: '🇮🇳' },
+  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', flag: '🇮🇳' },
+  { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+];
+
+// ✅ Export currencies
+export const currencies = [
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+];
+
+// ✅ Translations (simplified for this fix)
 const translations = {
   en: {
     home: 'Home',
     products: 'Products',
     orders: 'Orders',
-    track: 'Track Order',
+    track_order: 'Track Order',
     login: 'Login',
     logout: 'Logout',
     wishlist: 'Wishlist',
@@ -25,83 +51,106 @@ const translations = {
     price_high_to_low: 'Price: High to Low',
     name_a_to_z: 'Name: A to Z',
     apply_filters: 'Apply Filters',
-    clear_all: 'Clear All Filters',
-    search_products: 'Search for products, brands, and categories...',
+    clear_all: 'Clear All',
+    search_products: 'Search for products...',
     your_profile: 'Your Profile',
     your_orders: 'Your Orders',
-    track_order: 'Track Order',
     admin_dashboard: 'Admin Dashboard',
-    select_language: 'Select Language',
-    shop_now: 'Shop Now',
-    featured: 'Featured',
-    trending: 'Trending',
-    new_arrivals: 'New Arrivals',
-    best_sellers: 'Best Sellers',
-    added_to_cart: 'Added to cart',
-    removed_from_cart: 'Removed from cart',
-    cart_empty: 'Your cart is empty',
-    checkout: 'Checkout',
-    total: 'Total',
-    view_cart: 'View Cart',
+    admin: 'Administrator',
+    hello: 'Hello',
+    sign_in: 'Sign in',
+    cart: 'Cart',
     delivering_to: 'Delivering to',
     select_location: 'Select Location',
-    no_results: 'No locations found',
-    try_different: 'Try a different search term',
     currency: 'Currency',
     language: 'Language',
     country: 'Country',
-  },
-  hi: {
-    home: 'होम',
-    products: 'उत्पाद',
-    orders: 'ऑर्डर',
-    track: 'ट्रैक ऑर्डर',
-    login: 'लॉगिन',
-    logout: 'लॉगआउट',
-    wishlist: 'विशलिस्ट',
-    filters: 'फ़िल्टर',
-    categories: 'श्रेणियाँ',
-    all_categories: 'सभी श्रेणियाँ',
-    price_range: 'मूल्य सीमा',
-    min_price: 'न्यूनतम मूल्य',
-    max_price: 'अधिकतम मूल्य',
-    sort_by: 'क्रमबद्ध करें',
-    newest_first: 'नवीनतम पहले',
-    price_low_to_high: 'कम से ज्यादा कीमत',
-    price_high_to_low: 'ज्यादा से कम कीमत',
-    name_a_to_z: 'नाम A से Z',
-    apply_filters: 'फ़िल्टर लागू करें',
-    clear_all: 'सभी फ़िल्टर साफ़ करें',
-    search_products: 'उत्पाद, ब्रांड और श्रेणियाँ खोजें...',
-    your_profile: 'आपकी प्रोफ़ाइल',
-    your_orders: 'आपके ऑर्डर',
-    track_order: 'ऑर्डर ट्रैक करें',
-    admin_dashboard: 'एडमिन डैशबोर्ड',
-    select_language: 'भाषा चुनें',
-    shop_now: 'अभी खरीदें',
-    featured: 'विशेष',
-    trending: 'ट्रेंडिंग',
-    new_arrivals: 'नए आगमन',
-    best_sellers: 'बेस्ट सेलर्स',
-    added_to_cart: 'कार्ट में जोड़ा गया',
-    removed_from_cart: 'कार्ट से हटाया गया',
-    cart_empty: 'आपकी कार्ट खाली है',
-    checkout: 'चेकआउट',
-    total: 'कुल',
-    view_cart: 'कार्ट देखें',
-    delivering_to: 'डिलीवरी हो रही है',
-    select_location: 'स्थान चुनें',
-    no_results: 'कोई स्थान नहीं मिला',
-    try_different: 'अलग शब्द खोजें',
-    currency: 'मुद्रा',
-    language: 'भाषा',
-    country: 'देश',
+    location: 'Location',
+    select_currency: 'Select Currency',
+    current: 'Current',
+    close: 'Close',
+    retry: 'Retry',
+    update: 'Update',
+    your_location: 'Your Location',
+    search_location: 'Search location...',
+    auto_detect: 'Auto-detect',
+    view_map: 'View Map',
+    detecting: 'Detecting...',
+    getting_gps: 'Getting GPS...',
+    found: 'found',
+    detected: 'detected',
+    selected: 'selected',
+    ip_based: 'IP based - may be inaccurate',
+    may_be_inaccurate: 'May be inaccurate',
+    enable_gps_tip: 'Enable GPS for accurate location',
+    unknown_location: 'Unknown Location',
+    search: 'Search',
+    all: 'All',
+    in_stock: 'In Stock',
+    out_of_stock: 'Out of Stock',
+    add_to_cart: 'Add to Cart',
+    buy_now: 'Buy Now',
+    description: 'Description',
+    reviews: 'Reviews',
+    rating: 'Rating',
+    shipping: 'Shipping',
+    returns: 'Returns',
+    payment: 'Payment',
+    order_summary: 'Order Summary',
+    subtotal: 'Subtotal',
+    discount: 'Discount',
+    delivery_charge: 'Delivery Charge',
+    proceed_to_checkout: 'Proceed to Checkout',
+    continue_shopping: 'Continue Shopping',
+    place_order: 'Place Order',
+    order_confirmed: 'Order Confirmed',
+    order_cancelled: 'Order Cancelled',
+    track_your_order: 'Track Your Order',
+    order_id: 'Order ID',
+    order_date: 'Order Date',
+    order_status: 'Order Status',
+    delivered: 'Delivered',
+    shipped: 'Shipped',
+    processing: 'Processing',
+    pending: 'Pending',
+    cancelled: 'Cancelled',
+    refunded: 'Refunded',
+    no_products: 'No Products Available',
+    shop_description: "India's premium online shopping destination",
+    home_title: 'Sombu Store - Premium Products',
+    home_description: 'Welcome to Sombu Store',
+    hero_title: 'Discover Your Perfect Style',
+    hero_subtitle: "We're crafting something amazing!",
+    view_collections: 'View Collections',
+    shop_now: 'Shop Now',
+    explore_products: 'Explore Products',
+    free_shipping: 'Free Shipping',
+    free_shipping_desc: 'On orders above ₹500',
+    secure_payment: 'Secure Payment',
+    secure_payment_desc: '100% Secure',
+    support: '24/7 Support',
+    support_desc: 'Dedicated team',
+    easy_returns: 'Easy Returns',
+    easy_returns_desc: '7 days return',
+    happy_customers: 'Happy Customers',
+    brands: 'Brands',
+    delivery: 'Delivery*',
+    coming_soon: 'Coming Soon',
+    soon: 'Soon',
+    curating_collection: "We're curating the best collection",
+    under_construction: 'Store under construction',
+    launching_soon: "Launching soon",
+    stay_tuned: 'Stay tuned!',
+    progress: 'Progress',
+    almost_there: "Almost there!",
+    current_language: 'Current Language',
+    current_currency: 'Current Currency',
   },
   ta: {
     home: 'முகப்பு',
     products: 'தயாரிப்புகள்',
     orders: 'ஆர்டர்கள்',
-    track: 'ஆர்டரை கண்காணி',
+    track_order: 'ஆர்டரை கண்காணி',
     login: 'உள்நுழை',
     logout: 'வெளியேறு',
     wishlist: 'விருப்ப பட்டியல்',
@@ -118,82 +167,114 @@ const translations = {
     name_a_to_z: 'பெயர் A முதல் Z',
     apply_filters: 'வடிப்பான்களை பயன்படுத்து',
     clear_all: 'அனைத்து வடிப்பான்களையும் அழி',
-    search_products: 'தயாரிப்புகள், பிராண்டுகள் மற்றும் வகைகளை தேடுங்கள்...',
+    search_products: 'தயாரிப்புகளை தேடுங்கள்...',
     your_profile: 'உங்கள் சுயவிவரம்',
     your_orders: 'உங்கள் ஆர்டர்கள்',
-    track_order: 'ஆர்டரை கண்காணி',
     admin_dashboard: 'நிர்வாகி கட்டுப்பாட்டு பலகை',
-    select_language: 'மொழியை தேர்ந்தெடுக்கவும்',
+    admin: 'நிர்வாகி',
+    hero_title: 'உங்களின் சிறந்த பாணியை கண்டறியுங்கள்',
+    hero_subtitle: "நாங்கள் அற்புதமான ஒன்றை உருவாக்குகிறோம்!",
     shop_now: 'இப்போது வாங்க',
-    featured: 'சிறப்பு',
-    trending: 'பிரபலமானது',
-    new_arrivals: 'புதிய வருகை',
-    best_sellers: 'சிறந்த விற்பனையாளர்கள்',
-    added_to_cart: 'கார்டில் சேர்க்கப்பட்டது',
-    removed_from_cart: 'கார்டில் இருந்து நீக்கப்பட்டது',
-    cart_empty: 'உங்கள் கார்ட் காலியாக உள்ளது',
-    checkout: 'கட்டணம் செலுத்து',
-    total: 'மொத்தம்',
-    view_cart: 'கார்டை காண்க',
-    delivering_to: 'டெலிவரி செய்யப்படுகிறது',
-    select_location: 'இருப்பிடத்தை தேர்ந்தெடுக்கவும்',
-    no_results: 'இருப்பிடங்கள் எதுவும் இல்லை',
-    try_different: 'வேறு சொல்லை முயற்சிக்கவும்',
-    currency: 'நாணயம்',
-    language: 'மொழி',
-    country: 'நாடு',
+    explore_products: 'தயாரிப்புகளை ஆராயுங்கள்',
+    free_shipping: 'இலவச டெலிவரி',
+    free_shipping_desc: '₹500 க்கு மேல் ஆர்டர்களில்',
+    secure_payment: 'பாதுகாப்பான கட்டணம்',
+    secure_payment_desc: '100% பாதுகாப்பானது',
+    support: '24/7 ஆதரவு',
+    support_desc: 'அர்ப்பணிப்பு குழு',
+    easy_returns: 'எளிதான ரிட்டர்ன்',
+    easy_returns_desc: '7 நாட்கள் ரிட்டர்ன்',
+    launching_soon: "விரைவில் திறக்கிறோம்",
+    stay_tuned: 'காத்திருங்கள்!',
+    // Add other translations as needed
+  },
+  hi: {
+    home: 'होम',
+    products: 'उत्पाद',
+    orders: 'ऑर्डर',
+    track_order: 'ट्रैक ऑर्डर',
+    login: 'लॉगिन',
+    logout: 'लॉगआउट',
+    wishlist: 'विशलिस्ट',
+    filters: 'फ़िल्टर',
+    categories: 'श्रेणियाँ',
+    all_categories: 'सभी श्रेणियाँ',
+    price_range: 'मूल्य सीमा',
+    min_price: 'न्यूनतम मूल्य',
+    max_price: 'अधिकतम मूल्य',
+    sort_by: 'क्रमबद्ध करें',
+    newest_first: 'नवीनतम पहले',
+    price_low_to_high: 'कम से ज्यादा कीमत',
+    price_high_to_low: 'ज्यादा से कम कीमत',
+    name_a_to_z: 'नाम A से Z',
+    apply_filters: 'फ़िल्टर लागू करें',
+    clear_all: 'सभी फ़िल्टर साफ़ करें',
+    search_products: 'उत्पाद खोजें...',
+    your_profile: 'आपकी प्रोफ़ाइल',
+    your_orders: 'आपके ऑर्डर',
+    admin_dashboard: 'एडमिन डैशबोर्ड',
+    admin: 'प्रशासक',
+    hero_title: 'खोजें अपनी परफेक्ट स्टाइल',
+    hero_subtitle: "हम कुछ अद्भुत बना रहे हैं!",
+    shop_now: 'अभी खरीदें',
+    explore_products: 'उत्पाद खोजें',
+    free_shipping: 'मुफ्त शिपिंग',
+    free_shipping_desc: '₹500 से अधिक के ऑर्डर पर',
+    secure_payment: 'सुरक्षित भुगतान',
+    secure_payment_desc: '100% सुरक्षित',
+    support: '24/7 सहायता',
+    support_desc: 'समर्पित टीम',
+    easy_returns: 'आसान रिटर्न',
+    easy_returns_desc: '7 दिन रिटर्न',
+    launching_soon: "हम जल्द ही लॉन्च कर रहे हैं",
+    stay_tuned: 'बने रहें!',
   },
   te: {
     home: 'హోమ్',
     products: 'ఉత్పత్తులు',
     orders: 'ఆర్డర్లు',
-    track: 'ఆర్డర్ ట్రాక్',
+    track_order: 'ఆర్డర్ ట్రాక్ చేయండి',
     login: 'లాగిన్',
     logout: 'లాగౌట్',
-    wishlist: 'విష్‌లిస్ట్',
+    wishlist: 'విశ్లిస్ట్',
     filters: 'ఫిల్టర్లు',
     categories: 'వర్గాలు',
     all_categories: 'అన్ని వర్గాలు',
     price_range: 'ధర పరిధి',
-    min_price: 'కనిష్ట ధర',
+    min_price: 'కనీస ధర',
     max_price: 'గరిష్ట ధర',
     sort_by: 'క్రమీకరించు',
     newest_first: 'కొత్తవి మొదట',
     price_low_to_high: 'తక్కువ నుండి ఎక్కువ ధర',
     price_high_to_low: 'ఎక్కువ నుండి తక్కువ ధర',
     name_a_to_z: 'పేరు A నుండి Z',
-    apply_filters: 'ఫిల్టర్లు వర్తింపజేయి',
-    clear_all: 'అన్ని ఫిల్టర్లు క్లియర్',
-    search_products: 'ఉత్పత్తులు, బ్రాండ్‌లు మరియు వర్గాలను శోధించండి...',
+    apply_filters: 'ఫిల్టర్లు వర్తించు',
+    clear_all: 'అన్నీ క్లియర్ చేయి',
+    search_products: 'ఉత్పత్తుల కోసం శోధించండి...',
     your_profile: 'మీ ప్రొఫైల్',
     your_orders: 'మీ ఆర్డర్లు',
-    track_order: 'ఆర్డర్ ట్రాక్',
-    admin_dashboard: 'నిర్వాహక డాష్‌బోర్డ్',
-    select_language: 'భాషను ఎంచుకోండి',
-    shop_now: 'ఇప్పుడే కొనుగోలు చేయండి',
-    featured: 'ప్రత్యేక',
-    trending: 'ట్రెండింగ్',
-    new_arrivals: 'కొత్త ఆగమనాలు',
-    best_sellers: 'అత్యంత అమ్ముడైనవి',
-    added_to_cart: 'కార్ట్‌కి జోడించబడింది',
-    removed_from_cart: 'కార్ట్ నుండి తీసివేయబడింది',
-    cart_empty: 'మీ కార్ట్ ఖాళీగా ఉంది',
-    checkout: 'చెకౌట్',
-    total: 'మొత్తం',
-    view_cart: 'కార్ట్ వీక్షించండి',
-    delivering_to: 'డెలివరీ చేస్తున్నాము',
-    select_location: 'స్థానాన్ని ఎంచుకోండి',
-    no_results: 'స్థానాలు కనుగొనబడలేదు',
-    try_different: 'వేరే పదాన్ని ప్రయత్నించండి',
-    currency: 'కరెన్సీ',
-    language: 'భాష',
-    country: 'దేశం',
+    admin_dashboard: 'అడ్మిన్ డాష్‌బోర్డ్',
+    admin: 'నిర్వాహకుడు',
+    hero_title: 'మీ స్టైల్ కనుగొనండి',
+    hero_subtitle: "మేము అద్భుతమైనదాన్ని సృష్టిస్తున్నాము!",
+    shop_now: 'ఇప్పుడే కొనండి',
+    explore_products: 'ఉత్పత్తులను అన్వేషించండి',
+    free_shipping: 'ఉచిత షిప్పింగ్',
+    free_shipping_desc: '₹500 పైన ఆర్డర్లకు',
+    secure_payment: 'సురక్షిత చెల్లింపు',
+    secure_payment_desc: '100% సురక్షితం',
+    support: '24/7 మద్దతు',
+    support_desc: 'అంకిత బృందం',
+    easy_returns: 'సులభ రిటర్న్స్',
+    easy_returns_desc: '7 రోజుల రిటర్న్',
+    launching_soon: "త్వరలో ప్రారంభం",
+    stay_tuned: 'వేచి ఉండండి!',
   },
   ml: {
     home: 'ഹോം',
     products: 'ഉൽപ്പന്നങ്ങൾ',
     orders: 'ഓർഡറുകൾ',
-    track: 'ഓർഡർ ട്രാക്ക്',
+    track_order: 'ഓർഡർ ട്രാക്ക് ചെയ്യുക',
     login: 'ലോഗിൻ',
     logout: 'ലോഗൗട്ട്',
     wishlist: 'വിഷ്ലിസ്റ്റ്',
@@ -201,153 +282,127 @@ const translations = {
     categories: 'വിഭാഗങ്ങൾ',
     all_categories: 'എല്ലാ വിഭാഗങ്ങളും',
     price_range: 'വില പരിധി',
-    min_price: 'ഏറ്റവും കുറഞ്ഞ വില',
-    max_price: 'ഏറ്റവും കൂടിയ വില',
-    sort_by: 'അടുക്കുക',
-    newest_first: 'ഏറ്റവും പുതിയത് ആദ്യം',
-    price_low_to_high: 'കുറഞ്ഞതിൽ നിന്ന് ഉയർന്ന വില',
-    price_high_to_low: 'ഉയർന്നതിൽ നിന്ന് കുറഞ്ഞ വില',
-    name_a_to_z: 'പേര് A മുതൽ Z',
+    min_price: 'കുറഞ്ഞ വില',
+    max_price: 'കൂടിയ വില',
+    sort_by: 'ക്രമീകരിക്കുക',
+    newest_first: 'പുതിയത് ആദ്യം',
+    price_low_to_high: 'വില: കുറഞ്ഞത് മുതൽ കൂടിയത് വരെ',
+    price_high_to_low: 'വില: കൂടിയത് മുതൽ കുറഞ്ഞത് വരെ',
+    name_a_to_z: 'പേര്: A മുതൽ Z വരെ',
     apply_filters: 'ഫിൽട്ടറുകൾ പ്രയോഗിക്കുക',
-    clear_all: 'എല്ലാ ഫിൽട്ടറുകളും മായ്ക്കുക',
-    search_products: 'ഉൽപ്പന്നങ്ങൾ, ബ്രാൻഡുകൾ, വിഭാഗങ്ങൾ എന്നിവ തിരയുക...',
+    clear_all: 'എല്ലാം മായ്ക്കുക',
+    search_products: 'ഉൽപ്പന്നങ്ങൾക്കായി തിരയുക...',
     your_profile: 'നിങ്ങളുടെ പ്രൊഫൈൽ',
     your_orders: 'നിങ്ങളുടെ ഓർഡറുകൾ',
-    track_order: 'ഓർഡർ ട്രാക്ക്',
-    admin_dashboard: 'അഡ്മിൻ ഡാഷ്‌ബോർഡ്',
-    select_language: 'ഭാഷ തിരഞ്ഞെടുക്കുക',
+    admin_dashboard: 'അഡ്മിൻ ഡാഷ്ബോർഡ്',
+    admin: 'അഡ്മിനിസ്ട്രേറ്റർ',
+    hero_title: 'നിങ്ങളുടെ സ്റ്റൈൽ കണ്ടെത്തുക',
+    hero_subtitle: "ഞങ്ങൾ അതിശയകരമായ എന്തോ ഒന്ന് നിർമ്മിക്കുകയാണ്!",
     shop_now: 'ഇപ്പോൾ വാങ്ങുക',
-    featured: 'ഫീച്ചർ ചെയ്തത്',
-    trending: 'ട്രെൻഡിംഗ്',
-    new_arrivals: 'പുതിയ എത്തിച്ചേരലുകൾ',
-    best_sellers: 'ബെസ്റ്റ് സെല്ലേഴ്സ്',
-    added_to_cart: 'കാർട്ടിൽ ചേർത്തു',
-    removed_from_cart: 'കാർട്ടിൽ നിന്ന് നീക്കം ചെയ്തു',
-    cart_empty: 'നിങ്ങളുടെ കാർട്ട് ശൂന്യമാണ്',
-    checkout: 'ചെക്കൗട്ട്',
-    total: 'ആകെ',
-    view_cart: 'കാർട്ട് കാണുക',
-    delivering_to: 'ഡെലിവറി ചെയ്യുന്നു',
-    select_location: 'സ്ഥാനം തിരഞ്ഞെടുക്കുക',
-    no_results: 'സ്ഥാനങ്ങൾ കണ്ടെത്തിയില്ല',
-    try_different: 'മറ്റൊരു പദം പരീക്ഷിക്കുക',
-    currency: 'കറൻസി',
-    language: 'ഭാഷ',
-    country: 'രാജ്യം',
+    explore_products: 'ഉൽപ്പന്നങ്ങൾ പര്യവേക്ഷണം ചെയ്യുക',
+    free_shipping: 'സൗജന്യ ഷിപ്പിംഗ്',
+    free_shipping_desc: '₹500 ന് മുകളിലുള്ള ഓർഡറുകൾക്ക്',
+    secure_payment: 'സുരക്ഷിത പേയ്മെന്റ്',
+    secure_payment_desc: '100% സുരക്ഷിതം',
+    support: '24/7 പിന്തുണ',
+    support_desc: 'സമർപ്പിത ടീം',
+    easy_returns: 'എളുപ്പ റിട്ടേൺസ്',
+    easy_returns_desc: '7 ദിവസം റിട്ടേൺ',
+    launching_soon: "ഉടൻ ലോഞ്ച് ചെയ്യുന്നു",
+    stay_tuned: 'കാത്തിരിക്കുക!',
   },
 };
 
-// ✅ Currency options
-const currencies = [
-  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-  { code: 'USD', symbol: '$', name: 'US Dollar' },
-  { code: 'EUR', symbol: '€', name: 'Euro' },
-  { code: 'GBP', symbol: '£', name: 'British Pound' },
-  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
-  { code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal' },
-  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
-  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
-];
-
-// ✅ Language options
-const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-  { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
-];
-
-// ✅ Create Context
-const AppContext = createContext();
-
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp must be used within AppProvider');
-  }
-  return context;
-};
-
-// ✅ Provider Component
-const AppProvider = ({ children }) => {
+// ✅ AppProvider Component
+export const AppProvider = ({ children }) => {
   const [language, setLanguage] = useState('en');
   const [currency, setCurrency] = useState({ code: 'INR', symbol: '₹' });
+  const [country, setCountry] = useState({ code: 'IN', name: 'India', flag: '🇮🇳' });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
-  // ✅ Load saved preferences on mount
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    const savedCurrency = localStorage.getItem('preferredCurrency');
-    
-    if (savedLanguage && languages.find(l => l.code === savedLanguage)) {
-      setLanguage(savedLanguage);
-    }
-    
-    if (savedCurrency) {
-      try {
-        setCurrency(JSON.parse(savedCurrency));
-      } catch (e) {
-        setCurrency({ code: 'INR', symbol: '₹' });
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('preferredLanguage');
+      const savedCurrency = localStorage.getItem('preferredCurrency');
+      
+      if (savedLanguage && languages.find(l => l.code === savedLanguage)) {
+        setLanguage(savedLanguage);
+      } else {
+        setLanguage('en');
+        localStorage.setItem('preferredLanguage', 'en');
+      }
+      
+      if (savedCurrency) {
+        try {
+          setCurrency(JSON.parse(savedCurrency));
+        } catch (e) {
+          setCurrency({ code: 'INR', symbol: '₹' });
+        }
       }
     }
-    
     setIsLoaded(true);
   }, []);
 
-  // ✅ Change language
   const changeLanguage = (langCode) => {
     setLanguage(langCode);
     localStorage.setItem('preferredLanguage', langCode);
+    setForceUpdate(prev => prev + 1);
     
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('languageChange', {
         detail: { language: langCode }
       }));
     }
+    
+    const lang = languages.find(l => l.code === langCode);
+    toast.success(`🌐 ${lang?.name || langCode} selected`);
   };
 
-  // ✅ Change currency
   const changeCurrency = (currencyData) => {
     setCurrency(currencyData);
     localStorage.setItem('preferredCurrency', JSON.stringify(currencyData));
+    setForceUpdate(prev => prev + 1);
     
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('currencyChange', {
         detail: { currency: currencyData }
       }));
     }
+    
+    toast.success(`💱 ${currencyData.symbol} ${currencyData.code} selected`);
   };
 
-  // ✅ Translation function
   const t = (key) => {
-    return translations[language]?.[key] || translations.en[key] || key;
+    const translation = translations[language]?.[key];
+    if (translation) return translation;
+    return translations.en[key] || key;
   };
 
-  // ✅ Format price with currency
   const formatPrice = (amount) => {
     const symbol = currency.symbol || '₹';
     return `${symbol} ${Number(amount).toFixed(2)}`;
   };
 
-  // ✅ Get current language object
   const currentLanguage = languages.find(l => l.code === language) || languages[0];
-
-  // ✅ Get current currency object
-  const currentCurrency = currency;
 
   const value = {
     language,
     currency,
+    country,
     currentLanguage,
-    currentCurrency,
+    currentCurrency: currency,
     changeLanguage,
     changeCurrency,
+    setLanguage,
+    setCurrency,
+    setCountry,
     t,
     formatPrice,
     languages,
     currencies,
     isLoaded,
+    forceUpdate,
   };
 
   return (
@@ -357,4 +412,14 @@ const AppProvider = ({ children }) => {
   );
 };
 
+// ✅ IMPORTANT: Export useApp hook
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+};
+
+// ✅ Default export for backward compatibility
 export default AppProvider;

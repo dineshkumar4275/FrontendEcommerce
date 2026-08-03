@@ -111,7 +111,7 @@
 import { Inter, Poppins } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Providers } from "../src/store/providers";
-import AppProvider from "../src/providers/Appprovider";
+import AppProvider from "../src/providers/AppProvider";
 import { Header } from "../src/components/layout/Header";
 import "../src/styles/globals.css";
 
@@ -158,8 +158,8 @@ export const metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.ico", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",

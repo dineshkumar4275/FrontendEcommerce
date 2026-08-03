@@ -27,9 +27,15 @@ export const currencies = [
   { code: 'USD', symbol: '$', name: 'US Dollar' },
   { code: 'EUR', symbol: '€', name: 'Euro' },
   { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
 ];
 
-// ✅ Translations (simplified for this fix)
+// ✅ Translations
 const translations = {
   en: {
     home: 'Home',
@@ -145,6 +151,12 @@ const translations = {
     almost_there: "Almost there!",
     current_language: 'Current Language',
     current_currency: 'Current Currency',
+    select_language: 'Select Language',
+    tamil: 'Tamil',
+    hindi: 'Hindi',
+    telugu: 'Telugu',
+    malayalam: 'Malayalam',
+    english: 'English',
   },
   ta: {
     home: 'முகப்பு',
@@ -186,7 +198,12 @@ const translations = {
     easy_returns_desc: '7 நாட்கள் ரிட்டர்ன்',
     launching_soon: "விரைவில் திறக்கிறோம்",
     stay_tuned: 'காத்திருங்கள்!',
-    // Add other translations as needed
+    select_language: 'மொழியை தேர்ந்தெடுக்கவும்',
+    tamil: 'தமிழ்',
+    hindi: 'இந்தி',
+    telugu: 'தெலுங்கு',
+    malayalam: 'மலையாளம்',
+    english: 'ஆங்கிலம்',
   },
   hi: {
     home: 'होम',
@@ -228,6 +245,12 @@ const translations = {
     easy_returns_desc: '7 दिन रिटर्न',
     launching_soon: "हम जल्द ही लॉन्च कर रहे हैं",
     stay_tuned: 'बने रहें!',
+    select_language: 'भाषा चुनें',
+    tamil: 'तमिल',
+    hindi: 'हिंदी',
+    telugu: 'तेलुगु',
+    malayalam: 'मलयालम',
+    english: 'अंग्रेज़ी',
   },
   te: {
     home: 'హోమ్',
@@ -269,6 +292,12 @@ const translations = {
     easy_returns_desc: '7 రోజుల రిటర్న్',
     launching_soon: "త్వరలో ప్రారంభం",
     stay_tuned: 'వేచి ఉండండి!',
+    select_language: 'భాష ఎంచుకోండి',
+    tamil: 'తమిళం',
+    hindi: 'హిందీ',
+    telugu: 'తెలుగు',
+    malayalam: 'మలయాళం',
+    english: 'ఇంగ్లీష్',
   },
   ml: {
     home: 'ഹോം',
@@ -310,6 +339,12 @@ const translations = {
     easy_returns_desc: '7 ദിവസം റിട്ടേൺ',
     launching_soon: "ഉടൻ ലോഞ്ച് ചെയ്യുന്നു",
     stay_tuned: 'കാത്തിരിക്കുക!',
+    select_language: 'ഭാഷ തിരഞ്ഞെടുക്കുക',
+    tamil: 'തമിഴ്',
+    hindi: 'ഹിന്ദി',
+    telugu: 'തെലുങ്ക്',
+    malayalam: 'മലയാളം',
+    english: 'ഇംഗ്ലീഷ്',
   },
 };
 
@@ -412,7 +447,7 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-// ✅ IMPORTANT: Export useApp hook
+// ✅ Export useApp hook
 export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {
@@ -421,5 +456,5 @@ export const useApp = () => {
   return context;
 };
 
-// ✅ Default export for backward compatibility
+// ✅ Default export
 export default AppProvider;

@@ -1499,16 +1499,20 @@ const GlobalSelector = () => {
     setIsOpen(!isOpen);
   };
 
-  // ✅ Handle language change - Force page refresh after change
+  // ✅ Handle language change - Force page refresh
   const handleLanguageChange = (langCode) => {
     console.log('🔄 GlobalSelector - Changing language to:', langCode);
     changeLanguage(langCode);
     setIsOpen(false);
     
+    // ✅ Show toast
+    const lang = languages.find(l => l.code === langCode);
+    toast.success(`Language changed to ${lang?.name || langCode}`);
+    
     // ✅ Force reload after 500ms to apply translations
     setTimeout(() => {
       window.location.reload();
-    }, 300);
+    }, 500);
   };
 
   // ✅ Handle currency change
@@ -1516,6 +1520,7 @@ const GlobalSelector = () => {
     console.log('🔄 GlobalSelector - Changing currency to:', curr);
     changeCurrency(curr);
     setIsOpen(false);
+    toast.success(`Currency changed to ${curr.symbol} ${curr.code}`);
   };
 
   return (

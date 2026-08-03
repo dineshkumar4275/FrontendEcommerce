@@ -1080,24 +1080,39 @@ const languages = [
 ];
 
 export const AppProvider = ({ children }) => {
-  // ✅ FORCE English as default - ALWAYS
+  // ✅ Default to English
   const [language, setLanguage] = useState('en');
   const [currency, setCurrency] = useState({ code: 'INR', symbol: '₹' });
   const [country, setCountry] = useState({ code: 'IN', name: 'India', flag: '🇮🇳' });
   const [isLoaded, setIsLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
-  // ✅ On mount - ALWAYS set to English
+  // ✅ Load saved language on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // ✅ ALWAYS set to English - IGNORE everything else
-      console.log('✅ Setting language to English (forced)');
-      setLanguage('en');
-      localStorage.setItem('preferredLanguage', 'en');
+      const savedLanguage = localStorage.getItem('preferredLanguage');
+      console.log('🔍 Saved language in localStorage:', savedLanguage);
+      
+      // ✅ If saved language exists and is valid, use it
+      if (savedLanguage && languages.find(l => l.code === savedLanguage)) {
+        console.log('✅ Setting language to saved:', savedLanguage);
+        setLanguage(savedLanguage);
+      } else {
+        // ✅ Default to English
+        console.log('✅ No valid saved language, defaulting to English');
+        setLanguage('en');
+        localStorage.setItem('preferredLanguage', 'en');
+      }
       
       // ✅ Currency
-      setCurrency({ code: 'INR', symbol: '₹' });
-      localStorage.setItem('preferredCurrency', JSON.stringify({ code: 'INR', symbol: '₹' }));
+      const savedCurrency = localStorage.getItem('preferredCurrency');
+      if (savedCurrency) {
+        try {
+          setCurrency(JSON.parse(savedCurrency));
+        } catch (e) {
+          setCurrency({ code: 'INR', symbol: '₹' });
+        }
+      }
     }
     
     setIsLoaded(true);

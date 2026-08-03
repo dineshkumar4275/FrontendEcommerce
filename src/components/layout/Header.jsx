@@ -2034,6 +2034,7 @@
 //     </>
 //   );
 // };
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -2101,8 +2102,10 @@ export const Header = ({
   const { wishlistCount, getWishlist } = useWishlist();
   const { user, token } = useSelector((state) => state.auth);
 
+  // ✅ Use App Context for translations
   const { t, formatPrice, currency } = useApp();
 
+  // Load wishlist when logged in
   useEffect(() => {
     if (isLoggedIn) {
       getWishlist();
@@ -2245,6 +2248,7 @@ export const Header = ({
   const hasActiveFilters = selectedCategory || minPrice || maxPrice || sortBy !== 'newest';
   const activeFilterCount = (selectedCategory ? 1 : 0) + (minPrice || maxPrice ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
 
+  // ✅ Navigation links with translation
   const navLinks = [
     { name: 'home', href: '/', icon: SparklesIcon },
     { name: 'products', href: '/products', icon: CubeIcon },
@@ -2255,19 +2259,19 @@ export const Header = ({
   if (!mounted) {
     return (
       <>
-        <header className="fixed top-0 w-full z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
-          <div className="container mx-auto px-4 py-4">
+        <header className="fixed top-0 w-full z-40 bg-slate-900 border-b border-purple-500/20">
+          <nav className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl animate-pulse" />
+              <div className="w-10 h-10 bg-purple-500/20 rounded-xl animate-pulse" />
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full animate-pulse" />
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full animate-pulse" />
-                <div className="w-24 h-10 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl animate-pulse" />
+                <div className="w-8 h-8 bg-purple-500/10 rounded-xl animate-pulse" />
+                <div className="w-8 h-8 bg-purple-500/10 rounded-xl animate-pulse" />
+                <div className="w-20 h-10 bg-purple-500/20 rounded-xl animate-pulse" />
               </div>
             </div>
-          </div>
+          </nav>
         </header>
-        <div className="h-16"></div>
+        <div className="h-20"></div>
       </>
     );
   }
@@ -2276,150 +2280,151 @@ export const Header = ({
     <>
       <header className={`fixed top-0 w-full z-40 transition-all duration-500 ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-100' 
-          : 'bg-white/80 backdrop-blur-md border-b border-gray-100'
+          ? 'bg-slate-900 shadow-lg shadow-purple-900/30 border-b border-purple-500/30' 
+          : 'bg-slate-900 border-b border-purple-500/20'
       }`}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20 gap-2">
-
+        <nav className="container mx-auto px-4 py-3">
+          <div className="flex justify-between items-center gap-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all duration-300 group-hover:scale-105">
-                <SparklesIcon className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl lg:text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Sombu
-                </span>
-                <span className="hidden lg:inline text-xs text-gray-400 font-medium ml-1">Store</span>
-              </div>
+            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+              <img 
+                src="/favicon.ico"
+                alt="Sombu Store Logo"
+                className="w-10 h-10 object-contain rounded-xl"
+                width={40}
+                height={40}
+              />
             </Link>
 
-            {/* Location - Desktop */}
-            <div className="hidden xl:block flex-shrink-0">
-              <LocationDisplay />
-            </div>
-
             {/* Search Bar - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-4">
-              <div className="relative w-full group">
-                <input
-                  type="text"
-                  placeholder={t('search_products')}
-                  className="w-full px-5 py-2.5 rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:bg-white focus:border-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-700 placeholder-gray-400"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && e.target.value) {
-                      handleSearchSelect(e.target.value);
-                    }
-                  }}
-                />
-                <button 
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transition-all duration-300"
-                  onClick={() => {
-                    const input = document.querySelector('.search-input-desktop');
-                    if (input && input.value) {
-                      handleSearchSelect(input.value);
-                    }
-                  }}
-                >
-                  <MagnifyingGlassIcon className="w-5 h-5" />
-                </button>
-              </div>
+            <div className="hidden md:flex flex-1 max-w-2xl">
+              <AutoSuggestSearch 
+                placeholder={t('search_products')}
+                onSelect={handleSearchSelect}
+              />
             </div>
 
-            {/* Right Section */}
-            <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                    pathname === link.href
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 text-purple-200 shadow-sm border border-purple-500/20'
+                      : 'text-purple-300/70 hover:bg-purple-500/10 hover:text-purple-200'
+                  }`}
+                >
+                  <link.icon className="w-4 h-4" />
+                  {t(link.name)}
+                </Link>
+              ))}
+            </div>
 
-              {/* Location - Mobile */}
-              <div className="xl:hidden flex-shrink-0 max-w-[100px]">
+            {/* Desktop Icons */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* ✅ Location Display - Desktop */}
+              <div className="hidden md:block">
                 <LocationDisplay />
               </div>
 
-              {/* Global Selector */}
-              <div className="hidden sm:block">
+              {/* ✅ Global Selector - Desktop */}
+              <div className="hidden md:block">
                 <GlobalSelector />
               </div>
-              <div className="sm:hidden">
-                <GlobalSelector />
-              </div>
+
+              {/* Mobile Search Icon */}
+              <button 
+                onClick={() => setShowMobileSearch(!showMobileSearch)}
+                className="md:hidden p-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-purple-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
 
               {/* Wishlist */}
               <Link 
                 href="/wishlist" 
-                className="relative p-2.5 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 rounded-xl transition-all duration-300 group"
+                className="relative p-2 hover:bg-pink-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-pink-300"
                 aria-label={t('wishlist')}
               >
-                <HeartIcon className="w-5 h-5 text-gray-600 group-hover:text-pink-500 transition-colors" />
+                <HeartIcon className="w-5 h-5" />
                 {wishlistCount > 0 && (
-                  <div className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-lg shadow-pink-500/30">
+                  <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-lg z-10">
                     {wishlistCount > 99 ? '99+' : wishlistCount}
                   </div>
                 )}
               </Link>
 
-              {/* Admin */}
+              {/* Admin Icon */}
               {isAdmin && (
                 <Link
                   href="/admin/dashboard"
-                  className="hidden lg:block p-2.5 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 rounded-xl transition-all duration-300 relative group"
+                  className="relative p-2 hover:bg-green-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-green-400"
                   title={t('admin_dashboard')}
                 >
-                  <svg className="w-5 h-5 text-gray-600 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                 </Link>
               )}
 
-              {/* Cart */}
+              {/* Cart Button */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2.5 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 rounded-xl transition-all duration-300 group"
+                className="relative p-2 hover:bg-fuchsia-500/10 rounded-lg transition-all duration-300 text-purple-300/60 hover:text-fuchsia-300"
               >
-                <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 group-hover:text-purple-600 transition-colors" />
+                <ShoppingCartIcon className="w-5 h-5" />
                 {totalQuantity > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold rounded-full min-w-[20px] h-[20px] flex items-center justify-center px-1 shadow-lg shadow-purple-500/30">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 shadow-lg">
                     {totalQuantity > 99 ? '99+' : totalQuantity}
                   </span>
                 )}
               </button>
 
-              {/* User */}
+              {/* Login/User Button */}
               {isLoggedIn ? (
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 rounded-xl transition-all duration-300 group"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-purple-500/10 rounded-lg transition-all duration-300"
                   >
                     <div className="relative">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
                         {userName.charAt(0).toUpperCase()}
                       </div>
-                      {isAdmin && <span className="absolute -top-1 -right-1 text-xs">👑</span>}
+                      {isAdmin && (
+                        <span className="absolute -top-1 -right-1 text-xs">👑</span>
+                      )}
                     </div>
-                    <div className="hidden sm:block text-left">
-                      <div className="text-[10px] text-gray-400 font-medium">{t('hello') || 'Hello'}</div>
-                      <div className="text-sm font-semibold text-gray-700 leading-tight">{userName}</div>
-                    </div>
-                    <ChevronDownIcon className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-300 hidden sm:block ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                    <span className="text-purple-200 font-semibold text-sm hidden sm:block">{userName}</span>
+                    <ChevronDownIcon className={`w-4 h-4 text-purple-400/60 transition-transform hidden sm:block ${isUserMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isUserMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
-                      <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                        <div className="px-4 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100">
+                      <div className="absolute right-0 mt-2 w-64 bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/30 z-50 overflow-hidden">
+                        <div className="px-4 py-3 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border-b border-purple-500/30">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-md">
-                              {userName.charAt(0).toUpperCase()}
+                            <div className="relative">
+                              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-xl flex items-center justify-center text-white font-bold">
+                                {userName.charAt(0).toUpperCase()}
+                              </div>
+                              {isAdmin && (
+                                <span className="absolute -top-1 -right-1 text-xs">👑</span>
+                              )}
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-gray-800">{userName}</p>
-                              <p className="text-xs text-gray-500">{userEmail}</p>
+                              <p className="text-sm font-bold text-purple-100">{userName}</p>
+                              <p className="text-xs text-purple-400">{userEmail}</p>
                               {isAdmin && (
-                                <span className="text-[10px] bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-0.5 rounded-full mt-1 inline-block">
-                                  {t('admin') || 'Admin'}
+                                <span className="text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded mt-1 inline-block">
+                                  {t('admin') || 'Administrator'}
                                 </span>
                               )}
                             </div>
@@ -2436,35 +2441,35 @@ export const Header = ({
                               key={item.href}
                               href={item.href}
                               onClick={() => setIsUserMenuOpen(false)}
-                              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all"
+                              className="flex items-center gap-3 px-4 py-2 text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 transition-all text-sm"
                             >
-                              <item.icon className="w-4 h-4 text-gray-400" />
+                              <item.icon className="w-4 h-4" />
                               {t(item.label)}
                             </Link>
                           ))}
                           
                           {isAdmin && (
                             <>
-                              <div className="border-t border-gray-100 my-1" />
+                              <div className="border-t border-purple-500/20 my-1" />
                               <Link
                                 href="/admin/dashboard"
                                 onClick={() => setIsUserMenuOpen(false)}
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all"
+                                className="flex items-center gap-3 px-4 py-2 text-green-400 hover:bg-green-500/10 hover:text-green-300 transition-all text-sm"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                                 {t('admin_dashboard')}
-                                <span className="ml-auto text-[10px] bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-0.5 rounded-full">Admin</span>
+                                <span className="ml-auto text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded">Admin</span>
                               </Link>
                             </>
                           )}
                           
-                          <div className="border-t border-gray-100 my-1" />
+                          <div className="border-t border-purple-500/20 my-1" />
                           <button
                             onClick={handleLogout}
-                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 transition-all text-left"
+                            className="flex items-center gap-3 w-full px-4 py-2 text-red-400 hover:bg-red-500/10 transition-all text-sm"
                           >
                             <ArrowRightOnRectangleIcon className="w-4 h-4" />
                             {t('logout')}
@@ -2475,29 +2480,35 @@ export const Header = ({
                   )}
                 </div>
               ) : (
-                <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transition-all duration-300">
+                <Link href="/login" className="px-3 sm:px-5 py-1.5 sm:py-2.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300 shadow-lg shadow-purple-500/25 flex items-center gap-1 sm:gap-2">
                   <UserIcon className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm">{t('login')}</span>
+                  <span className="hidden xs:inline text-sm">{t('login')}</span>
                 </Link>
               )}
 
-              {/* Mobile Menu */}
+              {/* Mobile Menu Button */}
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className="lg:hidden p-2.5 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 rounded-xl transition-all duration-300"
+                className="lg:hidden p-2 hover:bg-purple-500/10 rounded-lg transition"
               >
-                {isMenuOpen ? <XMarkIcon className="h-5 w-5 text-gray-600" /> : <Bars3Icon className="h-5 w-5 text-gray-600" />}
+                {isMenuOpen ? <XMarkIcon className="h-5 w-5 text-purple-300" /> : <Bars3Icon className="h-5 w-5 text-purple-300" />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Search */}
-          <div className="md:hidden mt-3 pb-3">
-            <div className="relative w-full group">
+          {/* ✅ MOBILE SECTION - Amazon Style (Only on mobile) */}
+          <div className="lg:hidden mt-2 space-y-2">
+            {/* Location Display - Mobile (Amazon Style) */}
+            <div className="flex items-center">
+              <LocationDisplay />
+            </div>
+
+            {/* Search Bar - Mobile (Amazon Style) */}
+            <div className="relative">
               <input
                 type="text"
                 placeholder={t('search_products')}
-                className="w-full px-5 py-2.5 rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:bg-white focus:border-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-700 placeholder-gray-400 text-sm"
+                className="w-full px-4 py-2 rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-[#febd69] text-gray-900 text-sm bg-white"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.target.value) {
                     handleSearchSelect(e.target.value);
@@ -2505,7 +2516,7 @@ export const Header = ({
                 }}
               />
               <button 
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transition-all duration-300"
+                className="absolute right-0 top-0 h-full px-4 bg-[#febd69] rounded-r-md hover:bg-[#f3a847] transition-colors flex items-center justify-center"
                 onClick={() => {
                   const input = document.querySelector('.mobile-search-input');
                   if (input && input.value) {
@@ -2513,29 +2524,47 @@ export const Header = ({
                   }
                 }}
               >
-                <MagnifyingGlassIcon className="w-4 h-4" />
+                <MagnifyingGlassIcon className="w-5 h-5 text-[#131921]" />
               </button>
+            </div>
+
+            {/* Categories Row - Mobile */}
+            <div className="flex items-center gap-4 text-xs text-white/70 overflow-x-auto pb-1">
+              <span className="text-white font-medium whitespace-nowrap">Shop By</span>
+              <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Category</span>
+              <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Deals</span>
+              <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Sell</span>
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Navigation Menu */}
           <AnimatePresence>
             {isMenuOpen && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden pt-3 pb-4 border-t border-gray-100 space-y-1"
+                className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
+                {/* Location Display - Mobile Menu */}
+                <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
+                  <LocationDisplay />
+                </div>
+
+                {/* Global Selector - Mobile Menu */}
+                <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
+                  <GlobalSelector />
+                </div>
+
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                       pathname === link.href
-                        ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-600 font-semibold'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 text-purple-200 border border-purple-500/20'
+                        : 'text-purple-300/70 hover:bg-purple-500/10'
                     }`}
                   >
                     <link.icon className="w-5 h-5" />
@@ -2547,14 +2576,14 @@ export const Header = ({
                   <Link 
                     href="/admin/dashboard" 
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-600 hover:bg-green-50 transition-all"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-green-500/10 hover:text-green-300 transition-all font-medium"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     {t('admin_dashboard')}
-                    <span className="ml-auto text-[10px] bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-0.5 rounded-full">Admin</span>
+                    <span className="ml-auto text-[10px] bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded">Admin</span>
                   </Link>
                 )}
 
@@ -2563,12 +2592,12 @@ export const Header = ({
                     setIsMenuOpen(false);
                     setIsFilterOpen(true);
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-all w-full"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-purple-500/10 transition-all font-medium w-full"
                 >
                   <FunnelIcon className="w-5 h-5" />
                   {t('filters')}
                   {hasActiveFilters && (
-                    <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full px-2 ml-auto">
+                    <span className="bg-purple-500 text-white text-xs font-bold rounded-full px-2 ml-auto">
                       {activeFilterCount}
                     </span>
                   )}
@@ -2577,9 +2606,9 @@ export const Header = ({
                 <Link 
                   href="/wishlist" 
                   onClick={() => setIsMenuOpen(false)} 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-pink-50 transition-all"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300/70 hover:bg-pink-500/10 hover:text-pink-300 transition-all font-medium"
                 >
-                  <HeartIcon className="w-5 h-5 text-pink-500" />
+                  <HeartIcon className="w-5 h-5" />
                   {t('wishlist')}
                   {wishlistCount > 0 && (
                     <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-auto">
@@ -2588,12 +2617,12 @@ export const Header = ({
                   )}
                 </Link>
 
-                <div className="pt-3 border-t border-gray-100 mt-3">
+                <div className="pt-3 border-t border-purple-500/20 mt-3">
                   {!isLoggedIn && (
                     <Link 
                       href="/login" 
                       onClick={() => setIsMenuOpen(false)} 
-                      className="block w-full text-center py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all"
+                      className="block w-full text-center py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25"
                     >
                       {t('login')}
                     </Link>
@@ -2602,40 +2631,36 @@ export const Header = ({
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </nav>
       </header>
 
       {/* Filter Drawer */}
       <AnimatePresence>
         {isFilterOpen && (
           <>
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" onClick={() => setIsFilterOpen(false)} />
+            <div className="fixed inset-0 bg-black/50 z-50" onClick={() => setIsFilterOpen(false)} />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30 }}
-              className="fixed right-0 top-0 h-full w-full max-w-[85%] sm:max-w-md bg-white shadow-2xl z-50 flex flex-col"
+              className="fixed right-0 top-0 h-full w-full max-w-[85%] sm:max-w-md bg-slate-900 shadow-2xl z-50 flex flex-col"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-pink-50">
-                <h2 className="text-xl font-bold text-gray-800">{t('filters')}</h2>
-                <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-white/50 rounded-xl transition">
-                  <XMarkIcon className="w-5 h-5 text-gray-600" />
+              <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20">
+                <h2 className="text-base sm:text-xl font-bold text-purple-100">{t('filters')}</h2>
+                <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-purple-500/10 rounded-xl transition">
+                  <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
                 {categories.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t('categories')}</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('categories')}</h3>
+                    <div className="space-y-1.5 sm:space-y-2">
                       <button
                         onClick={() => setTempCategory('')}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl transition ${
-                          tempCategory === '' 
-                            ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-600 font-semibold border-2 border-purple-200' 
-                            : 'text-gray-600 hover:bg-gray-50'
-                        }`}
+                        className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempCategory === '' ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
                         {t('all_categories')}
                       </button>
@@ -2643,11 +2668,7 @@ export const Header = ({
                         <button
                           key={cat}
                           onClick={() => setTempCategory(cat)}
-                          className={`w-full text-left px-4 py-2.5 rounded-xl transition capitalize ${
-                            tempCategory === cat 
-                              ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-600 font-semibold border-2 border-purple-200' 
-                              : 'text-gray-600 hover:bg-gray-50'
-                          }`}
+                          className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition capitalize text-xs sm:text-sm ${tempCategory === cat ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                         >
                           {cat}
                         </button>
@@ -2657,28 +2678,28 @@ export const Header = ({
                 )}
 
                 <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t('price_range')}</h3>
-                  <div className="flex gap-3">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('price_range')}</h3>
+                  <div className="flex gap-2 sm:gap-3">
                     <input
                       type="number"
                       placeholder={t('min_price')}
                       value={tempMinPrice}
                       onChange={(e) => setTempMinPrice(e.target.value)}
-                      className="flex-1 px-4 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:border-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-100 transition-all"
+                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <input
                       type="number"
                       placeholder={t('max_price')}
                       value={tempMaxPrice}
                       onChange={(e) => setTempMaxPrice(e.target.value)}
-                      className="flex-1 px-4 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:border-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-100 transition-all"
+                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-800 border border-purple-500/30 rounded-lg text-purple-100 text-xs sm:text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t('sort_by')}</h3>
-                  <div className="space-y-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-300 uppercase tracking-wider mb-2 sm:mb-3">{t('sort_by')}</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
                     {[
                       { value: 'newest', label: 'newest_first' },
                       { value: 'price_low', label: 'price_low_to_high' },
@@ -2688,11 +2709,7 @@ export const Header = ({
                       <button
                         key={option.value}
                         onClick={() => setTempSortBy(option.value)}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl transition ${
-                          tempSortBy === option.value 
-                            ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-600 font-semibold border-2 border-purple-200' 
-                            : 'text-gray-600 hover:bg-gray-50'
-                        }`}
+                        className={`w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${tempSortBy === option.value ? 'bg-purple-600 text-white' : 'text-purple-300 hover:bg-purple-500/20'}`}
                       >
                         {t(option.label)}
                       </button>
@@ -2701,17 +2718,17 @@ export const Header = ({
                 </div>
               </div>
 
-              <div className="border-t border-gray-100 p-6 space-y-3 bg-gray-50">
+              <div className="border-t border-purple-500/30 p-4 sm:p-6 space-y-2 sm:space-y-3">
                 <button
                   onClick={handleApplyFilters}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition"
                 >
                   {t('apply_filters')}
                 </button>
                 {(tempCategory || tempMinPrice || tempMaxPrice || tempSortBy !== 'newest') && (
                   <button
                     onClick={handleClearFilters}
-                    className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all"
+                    className="w-full bg-slate-800 text-purple-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-slate-700 transition"
                   >
                     {t('clear_all')}
                   </button>
@@ -2725,7 +2742,7 @@ export const Header = ({
       {/* Cart Sidebar */}
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
-      <div className="h-16 lg:h-20"></div>
+      <div className="h-20"></div>
     </>
   );
 };

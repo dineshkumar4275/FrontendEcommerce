@@ -1061,7 +1061,8 @@ import {
   XMarkIcon,
   MapPinIcon,
   CurrencyDollarIcon,
-  LanguageIcon
+  LanguageIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { useApp } from '../hooks/useApp';
 import toast from 'react-hot-toast';
@@ -1070,9 +1071,11 @@ const GlobalSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectedCountry, setDetectedCountry] = useState(null);
-  const [activeTab, setActiveTab] = useState('currency');
+  const [activeTab, setActiveTab] = useState('language');
   const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
   
   // ✅ Use App Context
   const { 
@@ -1080,12 +1083,24 @@ const GlobalSelector = () => {
     currency, 
     currentLanguage, 
     currentCurrency,
-    changeLanguage,  // ✅ Use changeLanguage
-    changeCurrency,  // ✅ Use changeCurrency
+    changeLanguage,
+    changeCurrency,
     languages,
     currencies,
     t
   } = useApp();
+
+  // ✅ Filter languages based on search
+  const filteredLanguages = languages.filter(lang =>
+    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    lang.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // ✅ Filter currencies based on search
+  const filteredCurrencies = currencies.filter(curr =>
+    curr.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    curr.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // ✅ Debug: Log current language
   useEffect(() => {
@@ -1107,11 +1122,21 @@ const GlobalSelector = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
+        setSearchQuery('');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // ✅ Focus search when dropdown opens
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current.focus();
+      }, 300);
+    }
+  }, [isOpen]);
 
   // ✅ Auto-detect location
   const detectLocation = async () => {
@@ -1175,6 +1200,9 @@ const GlobalSelector = () => {
   // ✅ Toggle dropdown
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
+    if (isOpen) {
+      setSearchQuery('');
+    }
   };
 
   // ✅ Handle language change
@@ -1182,6 +1210,7 @@ const GlobalSelector = () => {
     console.log('🔄 Changing language to:', langCode);
     changeLanguage(langCode);
     setIsOpen(false);
+    setSearchQuery('');
     const lang = languages.find(l => l.code === langCode);
     toast.success(`Language changed to ${lang?.name || langCode}`);
   };
@@ -1191,6 +1220,7 @@ const GlobalSelector = () => {
     console.log('🔄 Changing currency to:', curr);
     changeCurrency(curr);
     setIsOpen(false);
+    setSearchQuery('');
     toast.success(`Currency changed to ${curr.symbol} ${curr.code}`);
   };
 
@@ -1228,7 +1258,7 @@ const GlobalSelector = () => {
           <div className={`
             ${isMobile 
               ? 'fixed bottom-0 left-0 right-0 rounded-t-2xl max-h-[85vh] w-full z-50' 
-              : 'absolute right-0 mt-2 w-[380px] sm:w-[420px] z-50'
+              : 'absolute right-0 mt-2 w-[400px] sm:w-[440px] z-50'
             } 
             bg-slate-800 shadow-2xl border border-purple-500/30 overflow-hidden transition-all duration-300
           `}>
@@ -1273,11 +1303,34 @@ const GlobalSelector = () => {
               </div>
             </div>
 
+            {/* Search Bar */}
+            <div className="p-3 border-b border-purple-500/20">
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400/50" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search language or currency..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-8 py-2 bg-slate-700/50 border border-purple-500/30 rounded-lg text-purple-200 text-sm placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400/50 hover:text-purple-300 transition"
+                  >
+                    <XMarkIcon className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Tabs */}
             <div className="flex border-b border-purple-500/20 overflow-x-auto scrollbar-hide">
               {[
-                { id: 'currency', label: t('currency') || 'Currency', icon: CurrencyDollarIcon },
                 { id: 'language', label: t('language') || 'Language', icon: LanguageIcon },
+                { id: 'currency', label: t('currency') || 'Currency', icon: CurrencyDollarIcon },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1294,52 +1347,15 @@ const GlobalSelector = () => {
               ))}
             </div>
 
-            <div className={`${isMobile ? 'max-h-[55vh]' : 'max-h-[400px]'} overflow-y-auto`}>
-              {/* Currency Tab */}
-              {activeTab === 'currency' && (
-                <div className="p-2 sm:p-3">
-                  <h4 className="text-[8px] sm:text-[10px] font-semibold text-purple-400 uppercase tracking-wider mb-1.5 sm:mb-2">
-                    {t('select_currency') || 'Select Currency'}
-                  </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-1">
-                    {currencies.map((curr) => (
-                      <button
-                        key={curr.code}
-                        onClick={() => handleCurrencyChange(curr)}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
-                          currency?.code === curr.code
-                            ? 'bg-purple-600 text-white'
-                            : 'text-purple-300/80 hover:bg-purple-500/10'
-                        }`}
-                      >
-                        <span className="text-sm sm:text-base font-medium">{curr.symbol}</span>
-                        <span className="text-[10px] sm:text-xs">{curr.code}</span>
-                        {currency?.code === curr.code && (
-                          <CheckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 ml-auto flex-shrink-0" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  {currency && (
-                    <div className="mt-2 sm:mt-3 p-1.5 sm:p-2 bg-purple-500/10 rounded-lg">
-                      <p className="text-[8px] sm:text-[10px] text-purple-400/70">
-                        {t('current') || 'Current'}: <span className="text-purple-200 font-semibold text-[10px] sm:text-xs">
-                          {currency.symbol} {currency.code} - {currency.name}
-                        </span>
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
+            <div className={`${isMobile ? 'max-h-[50vh]' : 'max-h-[400px]'} overflow-y-auto`}>
               {/* Language Tab */}
               {activeTab === 'language' && (
                 <div className="p-2 sm:p-3">
                   <h4 className="text-[8px] sm:text-[10px] font-semibold text-purple-400 uppercase tracking-wider mb-1.5 sm:mb-2">
                     {t('select_language') || 'Select Language'}
                   </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-1">
-                    {languages.map((lang) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {filteredLanguages.map((lang) => (
                       <button
                         key={lang.code}
                         onClick={() => handleLanguageChange(lang.code)}
@@ -1351,19 +1367,50 @@ const GlobalSelector = () => {
                       >
                         <span className="text-sm sm:text-base">{lang.flag}</span>
                         <span className="truncate text-[10px] sm:text-xs">{lang.name}</span>
+                        <span className="text-[8px] sm:text-[10px] text-purple-400/50 ml-auto">{lang.code.toUpperCase()}</span>
                         {language === lang.code && (
-                          <CheckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 ml-auto flex-shrink-0" />
+                          <CheckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
                         )}
                       </button>
                     ))}
                   </div>
-                  {currentLanguage && (
-                    <div className="mt-2 sm:mt-3 p-1.5 sm:p-2 bg-purple-500/10 rounded-lg">
-                      <p className="text-[8px] sm:text-[10px] text-purple-400/70">
-                        {t('current') || 'Current'}: <span className="text-purple-200 font-semibold text-[10px] sm:text-xs">
-                          {currentLanguage.flag} {currentLanguage.name}
-                        </span>
-                      </p>
+                  {filteredLanguages.length === 0 && (
+                    <div className="py-6 text-center text-purple-400/60 text-sm">
+                      No languages found
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Currency Tab */}
+              {activeTab === 'currency' && (
+                <div className="p-2 sm:p-3">
+                  <h4 className="text-[8px] sm:text-[10px] font-semibold text-purple-400 uppercase tracking-wider mb-1.5 sm:mb-2">
+                    {t('select_currency') || 'Select Currency'}
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {filteredCurrencies.map((curr) => (
+                      <button
+                        key={curr.code}
+                        onClick={() => handleCurrencyChange(curr)}
+                        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
+                          currency?.code === curr.code
+                            ? 'bg-purple-600 text-white'
+                            : 'text-purple-300/80 hover:bg-purple-500/10'
+                        }`}
+                      >
+                        <span className="text-sm sm:text-base font-medium">{curr.symbol}</span>
+                        <span className="truncate text-[10px] sm:text-xs">{curr.code}</span>
+                        <span className="text-[8px] sm:text-[10px] text-purple-400/50 ml-auto">{curr.name}</span>
+                        {currency?.code === curr.code && (
+                          <CheckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {filteredCurrencies.length === 0 && (
+                    <div className="py-6 text-center text-purple-400/60 text-sm">
+                      No currencies found
                     </div>
                   )}
                 </div>

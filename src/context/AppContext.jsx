@@ -3,13 +3,103 @@
 
 import React, { createContext, useState, useEffect } from 'react';
 
-// ✅ Create Context
 export const AppContext = createContext();
 
-// ✅ Translations
+// ✅ ALL WORLD LANGUAGES
+const languages = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
+  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
+  { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
+  { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+  { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
+  { code: 'or', name: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
+  { code: 'pa', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { code: 'ur', name: 'اردو', flag: '🇵🇰' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'fa', name: 'فارسی', flag: '🇮🇷' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩' },
+  { code: 'ms', name: 'Bahasa Melayu', flag: '🇲🇾' },
+  { code: 'th', name: 'ไทย', flag: '🇹🇭' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+  { code: 'tl', name: 'Tagalog', flag: '🇵🇭' },
+  { code: 'sw', name: 'Kiswahili', flag: '🇰🇪' },
+  { code: 'am', name: 'አማርኛ', flag: '🇪🇹' },
+  { code: 'yo', name: 'Yorùbá', flag: '🇳🇬' },
+  { code: 'ig', name: 'Igbo', flag: '🇳🇬' },
+  { code: 'ha', name: 'Hausa', flag: '🇳🇬' },
+  { code: 'zu', name: 'isiZulu', flag: '🇿🇦' },
+  { code: 'xh', name: 'isiXhosa', flag: '🇿🇦' },
+  { code: 'af', name: 'Afrikaans', flag: '🇿🇦' },
+  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+  { code: 'da', name: 'Dansk', flag: '🇩🇰' },
+  { code: 'no', name: 'Norsk', flag: '🇳🇴' },
+  { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
+  { code: 'el', name: 'Ελληνικά', flag: '🇬🇷' },
+  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+  { code: 'cs', name: 'Čeština', flag: '🇨🇿' },
+  { code: 'sk', name: 'Slovenčina', flag: '🇸🇰' },
+  { code: 'hu', name: 'Magyar', flag: '🇭🇺' },
+  { code: 'ro', name: 'Română', flag: '🇷🇴' },
+  { code: 'bg', name: 'Български', flag: '🇧🇬' },
+  { code: 'sr', name: 'Српски', flag: '🇷🇸' },
+  { code: 'hr', name: 'Hrvatski', flag: '🇭🇷' },
+  { code: 'sl', name: 'Slovenščina', flag: '🇸🇮' },
+  { code: 'lt', name: 'Lietuvių', flag: '🇱🇹' },
+  { code: 'lv', name: 'Latviešu', flag: '🇱🇻' },
+  { code: 'et', name: 'Eesti', flag: '🇪🇪' },
+];
+
+// ✅ ALL CURRENCIES
+const currencies = [
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+  { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
+  { code: 'RUB', symbol: '₽', name: 'Russian Ruble' },
+  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+  { code: 'ZAR', symbol: 'R', name: 'South African Rand' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+  { code: 'CHF', symbol: 'Fr', name: 'Swiss Franc' },
+  { code: 'SEK', symbol: 'kr', name: 'Swedish Krona' },
+  { code: 'NOK', symbol: 'kr', name: 'Norwegian Krone' },
+  { code: 'DKK', symbol: 'kr', name: 'Danish Krone' },
+  { code: 'PLN', symbol: 'zł', name: 'Polish Zloty' },
+  { code: 'TRY', symbol: '₺', name: 'Turkish Lira' },
+  { code: 'THB', symbol: '฿', name: 'Thai Baht' },
+  { code: 'VND', symbol: '₫', name: 'Vietnamese Dong' },
+  { code: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah' },
+  { code: 'PHP', symbol: '₱', name: 'Philippine Peso' },
+  { code: 'PKR', symbol: '₨', name: 'Pakistani Rupee' },
+  { code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' },
+  { code: 'LKR', symbol: 'Rs', name: 'Sri Lankan Rupee' },
+  { code: 'NPR', symbol: 'Rs', name: 'Nepalese Rupee' },
+];
+
+// ✅ TRANSLATIONS
 const translations = {
   en: {
-    // Navigation
     home: 'Home',
     products: 'Products',
     orders: 'Orders',
@@ -37,26 +127,16 @@ const translations = {
     admin_dashboard: 'Admin Dashboard',
     select_language: 'Select Language',
     shop_now: 'Shop Now',
-    featured: 'Featured',
-    trending: 'Trending',
-    new_arrivals: 'New Arrivals',
-    best_sellers: 'Best Sellers',
-    added_to_cart: 'Added to cart',
-    removed_from_cart: 'Removed from cart',
-    cart_empty: 'Your cart is empty',
-    checkout: 'Checkout',
-    total: 'Total',
-    view_cart: 'View Cart',
+    hello: 'Hello',
+    sign_in: 'Sign in',
+    cart: 'Cart',
     delivering_to: 'Delivering to',
     select_location: 'Select Location',
-    no_results: 'No locations found',
-    try_different: 'Try a different search term',
     currency: 'Currency',
     language: 'Language',
     country: 'Country',
     location: 'Location',
     select_currency: 'Select your preferred currency',
-    select_language: 'Select your preferred language',
     current: 'Current',
     close: 'Close',
     retry: 'Retry',
@@ -74,14 +154,6 @@ const translations = {
     may_be_inaccurate: 'May be inaccurate',
     enable_gps_tip: 'Tip: Enable GPS for accurate location',
     unknown_location: 'Unknown Location',
-    low_accuracy: 'Location accuracy is low. Please enable high accuracy GPS.',
-    gps_failed: 'GPS location failed',
-    permission_denied: 'Location permission denied. Please allow location access.',
-    position_unavailable: 'Location information is unavailable.',
-    timeout: 'Location request timed out. Please try again.',
-    unable_to_detect: 'Unable to detect location',
-    could_not_detect: 'Could not detect location',
-    detection_failed: 'Location detection failed',
     admin: 'Administrator',
     search: 'Search',
     all: 'All',
@@ -114,10 +186,9 @@ const translations = {
     pending: 'Pending',
     cancelled: 'Cancelled',
     refunded: 'Refunded',
-    // Home Page
     shop_description: "India's premium online shopping destination",
-    home_title: 'Sombustore - Premium Products & Amazing Offers',
-    home_description: "Welcome to Sombustore - India's premium online shopping destination.",
+    home_title: 'Sombu Store - Premium Products & Amazing Offers',
+    home_description: "Welcome to Sombu Store - India's premium online shopping destination.",
     coming_soon: '🚀 Coming Soon',
     discover_your: 'Discover Your',
     perfect_style: 'Perfect Style',
@@ -173,26 +244,16 @@ const translations = {
     admin_dashboard: 'एडमिन डैशबोर्ड',
     select_language: 'भाषा चुनें',
     shop_now: 'अभी खरीदें',
-    featured: 'विशेष',
-    trending: 'ट्रेंडिंग',
-    new_arrivals: 'नए आगमन',
-    best_sellers: 'बेस्ट सेलर्स',
-    added_to_cart: 'कार्ट में जोड़ा गया',
-    removed_from_cart: 'कार्ट से हटाया गया',
-    cart_empty: 'आपकी कार्ट खाली है',
-    checkout: 'चेकआउट',
-    total: 'कुल',
-    view_cart: 'कार्ट देखें',
+    hello: 'नमस्ते',
+    sign_in: 'साइन इन करें',
+    cart: 'कार्ट',
     delivering_to: 'डिलीवरी हो रही है',
     select_location: 'स्थान चुनें',
-    no_results: 'कोई स्थान नहीं मिला',
-    try_different: 'अलग शब्द खोजें',
     currency: 'मुद्रा',
     language: 'भाषा',
     country: 'देश',
     location: 'स्थान',
     select_currency: 'अपनी पसंदीदा मुद्रा चुनें',
-    select_language: 'अपनी पसंदीदा भाषा चुनें',
     current: 'वर्तमान',
     close: 'बंद करें',
     retry: 'पुनः प्रयास करें',
@@ -210,14 +271,6 @@ const translations = {
     may_be_inaccurate: 'अशुद्ध हो सकता है',
     enable_gps_tip: 'टिप: सटीक स्थान के लिए GPS सक्षम करें',
     unknown_location: 'अज्ञात स्थान',
-    low_accuracy: 'स्थान सटीकता कम है। कृपया उच्च सटीकता GPS सक्षम करें।',
-    gps_failed: 'GPS स्थान विफल',
-    permission_denied: 'स्थान अनुमति अस्वीकृत। कृपया स्थान पहुंच की अनुमति दें।',
-    position_unavailable: 'स्थान जानकारी उपलब्ध नहीं है।',
-    timeout: 'स्थान अनुरोध समय समाप्त। कृपया पुनः प्रयास करें।',
-    unable_to_detect: 'स्थान का पता लगाने में असमर्थ',
-    could_not_detect: 'स्थान का पता नहीं लगा सके',
-    detection_failed: 'स्थान का पता लगाना विफल',
     admin: 'प्रशासक',
     search: 'खोजें',
     all: 'सभी',
@@ -250,10 +303,9 @@ const translations = {
     pending: 'लंबित',
     cancelled: 'रद्द',
     refunded: 'रिफंड हुआ',
-    // Home Page
     shop_description: "भारत का प्रीमियम ऑनलाइन शॉपिंग गंतव्य",
-    home_title: 'Sombustore - प्रीमियम उत्पाद और शानदार ऑफर्स',
-    home_description: 'Sombustore में आपका स्वागत है - भारत का प्रीमियम ऑनलाइन शॉपिंग गंतव्य।',
+    home_title: 'Sombu Store - प्रीमियम उत्पाद और शानदार ऑफर्स',
+    home_description: 'Sombu Store में आपका स्वागत है - भारत का प्रीमियम ऑनलाइन शॉपिंग गंतव्य।',
     coming_soon: '🚀 जल्द आ रहा है',
     discover_your: 'खोजें अपनी',
     perfect_style: 'परफेक्ट स्टाइल',
@@ -309,26 +361,16 @@ const translations = {
     admin_dashboard: 'நிர்வாகி கட்டுப்பாட்டு பலகை',
     select_language: 'மொழியை தேர்ந்தெடுக்கவும்',
     shop_now: 'இப்போது வாங்க',
-    featured: 'சிறப்பு',
-    trending: 'பிரபலமானது',
-    new_arrivals: 'புதிய வருகை',
-    best_sellers: 'சிறந்த விற்பனையாளர்கள்',
-    added_to_cart: 'கார்டில் சேர்க்கப்பட்டது',
-    removed_from_cart: 'கார்டில் இருந்து நீக்கப்பட்டது',
-    cart_empty: 'உங்கள் கார்ட் காலியாக உள்ளது',
-    checkout: 'கட்டணம் செலுத்து',
-    total: 'மொத்தம்',
-    view_cart: 'கார்டை காண்க',
+    hello: 'வணக்கம்',
+    sign_in: 'உள்நுழையவும்',
+    cart: 'கார்ட்',
     delivering_to: 'டெலிவரி செய்யப்படுகிறது',
     select_location: 'இருப்பிடத்தை தேர்ந்தெடுக்கவும்',
-    no_results: 'இருப்பிடங்கள் எதுவும் இல்லை',
-    try_different: 'வேறு சொல்லை முயற்சிக்கவும்',
     currency: 'நாணயம்',
     language: 'மொழி',
     country: 'நாடு',
     location: 'இருப்பிடம்',
     select_currency: 'உங்கள் விருப்ப நாணயத்தை தேர்ந்தெடுக்கவும்',
-    select_language: 'உங்கள் விருப்ப மொழியை தேர்ந்தெடுக்கவும்',
     current: 'தற்போதைய',
     close: 'மூடு',
     retry: 'மீண்டும் முயற்சி செய்',
@@ -346,14 +388,6 @@ const translations = {
     may_be_inaccurate: 'தவறாக இருக்கலாம்',
     enable_gps_tip: 'குறிப்பு: துல்லியமான இருப்பிடத்திற்கு GPS ஐ இயக்கவும்',
     unknown_location: 'அறியப்படாத இருப்பிடம்',
-    low_accuracy: 'இருப்பிட துல்லியம் குறைவாக உள்ளது. தயவுசெய்து உயர் துல்லிய GPS ஐ இயக்கவும்.',
-    gps_failed: 'GPS இருப்பிடம் தோல்வியடைந்தது',
-    permission_denied: 'இருப்பிட அனுமதி மறுக்கப்பட்டது. தயவுசெய்து இருப்பிட அணுகலை அனுமதிக்கவும்.',
-    position_unavailable: 'இருப்பிட தகவல் கிடைக்கவில்லை.',
-    timeout: 'இருப்பிட கோரிக்கை நேரம் முடிந்தது. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.',
-    unable_to_detect: 'இருப்பிடத்தை கண்டறிய முடியவில்லை',
-    could_not_detect: 'இருப்பிடத்தை கண்டறிய முடியவில்லை',
-    detection_failed: 'இருப்பிட கண்டறிதல் தோல்வியடைந்தது',
     admin: 'நிர்வாகி',
     search: 'தேடு',
     all: 'அனைத்தும்',
@@ -386,10 +420,9 @@ const translations = {
     pending: 'நிலுவையில்',
     cancelled: 'ரத்து செய்யப்பட்டது',
     refunded: 'பணம் திருப்பி வழங்கப்பட்டது',
-    // Home Page
     shop_description: "இந்தியாவின் பிரீமியம் ஆன்லைன் ஷாப்பிங் இடம்",
-    home_title: 'Sombustore - பிரீமியம் தயாரிப்புகள் மற்றும் அற்புதமான சலுகைகள்',
-    home_description: 'Sombustore - இந்தியாவின் பிரீமியம் ஆன்லைன் ஷாப்பிங் இடத்திற்கு உங்களை வரவேற்கிறோம்.',
+    home_title: 'Sombu Store - பிரீமியம் தயாரிப்புகள் மற்றும் அற்புதமான சலுகைகள்',
+    home_description: 'Sombu Store - இந்தியாவின் பிரீமியம் ஆன்லைன் ஷாப்பிங் இடத்திற்கு உங்களை வரவேற்கிறோம்.',
     coming_soon: '🚀 விரைவில் வருகிறது',
     discover_your: 'உங்களின்',
     perfect_style: 'பெர்ஃபெக்ட் ஸ்டைலை கண்டறியுங்கள்',
@@ -445,26 +478,16 @@ const translations = {
     admin_dashboard: 'నిర్వాహక డాష్‌బోర్డ్',
     select_language: 'భాషను ఎంచుకోండి',
     shop_now: 'ఇప్పుడే కొనుగోలు చేయండి',
-    featured: 'ప్రత్యేక',
-    trending: 'ట్రెండింగ్',
-    new_arrivals: 'కొత్త ఆగమనాలు',
-    best_sellers: 'అత్యంత అమ్ముడైనవి',
-    added_to_cart: 'కార్ట్‌కి జోడించబడింది',
-    removed_from_cart: 'కార్ట్ నుండి తీసివేయబడింది',
-    cart_empty: 'మీ కార్ట్ ఖాళీగా ఉంది',
-    checkout: 'చెకౌట్',
-    total: 'మొత్తం',
-    view_cart: 'కార్ట్ వీక్షించండి',
+    hello: 'నమస్కారం',
+    sign_in: 'సైన్ ఇన్ చేయండి',
+    cart: 'కార్ట్',
     delivering_to: 'డెలివరీ చేస్తున్నాము',
     select_location: 'స్థానాన్ని ఎంచుకోండి',
-    no_results: 'స్థానాలు కనుగొనబడలేదు',
-    try_different: 'వేరే పదాన్ని ప్రయత్నించండి',
     currency: 'కరెన్సీ',
     language: 'భాష',
     country: 'దేశం',
     location: 'స్థానం',
     select_currency: 'మీకు నచ్చిన కరెన్సీని ఎంచుకోండి',
-    select_language: 'మీకు నచ్చిన భాషను ఎంచుకోండి',
     current: 'ప్రస్తుత',
     close: 'మూసివేయి',
     retry: 'మళ్ళీ ప్రయత్నించండి',
@@ -482,14 +505,6 @@ const translations = {
     may_be_inaccurate: 'తప్పు కావచ్చు',
     enable_gps_tip: 'చిట్కా: ఖచ్చితమైన స్థానం కోసం GPS ని ప్రారంభించండి',
     unknown_location: 'తెలియని స్థానం',
-    low_accuracy: 'స్థానం ఖచ్చితత్వం తక్కువగా ఉంది. దయచేసి అధిక ఖచ్చితత్వ GPS ని ప్రారంభించండి.',
-    gps_failed: 'GPS స్థానం విఫలమైంది',
-    permission_denied: 'స్థాన అనుమతి తిరస్కరించబడింది. దయచేసి స్థాన ప్రాప్తిని అనుమతించండి.',
-    position_unavailable: 'స్థాన సమాచారం అందుబాటులో లేదు.',
-    timeout: 'స్థాన అభ్యర్థన సమయం ముగిసింది. దయచేసి మళ్ళీ ప్రయత్నించండి.',
-    unable_to_detect: 'స్థానాన్ని గుర్తించలేకపోయింది',
-    could_not_detect: 'స్థానాన్ని గుర్తించలేకపోయింది',
-    detection_failed: 'స్థాన గుర్తింపు విఫలమైంది',
     admin: 'నిర్వాహకుడు',
     search: 'శోధించు',
     all: 'అన్నీ',
@@ -522,10 +537,9 @@ const translations = {
     pending: 'పెండింగ్',
     cancelled: 'రద్దు చేయబడింది',
     refunded: 'రిఫండ్ చేయబడింది',
-    // Home Page
     shop_description: "భారతదేశం యొక్క ప్రీమియం ఆన్లైన్ షాపింగ్ గమ్యం",
-    home_title: 'Sombustore - ప్రీమియం ఉత్పత్తులు మరియు అద్భుతమైన ఆఫర్లు',
-    home_description: 'Sombustore - భారతదేశం యొక్క ప్రీమియం ఆన్లైన్ షాపింగ్ గమ్యానికి స్వాగతం.',
+    home_title: 'Sombu Store - ప్రీమియం ఉత్పత్తులు మరియు అద్భుతమైన ఆఫర్లు',
+    home_description: 'Sombu Store - భారతదేశం యొక్క ప్రీమియం ఆన్లైన్ షాపింగ్ గమ్యానికి స్వాగతం.',
     coming_soon: '🚀 త్వరలో వస్తుంది',
     discover_your: 'మీ',
     perfect_style: 'పర్ఫెక్ట్ స్టైల్ ను కనుగొనండి',
@@ -581,26 +595,16 @@ const translations = {
     admin_dashboard: 'അഡ്മിൻ ഡാഷ്‌ബോർഡ്',
     select_language: 'ഭാഷ തിരഞ്ഞെടുക്കുക',
     shop_now: 'ഇപ്പോൾ വാങ്ങുക',
-    featured: 'ഫീച്ചർ ചെയ്തത്',
-    trending: 'ട്രെൻഡിംഗ്',
-    new_arrivals: 'പുതിയ എത്തിച്ചേരലുകൾ',
-    best_sellers: 'ബെസ്റ്റ് സെല്ലേഴ്സ്',
-    added_to_cart: 'കാർട്ടിൽ ചേർത്തു',
-    removed_from_cart: 'കാർട്ടിൽ നിന്ന് നീക്കം ചെയ്തു',
-    cart_empty: 'നിങ്ങളുടെ കാർട്ട് ശൂന്യമാണ്',
-    checkout: 'ചെക്കൗട്ട്',
-    total: 'ആകെ',
-    view_cart: 'കാർട്ട് കാണുക',
+    hello: 'ഹലോ',
+    sign_in: 'സൈൻ ഇൻ ചെയ്യുക',
+    cart: 'കാർട്ട്',
     delivering_to: 'ഡെലിവറി ചെയ്യുന്നു',
     select_location: 'സ്ഥാനം തിരഞ്ഞെടുക്കുക',
-    no_results: 'സ്ഥാനങ്ങൾ കണ്ടെത്തിയില്ല',
-    try_different: 'മറ്റൊരു പദം പരീക്ഷിക്കുക',
     currency: 'കറൻസി',
     language: 'ഭാഷ',
     country: 'രാജ്യം',
     location: 'സ്ഥാനം',
     select_currency: 'നിങ്ങൾ ഇഷ്ടപ്പെടുന്ന കറൻസി തിരഞ്ഞെടുക്കുക',
-    select_language: 'നിങ്ങൾ ഇഷ്ടപ്പെടുന്ന ഭാഷ തിരഞ്ഞെടുക്കുക',
     current: 'നിലവിലുള്ള',
     close: 'അടയ്ക്കുക',
     retry: 'വീണ്ടും ശ്രമിക്കുക',
@@ -618,14 +622,6 @@ const translations = {
     may_be_inaccurate: 'കൃത്യമല്ലായിരിക്കാം',
     enable_gps_tip: 'ടിപ്പ്: കൃത്യമായ സ്ഥാനത്തിന് GPS പ്രവർത്തനക്ഷമമാക്കുക',
     unknown_location: 'അജ്ഞാത സ്ഥാനം',
-    low_accuracy: 'സ്ഥാന കൃത്യത കുറവാണ്. ദയവായി ഉയർന്ന കൃത്യത GPS പ്രവർത്തനക്ഷമമാക്കുക.',
-    gps_failed: 'GPS സ്ഥാനം പരാജയപ്പെട്ടു',
-    permission_denied: 'സ്ഥാന അനുമതി നിഷേധിച്ചു. ദയവായി സ്ഥാന ആക്സസ് അനുവദിക്കുക.',
-    position_unavailable: 'സ്ഥാന വിവരങ്ങൾ ലഭ്യമല്ല.',
-    timeout: 'സ്ഥാന അഭ്യർത്ഥന സമയം കഴിഞ്ഞു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
-    unable_to_detect: 'സ്ഥാനം കണ്ടെത്താനായില്ല',
-    could_not_detect: 'സ്ഥാനം കണ്ടെത്താനായില്ല',
-    detection_failed: 'സ്ഥാന കണ്ടെത്തൽ പരാജയപ്പെട്ടു',
     admin: 'അഡ്മിൻ',
     search: 'തിരയുക',
     all: 'എല്ലാം',
@@ -658,10 +654,9 @@ const translations = {
     pending: 'പെൻഡിംഗ്',
     cancelled: 'റദ്ദാക്കി',
     refunded: 'റീഫണ്ട് ചെയ്തു',
-    // Home Page
     shop_description: "ഇന്ത്യയുടെ പ്രീമിയം ഓൺലൈൻ ഷോപ്പിംഗ് ലക്ഷ്യസ്ഥാനം",
-    home_title: 'Sombustore - പ്രീമിയം ഉൽപ്പന്നങ്ങളും അതിശയകരമായ ഓഫറുകളും',
-    home_description: 'Sombustore - ഇന്ത്യയുടെ പ്രീമിയം ഓൺലൈൻ ഷോപ്പിംഗ് ലക്ഷ്യസ്ഥാനത്തിലേക്ക് സ്വാഗതം.',
+    home_title: 'Sombu Store - പ്രീമിയം ഉൽപ്പന്നങ്ങളും അതിശയകരമായ ഓഫറുകളും',
+    home_description: 'Sombu Store - ഇന്ത്യയുടെ പ്രീമിയം ഓൺലൈൻ ഷോപ്പിംഗ് ലക്ഷ്യസ്ഥാനത്തിലേക്ക് സ്വാഗതം.',
     coming_soon: '🚀 ഉടൻ വരുന്നു',
     discover_your: 'നിങ്ങളുടെ',
     perfect_style: 'പെർഫെക്റ്റ് സ്റ്റൈൽ കണ്ടെത്തുക',
@@ -691,39 +686,21 @@ const translations = {
   },
 };
 
-// ✅ Currency options
-const currencies = [
-  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-  { code: 'USD', symbol: '$', name: 'US Dollar' },
-  { code: 'EUR', symbol: '€', name: 'Euro' },
-  { code: 'GBP', symbol: '£', name: 'British Pound' },
-  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
-  { code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal' },
-  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
-  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
-];
+// ✅ For other languages, use English as fallback
+// You can add more language translations here as needed
 
-// ✅ Language options
-const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-  { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
-];
-
-// ✅ Provider Component
 export const AppProvider = ({ children }) => {
   const [language, setLanguage] = useState('en');
   const [currency, setCurrency] = useState({ code: 'INR', symbol: '₹' });
   const [country, setCountry] = useState({ code: 'IN', name: 'India', flag: '🇮🇳' });
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // ✅ Load saved preferences on mount
   useEffect(() => {
     const savedLanguage = localStorage.getItem('preferredLanguage');
     const savedCurrency = localStorage.getItem('preferredCurrency');
     const savedCountry = localStorage.getItem('preferredCountry');
+    
+    console.log('🔍 Loading saved language:', savedLanguage);
     
     if (savedLanguage && languages.find(l => l.code === savedLanguage)) {
       setLanguage(savedLanguage);
@@ -746,8 +723,8 @@ export const AppProvider = ({ children }) => {
     setIsLoaded(true);
   }, []);
 
-  // ✅ Change language
   const changeLanguage = (langCode) => {
+    console.log('🔄 Changing language to:', langCode);
     setLanguage(langCode);
     localStorage.setItem('preferredLanguage', langCode);
     
@@ -758,7 +735,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // ✅ Change currency
   const changeCurrency = (currencyData) => {
     setCurrency(currencyData);
     localStorage.setItem('preferredCurrency', JSON.stringify(currencyData));
@@ -770,7 +746,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // ✅ Change country
   const changeCountry = (countryData) => {
     setCountry(countryData);
     localStorage.setItem('preferredCountry', JSON.stringify(countryData));
@@ -782,41 +757,37 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // ✅ Translation function
+  // ✅ Translation function with fallback
   const t = (key) => {
     return translations[language]?.[key] || translations.en[key] || key;
   };
 
-  // ✅ Format price with currency
   const formatPrice = (amount) => {
     const symbol = currency.symbol || '₹';
     return `${symbol} ${Number(amount).toFixed(2)}`;
   };
 
-  // ✅ Get current language object
   const currentLanguage = languages.find(l => l.code === language) || languages[0];
 
-  // ✅ Get current currency object
-  const currentCurrency = currency;
+  const value = {
+    language,
+    currency,
+    country,
+    currentLanguage,
+    currentCurrency: currency,
+    changeLanguage,
+    changeCurrency,
+    changeCountry,
+    setLanguage,
+    setCurrency,
+    setCountry,
+    t,
+    formatPrice,
+    languages,
+    currencies,
+    isLoaded,
+  };
 
-const value = {
-  language,
-  currency,
-  country,
-  currentLanguage,
-  currentCurrency,
-  changeLanguage,  // ✅ Make sure this is included
-  changeCurrency,  // ✅ Make sure this is included
-  changeCountry,   // ✅ Make sure this is included
-  setLanguage,
-  setCurrency,
-  setCountry,
-  t,
-  formatPrice,
-  languages,
-  currencies,
-  isLoaded,
-};
   return (
     <AppContext.Provider value={value}>
       {children}

@@ -1222,14 +1222,7 @@ export const Header = ({
                 className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
                 {/* Location Display - Mobile Menu */}
-                <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
-                  <LocationDisplay />
-                </div>
-
-                {/* Global Selector - Mobile Menu */}
-                <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
-                  <GlobalSelector />
-                </div>
+               
 
                 {navLinks.map((link) => (
                   <Link

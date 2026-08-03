@@ -1471,6 +1471,11 @@ const GlobalSelector = () => {
     t
   } = useApp();
 
+  // ✅ Log current language for debugging
+  useEffect(() => {
+    console.log('🔤 GlobalSelector - Current Language:', language);
+  }, [language]);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -1496,19 +1501,16 @@ const GlobalSelector = () => {
 
   // ✅ Handle language change
   const handleLanguageChange = (langCode) => {
-    console.log('🔄 Changing language to:', langCode);
+    console.log('🔄 GlobalSelector - Changing language to:', langCode);
     changeLanguage(langCode);
     setIsOpen(false);
-    const lang = languages.find(l => l.code === langCode);
-    toast.success(`Language changed to ${lang?.name || langCode}`);
   };
 
   // ✅ Handle currency change
   const handleCurrencyChange = (curr) => {
-    console.log('🔄 Changing currency to:', curr);
+    console.log('🔄 GlobalSelector - Changing currency to:', curr);
     changeCurrency(curr);
     setIsOpen(false);
-    toast.success(`Currency changed to ${curr.symbol} ${curr.code}`);
   };
 
   return (

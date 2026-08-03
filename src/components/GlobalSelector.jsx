@@ -1499,11 +1499,16 @@ const GlobalSelector = () => {
     setIsOpen(!isOpen);
   };
 
-  // ✅ Handle language change
+  // ✅ Handle language change - Force page refresh after change
   const handleLanguageChange = (langCode) => {
     console.log('🔄 GlobalSelector - Changing language to:', langCode);
     changeLanguage(langCode);
     setIsOpen(false);
+    
+    // ✅ Force reload after 500ms to apply translations
+    setTimeout(() => {
+      window.location.reload();
+    }, 300);
   };
 
   // ✅ Handle currency change

@@ -1370,7 +1370,7 @@
 // };
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
 import { useApp } from '../../providers/Appprovider';
@@ -1436,7 +1436,7 @@ export const Header = ({
   const { user, token } = useSelector((state) => state.auth);
 
   // ✅ Use App Context for translations
-  const { t, formatPrice, currency } = useApp();
+  const { t, formatPrice, currency, language, forceUpdate } = useApp();
 
   // Load wishlist when logged in
   useEffect(() => {
@@ -1485,6 +1485,19 @@ export const Header = ({
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [user, token]);
+
+  // ✅ Listen for language change events
+  useEffect(() => {
+    const handleLanguageChange = (event) => {
+      console.log('🔄 Language changed event received:', event.detail);
+      // Force re-render
+      setMounted(false);
+      setTimeout(() => setMounted(true), 10);
+    };
+
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
+  }, []);
 
   const isAdmin = isLoggedIn && (userEmail === 'admin@example.com' || user?.role === 'admin');
 
@@ -1581,7 +1594,7 @@ export const Header = ({
   const hasActiveFilters = selectedCategory || minPrice || maxPrice || sortBy !== 'newest';
   const activeFilterCount = (selectedCategory ? 1 : 0) + (minPrice || maxPrice ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
 
-  // ✅ Navigation links
+  // ✅ Navigation links with translation
   const navLinks = [
     { name: 'home', href: '/', icon: SparklesIcon },
     { name: 'products', href: '/products', icon: CubeIcon },
@@ -1611,7 +1624,7 @@ export const Header = ({
 
   return (
     <>
-      <header className={`fixed top-0 w-full z-40 transition-all duration-300 ${
+      <header key={`header-${language}-${forceUpdate}`} className={`fixed top-0 w-full z-40 transition-all duration-300 ${
         isScrolled 
           ? 'bg-[#131921] shadow-lg border-b border-[#3a4553]' 
           : 'bg-[#131921] border-b border-[#3a4553]'
@@ -1707,10 +1720,10 @@ export const Header = ({
 
           {/* Third Row - Categories / Deals / Sell (Amazon Style) */}
           <div className="hidden xs:flex items-center gap-4 mt-1.5 text-xs text-white/70 overflow-x-auto">
-            <span className="text-white font-medium whitespace-nowrap">Shop By</span>
-            <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Category</span>
-            <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Deals</span>
-            <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Sell</span>
+            <span className="text-white font-medium whitespace-nowrap">{t('shop_by') || 'Shop By'}</span>
+            <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">{t('category') || 'Category'}</span>
+            <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">{t('deals') || 'Deals'}</span>
+            <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">{t('sell') || 'Sell'}</span>
           </div>
         </div>
 

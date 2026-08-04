@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useAddress } from '../../hooks/useAddress';
-import { AddressForm } from '../../components/address/AddressForm';
-import { AddressSkeleton } from '../../components/address/AddressSkeleton';
+import { useAddress } from '../../src/hooks/useAddress';
+import { AddressForm } from '../../src/components/address/AddressForm';
+import { AddressSkeleton } from '../../src/components/address/AddressSkeleton';
 
 export default function MyAddressPage() {
     const {

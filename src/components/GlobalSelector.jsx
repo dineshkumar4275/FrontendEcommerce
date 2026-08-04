@@ -1653,10 +1653,106 @@
 
 // export default GlobalSelector;
 // src/components/GlobalSelector.jsx
+// 'use client';
+
+// import React, { useState, useRef, useEffect } from 'react';
+// import { useApp } from '../providers/AppProvider';
+// import { ChevronDownIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+
+// const GlobalSelector = () => {
+//   const { language, currency, changeLanguage, changeCurrency, t, languages, currencies } = useApp();
+//   const [isOpen, setIsOpen] = useState(false);
+//   const dropdownRef = useRef(null);
+
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setIsOpen(false);
+//       }
+//     };
+//     document.addEventListener('mousedown', handleClickOutside);
+//     return () => document.removeEventListener('mousedown', handleClickOutside);
+//   }, []);
+
+//   const currentLanguage = languages.find(l => l.code === language);
+//   const currentCurrency = currencies.find(c => c.code === currency.code);
+
+//   return (
+//     <div className="relative" ref={dropdownRef}>
+//       <button
+//         onClick={() => setIsOpen(!isOpen)}
+//         className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-purple-500/10 transition-all duration-300 text-purple-300/70 hover:text-purple-200 text-sm"
+//       >
+//         <GlobeAltIcon className="w-4 h-4" />
+//         <span>{currentLanguage?.flag || '🌐'}</span>
+//         <span className="hidden sm:inline">{currentCurrency?.symbol || '₹'}</span>
+//         <ChevronDownIcon className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+//       </button>
+
+//       {isOpen && (
+//         <div className="absolute right-0 mt-2 w-72 bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/30 z-50 overflow-hidden">
+//           <div className="p-4 space-y-4">
+//             {/* Language Section */}
+//             <div>
+//               <h3 className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">{t('language')}</h3>
+//               <div className="grid grid-cols-2 gap-1">
+//                 {languages.slice(0, 10).map((lang) => (
+//                   <button
+//                     key={lang.code}
+//                     onClick={() => {
+//                       changeLanguage(lang.code);
+//                       setIsOpen(false);
+//                     }}
+//                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all ${
+//                       language === lang.code
+//                         ? 'bg-purple-600/30 text-purple-200 border border-purple-500/30'
+//                         : 'text-purple-300/70 hover:bg-purple-500/10 hover:text-purple-200'
+//                     }`}
+//                   >
+//                     <span>{lang.flag}</span>
+//                     <span className="truncate">{lang.name}</span>
+//                   </button>
+//                 ))}
+//               </div>
+//             </div>
+
+//             <div className="border-t border-purple-500/20" />
+
+//             {/* Currency Section */}
+//             <div>
+//               <h3 className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">{t('currency')}</h3>
+//               <div className="grid grid-cols-2 gap-1">
+//                 {currencies.slice(0, 8).map((curr) => (
+//                   <button
+//                     key={curr.code}
+//                     onClick={() => {
+//                       changeCurrency(curr);
+//                       setIsOpen(false);
+//                     }}
+//                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all ${
+//                       currency.code === curr.code
+//                         ? 'bg-purple-600/30 text-purple-200 border border-purple-500/30'
+//                         : 'text-purple-300/70 hover:bg-purple-500/10 hover:text-purple-200'
+//                     }`}
+//                   >
+//                     <span className="font-bold">{curr.symbol}</span>
+//                     <span className="truncate">{curr.code}</span>
+//                   </button>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default GlobalSelector;
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useApp } from '../providers/AppProvider';
+import { useApp } from '../../providers/AppProvider';
 import { ChevronDownIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
 const GlobalSelector = () => {
@@ -1674,8 +1770,19 @@ const GlobalSelector = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentLanguage = languages.find(l => l.code === language);
-  const currentCurrency = currencies.find(c => c.code === currency.code);
+  const currentLanguage = languages?.find(l => l.code === language);
+  const currentCurrency = currencies?.find(c => c.code === currency?.code);
+
+  if (!currentLanguage || !currentCurrency) {
+    return null;
+  }
+
+  // ✅ Handle language change - This will trigger re-render
+  const handleLanguageChange = (langCode) => {
+    console.log('🌐 Changing language to:', langCode);
+    changeLanguage(langCode);
+    setIsOpen(false);
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -1691,18 +1798,15 @@ const GlobalSelector = () => {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/30 z-50 overflow-hidden">
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
             {/* Language Section */}
             <div>
               <h3 className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">{t('language')}</h3>
               <div className="grid grid-cols-2 gap-1">
-                {languages.slice(0, 10).map((lang) => (
+                {languages?.map((lang) => (
                   <button
                     key={lang.code}
-                    onClick={() => {
-                      changeLanguage(lang.code);
-                      setIsOpen(false);
-                    }}
+                    onClick={() => handleLanguageChange(lang.code)}
                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all ${
                       language === lang.code
                         ? 'bg-purple-600/30 text-purple-200 border border-purple-500/30'
@@ -1710,7 +1814,7 @@ const GlobalSelector = () => {
                     }`}
                   >
                     <span>{lang.flag}</span>
-                    <span className="truncate">{lang.name}</span>
+                    <span className="truncate">{lang.nativeName}</span>
                   </button>
                 ))}
               </div>
@@ -1722,7 +1826,7 @@ const GlobalSelector = () => {
             <div>
               <h3 className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">{t('currency')}</h3>
               <div className="grid grid-cols-2 gap-1">
-                {currencies.slice(0, 8).map((curr) => (
+                {currencies?.map((curr) => (
                   <button
                     key={curr.code}
                     onClick={() => {
@@ -1730,7 +1834,7 @@ const GlobalSelector = () => {
                       setIsOpen(false);
                     }}
                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all ${
-                      currency.code === curr.code
+                      currency?.code === curr.code
                         ? 'bg-purple-600/30 text-purple-200 border border-purple-500/30'
                         : 'text-purple-300/70 hover:bg-purple-500/10 hover:text-purple-200'
                     }`}

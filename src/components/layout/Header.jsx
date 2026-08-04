@@ -717,7 +717,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
 // ✅ FIXED: Correct import path
-import { useApp } from '../../src/providers/AppProvider';
+import { useApp } from '../../providers/AppProvider';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocationDisplay } from '../Location';

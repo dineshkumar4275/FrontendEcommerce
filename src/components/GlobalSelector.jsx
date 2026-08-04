@@ -1752,7 +1752,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useApp } from '../../providers/AppProvider';
+import { useApp } from '../providers/AppProvider';
 import { ChevronDownIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
 const GlobalSelector = () => {

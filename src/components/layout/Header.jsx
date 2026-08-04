@@ -713,10 +713,10 @@
 
 'use client';
 // src/components/layout/Header.jsx - COMPLETELY FIXED
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
-// ✅ FIXED: Correct import path
+// ✅ FIXED: Correct import path - AppProvider is in src/providers/
 import { useApp } from '../../providers/AppProvider';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';

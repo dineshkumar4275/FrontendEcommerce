@@ -533,6 +533,7 @@ import {
   ClockIcon,
   GlobeAltIcon,
   ChevronDownIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 // ✅ Fallback translations (for SSR)
@@ -574,6 +575,9 @@ const FALLBACK_TRANSLATIONS = {
   'telugu': 'Telugu',
   'malayalam': 'Malayalam',
   'english': 'English',
+  'close': 'Close',
+  'change_language': 'Change Language',
+  'all_languages': 'All Languages',
 };
 
 export default function HomeClient() {
@@ -582,6 +586,7 @@ export default function HomeClient() {
   const [mounted, setMounted] = useState(false);
   const [renderCount, setRenderCount] = useState(0);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const [showAllLanguages, setShowAllLanguages] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -593,6 +598,7 @@ export default function HomeClient() {
       console.log('🔄 HomeClient: Language changed to:', event.detail?.language);
       setRenderCount(prev => prev + 1);
       setIsLanguageMenuOpen(false);
+      setShowAllLanguages(false);
     };
 
     window.addEventListener('languageChange', handleLanguageChange);
@@ -606,9 +612,11 @@ export default function HomeClient() {
     }
   }, [forceUpdate]);
 
+  // ✅ Translation function - THIS MUST BE USED FOR ALL TEXT
   const translate = useCallback((key) => {
     if (mounted) {
-      return t(key);
+      const result = t(key);
+      return result;
     }
     return FALLBACK_TRANSLATIONS[key] || key;
   }, [mounted, t, language, renderCount]);
@@ -620,11 +628,28 @@ export default function HomeClient() {
     return `₹ ${Number(amount).toFixed(2)}`;
   }, [mounted, formatPrice, currency, renderCount]);
 
+  // ✅ Features - ALL text uses translate()
   const features = useMemo(() => [ 
-    { icon: TruckIcon, title: translate('free_shipping'), desc: translate('free_shipping_desc') },
-    { icon: ShieldCheckIcon, title: translate('secure_payment'), desc: translate('secure_payment_desc') },
-    { icon: ClockIcon, title: translate('support'), desc: translate('support_desc') },
-    { icon: ArrowRightIcon, title: translate('easy_returns'), desc: translate('easy_returns_desc') }
+    { 
+      icon: TruckIcon, 
+      title: translate('free_shipping'), 
+      desc: translate('free_shipping_desc') 
+    },
+    { 
+      icon: ShieldCheckIcon, 
+      title: translate('secure_payment'), 
+      desc: translate('secure_payment_desc') 
+    },
+    { 
+      icon: ClockIcon, 
+      title: translate('support'), 
+      desc: translate('support_desc') 
+    },
+    { 
+      icon: ArrowRightIcon, 
+      title: translate('easy_returns'), 
+      desc: translate('easy_returns_desc') 
+    }
   ], [translate]);
 
   const currentLang = useMemo(() => 
@@ -637,10 +662,10 @@ export default function HomeClient() {
     [mounted, currency, renderCount]
   );
 
-  // ✅ Mobile language change handler
   const handleLanguageChange = (langCode) => {
     changeLanguage(langCode);
     setIsLanguageMenuOpen(false);
+    setShowAllLanguages(false);
   };
 
   const organizationData = {
@@ -658,7 +683,11 @@ export default function HomeClient() {
     url: 'https://www.sombu.in/',
   };
 
+  // ✅ Force complete re-render when language changes
   const pageKey = `home-${language}-${renderCount}-${forceUpdate}`;
+
+  // ✅ Get display languages (show all if showAllLanguages is true)
+  const displayLanguages = showAllLanguages ? languages : languages?.slice(0, 6);
 
   return (
     <div key={pageKey}>
@@ -678,13 +707,13 @@ export default function HomeClient() {
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-black">
           <div className="relative container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-24 text-center">
-            {/* Badge - Mobile Responsive */}
+            {/* Badge */}
             <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-slate-800/60 backdrop-blur-md border border-slate-700 mb-4 sm:mb-6 animate-fade-down">
               <SparklesIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" />
               <span className="text-xs sm:text-sm text-slate-300">{translate('coming_soon')}</span>
             </div>
 
-            {/* Title - Mobile Responsive */}
+            {/* Title */}
             <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 animate-fade-up">
               <span className="text-slate-200 text-lg sm:text-xl md:text-3xl lg:text-4xl block">{translate('discover_your')}</span>
               <span className="block bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent mt-1 sm:mt-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
@@ -696,22 +725,22 @@ export default function HomeClient() {
               {translate('hero_description')}
             </p>
 
-            {/* Buttons - Mobile Responsive */}
+            {/* Buttons */}
             <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 animate-fade-up animation-delay-400">
-              <div className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-slate-700/50 text-slate-400 rounded-full font-semibold cursor-not-allowed opacity-60 text-sm sm:text-base">
+              <button className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-slate-700/50 text-slate-400 rounded-full font-semibold cursor-not-allowed opacity-60 text-sm sm:text-base">
                 <ShoppingBagIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>{translate('shop_now')}</span>
                 <ArrowRightIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="text-[10px] sm:text-xs bg-slate-600/50 px-1.5 sm:px-2 py-0.5 rounded-full">{translate('soon')}</span>
-              </div>
+              </button>
 
-              <div className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-slate-800/60 backdrop-blur-md border border-slate-700 text-slate-400 rounded-full font-semibold cursor-not-allowed opacity-60 text-sm sm:text-base">
+              <button className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-slate-800/60 backdrop-blur-md border border-slate-700 text-slate-400 rounded-full font-semibold cursor-not-allowed opacity-60 text-sm sm:text-base">
                 {translate('view_collections')}
                 <span className="text-[10px] sm:text-xs bg-slate-700/50 px-1.5 sm:px-2 py-0.5 rounded-full">{translate('soon')}</span>
-              </div>
+              </button>
             </div>
 
-            {/* Stats - Mobile Responsive Grid */}
+            {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-3xl mx-auto mt-10 sm:mt-12 md:mt-16 pt-6 sm:pt-8 border-t border-slate-800 animate-fade-up animation-delay-600">
               <div className="p-2">
                 <div className="text-xl sm:text-2xl font-bold text-slate-200">{translate('soon')}</div>
@@ -732,7 +761,7 @@ export default function HomeClient() {
             </div>
           </div>
 
-          {/* Waves - Mobile Responsive */}
+          {/* Waves */}
           <div className="relative mt-8 sm:mt-12 md:mt-16 overflow-hidden h-20 sm:h-24 md:h-32">
             <svg className="absolute top-0 left-0 w-full h-24 sm:h-32 md:h-40 animate-wave-down-slow opacity-40" viewBox="0 0 1440 120">
               <path fill="#020617" d="M0,60 C240,90 480,30 720,60 C960,90 1200,30 1440,60 L1440,120 L0,120 Z" />
@@ -743,7 +772,7 @@ export default function HomeClient() {
           </div>
         </div>
 
-        {/* Features - Mobile Responsive */}
+        {/* Features */}
         <div className="bg-gradient-to-b from-slate-900 to-slate-950 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
@@ -760,7 +789,7 @@ export default function HomeClient() {
           </div>
         </div>
 
-        {/* No Products Message - Mobile Responsive */}
+        {/* No Products Message */}
         <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 bg-slate-950">
           <div className="max-w-2xl mx-auto text-center">
             <div className="text-5xl sm:text-6xl md:text-7xl mb-4 sm:mb-6">🛍️</div>
@@ -768,7 +797,7 @@ export default function HomeClient() {
             <p className="text-sm sm:text-base text-slate-400 mb-2">{translate('curating_collection')}</p>
             <p className="text-xs sm:text-sm text-slate-500 mb-6 sm:mb-8">{translate('under_construction')}</p>
 
-            {/* Status Card - Mobile Responsive */}
+            {/* Status Card */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/60 rounded-xl sm:rounded-2xl border border-slate-700">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -781,7 +810,7 @@ export default function HomeClient() {
               </div>
             </div>
 
-            {/* Progress Bar - Mobile Responsive */}
+            {/* Progress Bar */}
             <div className="mt-6 sm:mt-8 max-w-md mx-auto">
               <div className="flex justify-between text-xs sm:text-sm text-slate-500 mb-1">
                 <span>{translate('progress')}</span>
@@ -793,7 +822,7 @@ export default function HomeClient() {
               <p className="text-[10px] sm:text-xs text-slate-600 mt-1.5 sm:mt-2">{translate('almost_there')}</p>
             </div>
 
-            {/* ✅ Language & Currency Display - Mobile Responsive */}
+            {/* ✅ Language & Currency Display */}
             <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-slate-800/40 rounded-xl sm:rounded-2xl border border-slate-700">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="text-left">
@@ -827,24 +856,35 @@ export default function HomeClient() {
                 </p>
               </div>
 
-              {/* ✅ Language Switcher - Mobile Responsive Dropdown */}
-              <div className="mt-4 sm:mt-6 relative">
+              {/* ✅ Language Switcher - Full Dropdown with All Languages */}
+              <div className="mt-4 sm:mt-6">
                 <button
-                  onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+                  onClick={() => {
+                    setIsLanguageMenuOpen(!isLanguageMenuOpen);
+                    setShowAllLanguages(false);
+                  }}
                   className="w-full flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg text-sm sm:text-base font-semibold transition-all duration-300 shadow-lg shadow-purple-500/25"
                 >
                   <span className="flex items-center gap-2">
                     <GlobeAltIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    {translate('select_language')}
+                    {translate('select_language')} ({language.toUpperCase()})
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isLanguageMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Language Dropdown */}
+                {/* Language Dropdown - Shows All Languages */}
                 {isLanguageMenuOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 rounded-xl border border-purple-500/30 shadow-2xl overflow-hidden z-50">
-                    <div className="p-2 max-h-60 overflow-y-auto">
-                      {languages && languages.slice(0, 6).map((lang) => (
+                  <div className="mt-2 bg-slate-800 rounded-xl border border-purple-500/30 shadow-2xl overflow-hidden z-50">
+                    <div className="p-2 max-h-80 overflow-y-auto">
+                      {/* Search/Filter */}
+                      <div className="sticky top-0 bg-slate-800 p-2 border-b border-slate-700">
+                        <p className="text-xs text-slate-400 text-center">
+                          {languages?.length || 0} {translate('all_languages')}
+                        </p>
+                      </div>
+                      
+                      {/* All Languages */}
+                      {languages?.map((lang) => (
                         <button
                           key={lang.code}
                           onClick={() => handleLanguageChange(lang.code)}
@@ -867,31 +907,38 @@ export default function HomeClient() {
                         </button>
                       ))}
                     </div>
+                    
+                    {/* Close Button */}
+                    <div className="p-2 border-t border-slate-700">
+                      <button
+                        onClick={() => setIsLanguageMenuOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-slate-300 text-sm transition-colors"
+                      >
+                        <XMarkIcon className="w-4 h-4" />
+                        {translate('close')}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Quick Language Buttons - Mobile Responsive */}
+              {/* Quick Language Buttons - Top 5 Languages */}
               <div className="mt-3 sm:mt-4 grid grid-cols-3 sm:grid-cols-5 gap-1.5 sm:gap-2">
-                {['en', 'ta', 'hi', 'te', 'ml'].map((code) => {
-                  const lang = languages?.find(l => l.code === code);
-                  if (!lang) return null;
-                  return (
-                    <button
-                      key={code}
-                      onClick={() => handleLanguageChange(code)}
-                      className={`flex flex-col items-center gap-0.5 px-1 sm:px-2 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs transition-all ${
-                        language === code
-                          ? 'bg-purple-600/40 text-purple-200 border border-purple-500/30'
-                          : 'bg-slate-700/30 text-slate-400 hover:bg-purple-500/10 hover:text-slate-200'
-                      }`}
-                    >
-                      <span className="text-sm sm:text-base">{lang.flag}</span>
-                      <span className="hidden xs:inline">{lang.code.toUpperCase()}</span>
-                      <span className="inline xs:hidden">{lang.code.toUpperCase().slice(0, 2)}</span>
-                    </button>
-                  );
-                })}
+                {languages?.slice(0, 5).map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={`flex flex-col items-center gap-0.5 px-1 sm:px-2 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs transition-all ${
+                      language === lang.code
+                        ? 'bg-purple-600/40 text-purple-200 border border-purple-500/30'
+                        : 'bg-slate-700/30 text-slate-400 hover:bg-purple-500/10 hover:text-slate-200'
+                    }`}
+                  >
+                    <span className="text-sm sm:text-base">{lang.flag}</span>
+                    <span className="hidden xs:inline">{lang.code.toUpperCase()}</span>
+                    <span className="inline xs:hidden">{lang.code.toUpperCase().slice(0, 2)}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -921,7 +968,6 @@ export default function HomeClient() {
         .animate-wave-down-fast { animation: waveDown 4s ease-in-out infinite; }
         .animate-wave-down-slow { animation: waveDown 7s ease-in-out infinite; }
 
-        /* Mobile responsive breakpoints */
         @media (max-width: 480px) {
           .xs\\:inline { display: inline !important; }
         }

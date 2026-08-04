@@ -710,12 +710,14 @@
 //     </>
 //   );
 // };
+
 'use client';
 // src/components/layout/Header.jsx - FIXED IMPORTS
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
-import { useApp } from '../../providers/AppProvider'; // ✅ Fixed import
+// ✅ FIXED: Correct import path for AppProvider
+import { useApp } from '../../src/providers/AppProvider'; // ✅ Fixed import
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocationDisplay } from '../Location';
@@ -740,8 +742,6 @@ import { logout } from '../../store/slices/authSlice';
 import CartSidebar from '../layout/CartSidebar';
 import GlobalSelector from '../GlobalSelector';
 import toast from 'react-hot-toast';
-
-
 
 export const Header = ({ 
   categories = [], 

@@ -712,12 +712,12 @@
 // };
 
 'use client';
-// src/components/layout/Header.jsx - FIXED IMPORTS
-import React, { useState, useEffect } from 'react';
+// src/components/layout/Header.jsx - COMPLETELY FIXED
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
-// ✅ FIXED: Correct import path for AppProvider
-import { useApp } from '../../providers/AppProvider'; // ✅ Fixed import
+// ✅ FIXED: Correct import path
+import { useApp } from '../../src/providers/AppProvider';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocationDisplay } from '../Location';
@@ -766,6 +766,7 @@ export const Header = ({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [renderKey, setRenderKey] = useState(0);
   
   const [tempCategory, setTempCategory] = useState(selectedCategory);
   const [tempMinPrice, setTempMinPrice] = useState(minPrice);
@@ -780,7 +781,25 @@ export const Header = ({
   const { user, token } = useSelector((state) => state.auth);
 
   // ✅ Use App Context for translations
-  const { t, formatPrice, currency, language } = useApp();
+  const { t, formatPrice, currency, language, forceUpdate } = useApp();
+
+  // ✅ Force re-render when language changes
+  useEffect(() => {
+    const handleLanguageChange = (event) => {
+      console.log('🔄 Header: Language changed to:', event.detail?.language);
+      setRenderKey(prev => prev + 1);
+    };
+
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
+  }, []);
+
+  // ✅ Also re-render when forceUpdate changes
+  useEffect(() => {
+    if (forceUpdate) {
+      setRenderKey(prev => prev + 1);
+    }
+  }, [forceUpdate]);
 
   // Load wishlist when logged in
   useEffect(() => {
@@ -933,6 +952,9 @@ export const Header = ({
     { name: 'track_order', href: '/track', icon: TruckIcon },
   ];
 
+  // ✅ Force re-render when language changes
+  const headerKey = `header-${language}-${renderKey}-${forceUpdate}`;
+
   if (!mounted) {
     return (
       <>
@@ -955,7 +977,7 @@ export const Header = ({
 
   return (
     <>
-      <header className={`fixed top-0 w-full z-40 transition-all duration-500 ${
+      <header key={headerKey} className={`fixed top-0 w-full z-40 transition-all duration-500 ${
         isScrolled 
           ? 'bg-slate-900 shadow-lg shadow-purple-900/30 border-b border-purple-500/30' 
           : 'bg-slate-900 border-b border-purple-500/20'

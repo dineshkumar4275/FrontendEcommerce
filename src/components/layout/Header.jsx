@@ -712,11 +712,11 @@
 // };
 
 'use client';
-// src/components/layout/Header.jsx - COMPLETELY FIXED
+// src/components/layout/Header.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
-// ✅ FIXED: Correct import path - AppProvider is in src/providers/
+// ✅ CORRECT IMPORT PATH
 import { useApp } from '../../providers/AppProvider';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -766,7 +766,6 @@ export const Header = ({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [renderKey, setRenderKey] = useState(0);
   
   const [tempCategory, setTempCategory] = useState(selectedCategory);
   const [tempMinPrice, setTempMinPrice] = useState(minPrice);
@@ -780,26 +779,8 @@ export const Header = ({
   const { wishlistCount, getWishlist } = useWishlist();
   const { user, token } = useSelector((state) => state.auth);
 
-  // ✅ Use App Context for translations
-  const { t, formatPrice, currency, language, forceUpdate } = useApp();
-
-  // ✅ Force re-render when language changes
-  useEffect(() => {
-    const handleLanguageChange = (event) => {
-      console.log('🔄 Header: Language changed to:', event.detail?.language);
-      setRenderKey(prev => prev + 1);
-    };
-
-    window.addEventListener('languageChange', handleLanguageChange);
-    return () => window.removeEventListener('languageChange', handleLanguageChange);
-  }, []);
-
-  // ✅ Also re-render when forceUpdate changes
-  useEffect(() => {
-    if (forceUpdate) {
-      setRenderKey(prev => prev + 1);
-    }
-  }, [forceUpdate]);
+  // ✅ Use App Context for translations - This will automatically re-render
+  const { t, formatPrice, currency, language } = useApp();
 
   // Load wishlist when logged in
   useEffect(() => {
@@ -952,9 +933,6 @@ export const Header = ({
     { name: 'track_order', href: '/track', icon: TruckIcon },
   ];
 
-  // ✅ Force re-render when language changes
-  const headerKey = `header-${language}-${renderKey}-${forceUpdate}`;
-
   if (!mounted) {
     return (
       <>
@@ -977,7 +955,7 @@ export const Header = ({
 
   return (
     <>
-      <header key={headerKey} className={`fixed top-0 w-full z-40 transition-all duration-500 ${
+      <header className={`fixed top-0 w-full z-40 transition-all duration-500 ${
         isScrolled 
           ? 'bg-slate-900 shadow-lg shadow-purple-900/30 border-b border-purple-500/30' 
           : 'bg-slate-900 border-b border-purple-500/20'
@@ -1195,14 +1173,12 @@ export const Header = ({
             </div>
           </div>
 
-          {/* ✅ MOBILE SECTION - Amazon Style (Only on mobile) */}
+          {/* ✅ MOBILE SECTION */}
           <div className="lg:hidden mt-2 space-y-2">
-            {/* Location Display - Mobile (Amazon Style) */}
             <div className="flex items-center">
               <LocationDisplay />
             </div>
 
-            {/* Search Bar - Mobile (Amazon Style) */}
             <div className="relative">
               <input
                 type="text"
@@ -1227,7 +1203,6 @@ export const Header = ({
               </button>
             </div>
 
-            {/* Categories Row - Mobile */}
             <div className="flex items-center gap-4 text-xs text-white/70 overflow-x-auto pb-1">
               <span className="text-white font-medium whitespace-nowrap">Shop By</span>
               <span className="whitespace-nowrap hover:text-white transition-colors cursor-pointer">Category</span>
@@ -1245,12 +1220,10 @@ export const Header = ({
                 exit={{ opacity: 0, height: 0 }}
                 className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 space-y-1 overflow-hidden"
               >
-                {/* Location Display - Mobile Menu */}
                 <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
                   <LocationDisplay />
                 </div>
 
-                {/* Global Selector - Mobile Menu */}
                 <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
                   <GlobalSelector />
                 </div>

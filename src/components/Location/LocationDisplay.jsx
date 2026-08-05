@@ -3384,6 +3384,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   MapPinIcon, 
   ArrowPathIcon,
+  ChevronDownIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
@@ -3393,61 +3394,55 @@ const LocationDisplay = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [toastShown, setToastShown] = useState(false);
   const [locationSet, setLocationSet] = useState(false);
   const [locationMethod, setLocationMethod] = useState('unknown');
-  const [permissionState, setPermissionState] = useState('prompt'); // 'prompt', 'granted', 'denied'
+  const [permissionState, setPermissionState] = useState('prompt');
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [manualLocation, setManualLocation] = useState('');
+  const [suggestedLocations, setSuggestedLocations] = useState([]);
   
   const { t } = useApp();
   const detectionAttempted = useRef(false);
-  const permissionChecked = useRef(false);
+  const detectionStartTime = useRef(null);
 
-  // ✅ Check permission state FIRST (before anything else)
+  // ✅ Indian cities for quick selection
+  const INDIAN_CITIES = [
+    'New Delhi', 'Mumbai', 'Bangalore', 'Chennai', 
+    'Hyderabad', 'Kolkata', 'Pune', 'Ahmedabad',
+    'Jaipur', 'Lucknow', 'Nagpur', 'Indore'
+  ];
+
+  // ✅ Check permission and detect location
   useEffect(() => {
-    const checkPermission = async () => {
-      if (!navigator.permissions || permissionChecked.current) return;
-      permissionChecked.current = true;
-
-      try {
-        const result = await navigator.permissions.query({ name: 'geolocation' });
-        setPermissionState(result.state);
-        
-        console.log(`📍 Permission state: ${result.state}`);
-        
-        // If already denied, skip GPS and go straight to IP
-        if (result.state === 'denied') {
-          console.log('📍 Permission denied, using IP only');
-          setLoading(true);
-          await detectLocationByIP();
-          setLoading(false);
-          return;
-        }
-      } catch (e) {
-        console.log('Permission check not supported, continuing...');
-      }
-      
-      // Check for saved location
+    const initLocation = async () => {
+      // Check for saved location first
       const savedLocation = localStorage.getItem('userLocation');
       if (savedLocation) {
         try {
           const parsed = JSON.parse(savedLocation);
-          // Use if less than 5 minutes old
-          if (parsed.timestamp && Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-            setLocation({
-              ...parsed,
-              displayStreet: parsed.street || parsed.locationName || parsed.city || 'Location',
-              method: 'saved'
-            });
+          // Use if less than 30 minutes old (longer cache for better UX)
+          if (parsed.timestamp && Date.now() - parsed.timestamp < 30 * 60 * 1000) {
+            setLocation(parsed);
             setLocationSet(true);
             setLoading(false);
-            console.log('✅ Location loaded from localStorage (cached)');
+            console.log('✅ Location loaded from cache');
             return;
           }
         } catch (e) {
-          console.log('⚠️ Error parsing saved location:', e);
+          console.log('Cache parse error:', e);
         }
       }
-      
+
+      // Check permission
+      if (navigator.permissions) {
+        try {
+          const result = await navigator.permissions.query({ name: 'geolocation' });
+          setPermissionState(result.state);
+        } catch (e) {
+          console.log('Permission check not supported');
+        }
+      }
+
       // Start detection
       if (!detectionAttempted.current) {
         detectionAttempted.current = true;
@@ -3455,212 +3450,365 @@ const LocationDisplay = () => {
       }
     };
 
-    checkPermission();
+    initLocation();
   }, []);
 
-  // ✅ Detect location - with fast IP fallback
+  // ✅ Amazon-style fast location detection
   const detectLocation = async () => {
-    if (locationSet) return;
-    
     setLoading(true);
     setError(null);
-    setToastShown(false);
+    detectionStartTime.current = Date.now();
 
-    // ✅ Try GPS first (if permission not denied)
-    if (navigator.geolocation && permissionState !== 'denied') {
-      console.log('📍 Trying GPS location...');
-      
-      // Set a timeout for GPS
-      const gpsTimeout = setTimeout(() => {
-        console.log('📍 GPS taking too long, using IP fallback...');
-        detectLocationByIP();
-      }, 3000); // 3 seconds timeout - fast!
-      
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          clearTimeout(gpsTimeout);
-          const { latitude, longitude } = position.coords;
-          console.log('📍 GPS Position:', { latitude, longitude });
-          await getLocationFromCoords(latitude, longitude);
-        },
-        async (error) => {
-          clearTimeout(gpsTimeout);
-          console.warn('⚠️ GPS failed:', error.message);
-          console.log('📍 Falling back to IP detection...');
-          await detectLocationByIP();
-        },
-        { 
-          enableHighAccuracy: false, // ✅ Faster! Use false for speed
-          timeout: 5000,
-          maximumAge: 60000 // ✅ Use cached position
-        }
-      );
-    } else {
-      // Skip GPS, go straight to IP
-      console.log('📍 GPS skipped, using IP...');
-      await detectLocationByIP();
-    }
-  };
-
-  // ✅ Get location from coordinates (GPS)
-  const getLocationFromCoords = async (lat, lng) => {
     try {
-      console.log(`📍 Getting address from: lat=${lat}, lng=${lng}`);
+      // ✅ STEP 1: Try IP-based detection FIRST (fastest, no permission needed)
+      console.log('📍 Step 1: IP-based detection (fast)');
+      const ipLocation = await detectLocationByIP();
       
-      const response = await apiClient.get(`/location/reverse?lat=${lat}&lng=${lng}`);
-      console.log('✅ Location data:', response.data);
+      if (ipLocation && ipLocation.country === 'India') {
+        console.log('✅ Location found via IP in India');
+        setLocationWithCache(ipLocation, 'ip');
+        setLoading(false);
+        showLocationToast(ipLocation);
+        return;
+      }
 
-      if (response.data.success && response.data.data) {
-        const locData = response.data.data;
+      // ✅ STEP 2: Try GPS with short timeout (if permission granted)
+      if (navigator.geolocation && permissionState !== 'denied') {
+        console.log('📍 Step 2: GPS detection');
         
-        if (!locationSet) {
-          const displayStreet = locData.street || locData.locationName || locData.city || 'Location';
+        const gpsLocation = await new Promise((resolve) => {
+          let resolved = false;
           
-          // Add timestamp for cache
-          const locationWithTimestamp = {
-            ...locData,
-            timestamp: Date.now(),
-            displayStreet: displayStreet,
-            method: 'gps'
-          };
-          
-          setLocation(locationWithTimestamp);
-          setLocationMethod('gps');
-          
-          localStorage.setItem('userLocation', JSON.stringify(locationWithTimestamp));
-          
-          if (!toastShown && !locationSet) {
-            toast.success(`📍 ${displayStreet}`);
-            setToastShown(true);
-            setLocationSet(true);
-          }
-        }
-      } else {
-        throw new Error(response.data.message || 'No location data');
-      }
-    } catch (error) {
-      console.error('❌ Geocoding error:', error);
-      await detectLocationByIP();
-    } finally {
-      setLoading(false);
-    }
-  };
+          // Fast timeout - 3 seconds max for GPS
+          const timeoutId = setTimeout(() => {
+            if (!resolved) {
+              console.log('⏱️ GPS timeout, using IP fallback');
+              resolved = true;
+              resolve(null);
+            }
+          }, 3000);
 
-  // ✅ Detect by IP - Fast Fallback
-  const detectLocationByIP = async () => {
-    try {
-      console.log('📍 Detecting via IP (fast fallback)...');
-      
-      const response = await apiClient.get('/location/detect');
-      console.log('📍 IP Location:', response.data);
-
-      if (response.data.success && response.data.data) {
-        if (!locationSet) {
-          const locData = response.data.data;
-          const displayStreet = locData.street || locData.locationName || locData.city || 'Location';
-          
-          const locationWithTimestamp = {
-            ...locData,
-            timestamp: Date.now(),
-            displayStreet: displayStreet,
-            method: 'ip'
-          };
-          
-          setLocation(locationWithTimestamp);
-          setLocationMethod('ip');
-          
-          localStorage.setItem('userLocation', JSON.stringify(locationWithTimestamp));
-          
-          if (!toastShown && !locationSet) {
-            toast.success(`📍 ${displayStreet}`);
-            setToastShown(true);
-            setLocationSet(true);
-          }
-        }
-      } else {
-        // Use default location
-        setError('Could not detect location');
-        setLocation({
-          city: 'New Delhi',
-          state: 'Delhi',
-          country: 'India',
-          displayStreet: 'New Delhi',
-          method: 'default',
-          timestamp: Date.now(),
-          latitude: 28.6139,
-          longitude: 77.2090,
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timeoutId);
+                const { latitude, longitude } = position.coords;
+                console.log('📍 GPS position:', { latitude, longitude });
+                
+                // Reverse geocode to get address
+                const address = await getLocationFromCoords(latitude, longitude);
+                resolve(address);
+              }
+            },
+            (error) => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timeoutId);
+                console.log('⚠️ GPS error:', error.message);
+                resolve(null);
+              }
+            },
+            { 
+              enableHighAccuracy: false, // Fast mode
+              timeout: 5000,
+              maximumAge: 60000
+            }
+          );
         });
-        setLocationMethod('default');
+
+        if (gpsLocation && gpsLocation.country === 'India') {
+          console.log('✅ Location found via GPS in India');
+          setLocationWithCache(gpsLocation, 'gps');
+          setLoading(false);
+          showLocationToast(gpsLocation);
+          return;
+        }
       }
-    } catch (error) {
-      console.error('❌ IP location error:', error);
-      setError('Location detection failed');
-      // Use default location
-      setLocation({
+
+      // ✅ STEP 3: Try IP again with different service (fallback)
+      console.log('📍 Step 3: IP fallback detection');
+      const fallbackLocation = await detectLocationByIP(true);
+      
+      if (fallbackLocation) {
+        console.log('✅ Location found via IP fallback');
+        setLocationWithCache(fallbackLocation, 'ip');
+        setLoading(false);
+        showLocationToast(fallbackLocation);
+        return;
+      }
+
+      // ✅ STEP 4: Default to India
+      console.log('📍 Step 4: Using default India location');
+      const defaultLocation = {
         city: 'New Delhi',
         state: 'Delhi',
         country: 'India',
-        displayStreet: 'New Delhi',
-        method: 'default',
-        timestamp: Date.now(),
+        countryCode: 'IN',
+        displayStreet: 'New Delhi, Delhi',
         latitude: 28.6139,
         longitude: 77.2090,
-      });
-      setLocationMethod('default');
-    } finally {
+        method: 'default',
+        timestamp: Date.now(),
+      };
+      setLocationWithCache(defaultLocation, 'default');
       setLoading(false);
+      showLocationToast(defaultLocation);
+
+    } catch (error) {
+      console.error('❌ Location detection error:', error);
+      setError('Could not detect location');
+      setLoading(false);
+      
+      // Default to India
+      const defaultLocation = {
+        city: 'New Delhi',
+        state: 'Delhi',
+        country: 'India',
+        countryCode: 'IN',
+        displayStreet: 'New Delhi, Delhi',
+        latitude: 28.6139,
+        longitude: 77.2090,
+        method: 'default',
+        timestamp: Date.now(),
+      };
+      setLocationWithCache(defaultLocation, 'default');
     }
   };
 
-  // ✅ Manually refresh location (user triggered)
+  // ✅ Get location from coordinates
+  const getLocationFromCoords = async (lat, lng) => {
+    try {
+      const response = await apiClient.get(`/location/reverse?lat=${lat}&lng=${lng}`);
+      
+      if (response.data.success && response.data.data) {
+        const locData = response.data.data;
+        return {
+          ...locData,
+          displayStreet: locData.street || locData.locationName || `${locData.city}, ${locData.state}`,
+          latitude: lat,
+          longitude: lng,
+          timestamp: Date.now(),
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Reverse geocoding error:', error);
+      return null;
+    }
+  };
+
+  // ✅ Enhanced IP detection (with multiple services)
+  const detectLocationByIP = async (forceRefresh = false) => {
+    try {
+      // Try multiple IP services for better accuracy
+      const ipServices = [
+        'https://ipapi.co/json/',
+        'https://ip-api.com/json/',
+        'https://freegeoip.app/json/',
+        'https://ipinfo.io/json',
+      ];
+
+      for (const url of ipServices) {
+        try {
+          const response = await fetch(url, {
+            signal: AbortSignal.timeout(2000),
+          });
+          
+          if (!response.ok) continue;
+          
+          const data = await response.json();
+          
+          // Parse different API responses
+          let location = null;
+          
+          if (url.includes('ipapi.co')) {
+            location = {
+              city: data.city || '',
+              state: data.region || '',
+              country: data.country_name || data.country || '',
+              countryCode: data.country_code || '',
+              latitude: data.latitude || 0,
+              longitude: data.longitude || 0,
+              postal: data.postal || '',
+              timezone: data.timezone || '',
+            };
+          } else if (url.includes('ip-api.com')) {
+            location = {
+              city: data.city || '',
+              state: data.regionName || '',
+              country: data.country || '',
+              countryCode: data.countryCode || '',
+              latitude: data.lat || 0,
+              longitude: data.lon || 0,
+              postal: data.zip || '',
+              timezone: data.timezone || '',
+            };
+          } else if (url.includes('freegeoip.app')) {
+            location = {
+              city: data.city || '',
+              state: data.region_name || '',
+              country: data.country_name || '',
+              countryCode: data.country_code || '',
+              latitude: data.latitude || 0,
+              longitude: data.longitude || 0,
+              postal: data.zip_code || '',
+              timezone: data.time_zone || '',
+            };
+          } else if (url.includes('ipinfo.io')) {
+            const [lat, lng] = (data.loc || '0,0').split(',').map(Number);
+            location = {
+              city: data.city || '',
+              state: data.region || '',
+              country: data.country || '',
+              countryCode: data.country || '',
+              latitude: lat || 0,
+              longitude: lng || 0,
+              postal: data.postal || '',
+              timezone: data.timezone || '',
+            };
+          }
+
+          if (location && location.city && location.country) {
+            // Ensure it's India (or use as is)
+            const displayStreet = `${location.city}${location.state ? `, ${location.state}` : ''}`;
+            
+            // If not in India, try to find nearest Indian city
+            if (location.country !== 'India' && location.country !== 'IN') {
+              console.log('📍 Not in India, defaulting to New Delhi');
+              return {
+                city: 'New Delhi',
+                state: 'Delhi',
+                country: 'India',
+                countryCode: 'IN',
+                displayStreet: 'New Delhi, Delhi',
+                latitude: 28.6139,
+                longitude: 77.2090,
+                timestamp: Date.now(),
+              };
+            }
+
+            return {
+              ...location,
+              displayStreet: displayStreet,
+              timestamp: Date.now(),
+            };
+          }
+        } catch (e) {
+          console.log(`IP service failed: ${url}`);
+          continue;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('IP detection error:', error);
+      return null;
+    }
+  };
+
+  // ✅ Set location with cache
+  const setLocationWithCache = (locationData, method) => {
+    const locWithMeta = {
+      ...locationData,
+      method: method,
+      timestamp: Date.now(),
+    };
+    setLocation(locWithMeta);
+    setLocationMethod(method);
+    setLocationSet(true);
+    localStorage.setItem('userLocation', JSON.stringify(locWithMeta));
+  };
+
+  // ✅ Show toast notification
+  const showLocationToast = (location) => {
+    const message = `📍 ${location.displayStreet || location.city}`;
+    toast.success(message, {
+      duration: 3000,
+      icon: '📍',
+    });
+  };
+
+  // ✅ Refresh location
   const refreshLocation = () => {
-    // Clear saved location to force new detection
     localStorage.removeItem('userLocation');
     setLocationSet(false);
     detectionAttempted.current = false;
-    setToastShown(false);
     setLoading(true);
     detectLocation();
   };
 
-  // ✅ Get display street name
-  const getStreetName = () => {
-    if (!location) return 'Select Location';
-    return location.displayStreet || location.street || location.city || location.formattedAddress || 'Unknown Location';
-  };
-
-  // ✅ Get display city/state
-  const getCityState = () => {
-    if (!location) return '';
-    const parts = [];
-    if (location.city) parts.push(location.city);
-    if (location.state) parts.push(location.state);
-    if (location.country) parts.push(location.country);
-    return parts.join(', ');
-  };
-
-  // ✅ Show method badge
-  const getMethodBadge = () => {
-    if (!location) return null;
-    const method = location.method || 'unknown';
-    const badges = {
-      'gps': { label: 'GPS', color: 'text-green-400 bg-green-500/20' },
-      'ip': { label: 'IP', color: 'text-yellow-400 bg-yellow-500/20' },
-      'saved': { label: 'Saved', color: 'text-purple-400 bg-purple-500/20' },
-      'default': { label: 'Default', color: 'text-blue-400 bg-blue-500/20' },
+  // ✅ Manual location selection
+  const handleManualLocationSelect = (city) => {
+    const locationData = {
+      city: city,
+      state: getStateForCity(city),
+      country: 'India',
+      countryCode: 'IN',
+      displayStreet: `${city}, ${getStateForCity(city)}`,
+      latitude: getLatLngForCity(city).lat,
+      longitude: getLatLngForCity(city).lng,
+      method: 'manual',
+      timestamp: Date.now(),
     };
-    return badges[method] || badges['ip'];
+    setLocationWithCache(locationData, 'manual');
+    setShowLocationModal(false);
+    toast.success(`📍 ${locationData.displayStreet}`);
   };
 
-  // ✅ Loading state with fast detection message
+  // ✅ Helper functions for Indian cities
+  const getStateForCity = (city) => {
+    const states = {
+      'New Delhi': 'Delhi',
+      'Mumbai': 'Maharashtra',
+      'Bangalore': 'Karnataka',
+      'Chennai': 'Tamil Nadu',
+      'Hyderabad': 'Telangana',
+      'Kolkata': 'West Bengal',
+      'Pune': 'Maharashtra',
+      'Ahmedabad': 'Gujarat',
+      'Jaipur': 'Rajasthan',
+      'Lucknow': 'Uttar Pradesh',
+      'Nagpur': 'Maharashtra',
+      'Indore': 'Madhya Pradesh',
+    };
+    return states[city] || '';
+  };
+
+  const getLatLngForCity = (city) => {
+    const coords = {
+      'New Delhi': { lat: 28.6139, lng: 77.2090 },
+      'Mumbai': { lat: 19.0760, lng: 72.8777 },
+      'Bangalore': { lat: 12.9716, lng: 77.5946 },
+      'Chennai': { lat: 13.0827, lng: 80.2707 },
+      'Hyderabad': { lat: 17.3850, lng: 78.4867 },
+      'Kolkata': { lat: 22.5726, lng: 88.3639 },
+      'Pune': { lat: 18.5204, lng: 73.8567 },
+      'Ahmedabad': { lat: 23.0225, lng: 72.5714 },
+      'Jaipur': { lat: 26.9124, lng: 75.7873 },
+      'Lucknow': { lat: 26.8467, lng: 80.9462 },
+      'Nagpur': { lat: 21.1458, lng: 79.0882 },
+      'Indore': { lat: 22.7196, lng: 75.8577 },
+    };
+    return coords[city] || { lat: 28.6139, lng: 77.2090 };
+  };
+
+  // ✅ Get display name
+  const getDisplayName = () => {
+    if (!location) return 'Select Location';
+    return location.displayStreet || location.city || 'Unknown';
+  };
+
+  // ✅ Loading state
   if (loading) {
+    const elapsed = detectionStartTime.current ? Date.now() - detectionStartTime.current : 0;
     return (
-      <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-purple-500/10 rounded-lg animate-pulse">
-        <MapPinIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-        <span className="text-xs sm:text-sm text-purple-300">
-          {permissionState === 'denied' ? 'Using IP...' : 'Detecting...'}
+      <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 rounded-lg animate-pulse">
+        <MapPinIcon className="w-5 h-5 text-purple-400" />
+        <span className="text-sm text-purple-300">
+          {elapsed > 2000 ? 'Locating...' : 'Detecting location...'}
         </span>
-        <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-purple-500 border-t-transparent" />
+        <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-500 border-t-transparent" />
       </div>
     );
   }
@@ -3668,12 +3816,12 @@ const LocationDisplay = () => {
   // ✅ Error state
   if (error) {
     return (
-      <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-red-500/10 rounded-lg border border-red-500/20">
-        <MapPinIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
-        <span className="text-xs sm:text-sm text-red-300 truncate max-w-[80px] sm:max-w-none">{error}</span>
+      <div className="flex items-center gap-2 px-3 py-2 bg-red-500/10 rounded-lg border border-red-500/20">
+        <MapPinIcon className="w-5 h-5 text-red-400" />
+        <span className="text-sm text-red-300 truncate">{error}</span>
         <button
           onClick={refreshLocation}
-          className="ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs bg-red-500/20 text-red-300 rounded hover:bg-red-500/30 transition flex-shrink-0"
+          className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded hover:bg-red-500/30"
         >
           Retry
         </button>
@@ -3681,45 +3829,96 @@ const LocationDisplay = () => {
     );
   }
 
-  // ✅ Main render - Location Only (No Dropdown)
+  // ✅ Main render - Amazon style
   return (
-    <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-purple-500/10 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all group w-full sm:w-auto">
-      <MapPinIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 group-hover:text-purple-300 flex-shrink-0" />
-      
-      <div className="text-left min-w-0 flex-1">
-        <div className="text-[10px] sm:text-xs text-purple-400/70 leading-none">
-          {t('delivering_to') || 'Delivering to'}
-        </div>
-        <div className="text-xs sm:text-sm font-semibold text-purple-200 truncate max-w-[80px] sm:max-w-[120px] md:max-w-[180px]">
-          {getStreetName()}
-        </div>
-        {location?.city && (
-          <div className="text-[8px] sm:text-[10px] text-purple-400/50 truncate">
-            {location.city}{location.state ? `, ${location.state}` : ''}
+    <>
+      <div 
+        className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group"
+        onClick={() => setShowLocationModal(!showLocationModal)}
+      >
+        <MapPinIcon className="w-5 h-5 text-purple-400 flex-shrink-0" />
+        
+        <div className="text-left min-w-0">
+          <div className="text-xs text-purple-400/70 leading-none">
+            {t('delivering_to') || 'Delivering to'}
           </div>
+          <div className="text-sm font-semibold text-purple-200 truncate max-w-[120px] md:max-w-[180px]">
+            {getDisplayName()}
+          </div>
+        </div>
+
+        <ChevronDownIcon className="w-4 h-4 text-purple-400/50 flex-shrink-0" />
+        
+        {locationMethod !== 'default' && (
+          <span className="text-[8px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 flex-shrink-0 hidden xs:inline-block">
+            {locationMethod.toUpperCase()}
+          </span>
         )}
       </div>
 
-      {/* ✅ Method Badge */}
-      {(() => {
-        const badge = getMethodBadge();
-        return badge ? (
-          <span className={`text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded ${badge.color} flex-shrink-0 hidden xs:inline-block`}>
-            {badge.label}
-          </span>
-        ) : null;
-      })()}
+      {/* ✅ Location Modal - Amazon Style */}
+      {showLocationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-lg shadow-xl max-w-md w-full mx-4 p-6 border border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Choose your location</h3>
+              <button
+                onClick={() => setShowLocationModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
 
-      {/* ✅ Refresh Button */}
-      <button
-        onClick={refreshLocation}
-        className="p-0.5 hover:bg-purple-500/10 rounded transition flex-shrink-0"
-        aria-label="Refresh location"
-        title="Refresh location"
-      >
-        <ArrowPathIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-400/50 hover:text-purple-300 transition" />
-      </button>
-    </div>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search for a city..."
+                value={manualLocation}
+                onChange={(e) => setManualLocation(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+              />
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {/* Suggested locations */}
+              <div className="text-xs text-gray-400 mb-2">Popular Cities</div>
+              <div className="grid grid-cols-2 gap-2">
+                {INDIAN_CITIES.map((city) => (
+                  <button
+                    key={city}
+                    onClick={() => handleManualLocationSelect(city)}
+                    className="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-sm transition text-left"
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
+
+              {/* Current location option */}
+              <button
+                onClick={() => {
+                  setShowLocationModal(false);
+                  refreshLocation();
+                }}
+                className="w-full px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg text-purple-300 text-sm transition mt-2"
+              >
+                📍 Use current location
+              </button>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <div className="text-xs text-gray-500">
+                Location: {location?.city}, {location?.country}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                Method: {locationMethod.toUpperCase()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

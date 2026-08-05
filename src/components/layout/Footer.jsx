@@ -122,17 +122,20 @@
 // src/components/Footer.jsx
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import Image from 'next/image';
-import { useApp } from '../../hooks/useApp'; // ✅ Add this import
+import { useApp } from '../hooks/useApp';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const { t, language } = useApp(); // ✅ Get translation function
+  // ✅ Get translation function and language
+  const { t, language } = useApp();
 
-  // ✅ All text now uses t() function
+  // ✅ Force re-render when language changes
+  const footerKey = `footer-${language}`;
+
   const footerSections = {
     company: {
       title: t('company') || 'Company',
@@ -177,7 +180,7 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="bg-gray-900 text-white mt-auto">
+    <footer key={footerKey} className="bg-gray-900 text-white mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {/* Brand Section */}

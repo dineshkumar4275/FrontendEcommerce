@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '../../src/hooks/useCart';
 import { useAuth } from '../../src/hooks/useAuth';
 import { useAddress } from '../../src/hooks/useAddress';
+import { useApp } from '../../src/hooks/useApp'; // ✅ Add this
 import { formatPrice } from '../../src/utils/formatters';
 import apiClient from '../../src/lib/apiClient';
 import toast from 'react-hot-toast';
@@ -33,6 +34,7 @@ export default function CheckoutPage() {
   const { items, clearCart } = useCart();
   const { user } = useAuth();
   const { address: savedAddress, hasAddress, updateAddress, loading: addressLoading } = useAddress();
+  const { t } = useApp(); // ✅ Get translation function
   
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -102,17 +104,15 @@ export default function CheckoutPage() {
         pincode: savedAddress.pincode || '',
         addressType: savedAddress.address_type || 'Home',
       }));
-      // If address exists, show view mode
       setIsEditingAddress(false);
     } else if (user) {
-      // If no saved address, pre-fill with user data
       setFormData(prev => ({
         ...prev,
         fullName: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
       }));
-      setIsEditingAddress(true); // Show edit mode for new address
+      setIsEditingAddress(true);
     }
   }, [user, items, savedAddress, hasAddress]);
 
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
   // Redirect if cart is empty
   useEffect(() => {
     if (mounted && cartItems.length === 0) {
-      toast.error('Your cart is empty. Please add items to continue.');
+      toast.error(t('cart_empty') || 'Your cart is empty. Please add items to continue.');
       setTimeout(() => {
         router.push('/products');
       }, 1500);
@@ -168,21 +168,21 @@ export default function CheckoutPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!formData.fullName.trim()) newErrors.fullName = t('full_name_required') || 'Full name is required';
+    if (!formData.email.trim()) newErrors.email = t('email_required') || 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = t('email_invalid') || 'Email is invalid';
+    if (!formData.phone.trim()) newErrors.phone = t('phone_required') || 'Phone number is required';
     else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Phone number must be 10 digits';
+      newErrors.phone = t('phone_invalid') || 'Phone number must be 10 digits';
     }
     if (formData.alternatePhone && !/^[0-9]{10}$/.test(formData.alternatePhone.replace(/\D/g, ''))) {
-      newErrors.alternatePhone = 'Alternate phone must be 10 digits';
+      newErrors.alternatePhone = t('phone_invalid') || 'Alternate phone must be 10 digits';
     }
-    if (!formData.addressLine1.trim()) newErrors.addressLine1 = 'Address is required';
-    if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.state.trim()) newErrors.state = 'State is required';
-    if (!formData.pincode.trim()) newErrors.pincode = 'Pincode is required';
-    else if (!/^[0-9]{6}$/.test(formData.pincode)) newErrors.pincode = 'Pincode must be 6 digits';
+    if (!formData.addressLine1.trim()) newErrors.addressLine1 = t('address_required') || 'Address is required';
+    if (!formData.city.trim()) newErrors.city = t('city_required') || 'City is required';
+    if (!formData.state.trim()) newErrors.state = t('state_required') || 'State is required';
+    if (!formData.pincode.trim()) newErrors.pincode = t('pincode_required') || 'Pincode is required';
+    else if (!/^[0-9]{6}$/.test(formData.pincode)) newErrors.pincode = t('pincode_invalid') || 'Pincode must be 6 digits';
     return newErrors;
   };
 
@@ -191,7 +191,6 @@ export default function CheckoutPage() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        // If no token, save locally only
         return null;
       }
 
@@ -278,7 +277,7 @@ export default function CheckoutPage() {
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      toast.error('Please fix all errors before saving');
+      toast.error(t('fix_errors') || 'Please fix all errors before saving');
       return;
     }
 
@@ -301,16 +300,15 @@ export default function CheckoutPage() {
 
       const saved = await saveAddressToBackend(addressData);
       if (saved || !localStorage.getItem('token')) {
-        // Save locally if no token or backend success
         localStorage.setItem('userAddress', JSON.stringify(addressData));
-        toast.success('Address saved successfully!');
+        toast.success(t('address_saved') || 'Address saved successfully!');
         setIsEditingAddress(false);
       } else {
-        toast.error('Failed to save address');
+        toast.error(t('address_save_failed') || 'Failed to save address');
       }
     } catch (error) {
       console.error('Save address error:', error);
-      toast.error('Failed to save address');
+      toast.error(t('address_save_failed') || 'Failed to save address');
     } finally {
       setIsSavingAddress(false);
     }
@@ -318,15 +316,13 @@ export default function CheckoutPage() {
 
   // ✅ Handle place order (COD)
   const handlePlaceOrder = async () => {
-    // Validate address first
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      toast.error('Please fill all required fields');
+      toast.error(t('fix_errors') || 'Please fill all required fields');
       return;
     }
 
-    // If address is not saved, save it first
     if (isEditingAddress) {
       await handleSaveAddress();
     }
@@ -347,22 +343,19 @@ export default function CheckoutPage() {
         payment_status: 'pending'
       };
 
-      // ✅ Save to backend database
       const savedOrder = await saveOrderToBackend(orderData);
       
       if (savedOrder) {
         console.log('✅ Order saved to database successfully');
         saveToLocalStorage(savedOrder);
         
-        // Clear cart
         localStorage.removeItem('cartItems');
         clearCart();
         window.dispatchEvent(new Event('cartUpdated'));
         
-        toast.success('Order placed successfully!');
+        toast.success(t('order_placed') || 'Order placed successfully!');
         router.push(`/orders/${orderNumber}`);
       } else {
-        // Fallback: Save only to localStorage if backend fails
         console.warn('Backend save failed, saving only to localStorage');
         const fallbackOrder = {
           id: orderNumber,
@@ -386,12 +379,12 @@ export default function CheckoutPage() {
         saveToLocalStorage(fallbackOrder);
         localStorage.removeItem('cartItems');
         clearCart();
-        toast.warning('Order saved locally. Will sync when online.');
+        toast.warning(t('order_saved_locally') || 'Order saved locally. Will sync when online.');
         router.push(`/orders/${orderNumber}`);
       }
     } catch (error) {
       console.error('Order error:', error);
-      toast.error('Failed to place order');
+      toast.error(t('order_failed') || 'Failed to place order');
     } finally {
       setLoading(false);
     }
@@ -399,15 +392,13 @@ export default function CheckoutPage() {
 
   // ✅ Handle payment success
   const handlePaymentSuccess = async (paymentData) => {
-    // Validate address first
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      toast.error('Please fill all required fields');
+      toast.error(t('fix_errors') || 'Please fill all required fields');
       return;
     }
 
-    // If address is not saved, save it first
     if (isEditingAddress) {
       await handleSaveAddress();
     }
@@ -441,19 +432,18 @@ export default function CheckoutPage() {
         
         saveToLocalStorage(orderWithPayment);
         
-        // Clear cart
         localStorage.removeItem('cartItems');
         clearCart();
         window.dispatchEvent(new Event('cartUpdated'));
         
-        toast.success('Payment successful! Order placed.');
+        toast.success(t('payment_success') || 'Payment successful! Order placed.');
         router.push(`/orders/${orderNumber}`);
       } else {
-        toast.error('Payment successful but order creation failed. Contact support.');
+        toast.error(t('order_creation_failed') || 'Payment successful but order creation failed. Contact support.');
       }
     } catch (error) {
       console.error('Order creation error:', error);
-      toast.error('Payment successful but order creation failed. Contact support.');
+      toast.error(t('order_creation_failed') || 'Payment successful but order creation failed. Contact support.');
     } finally {
       setLoading(false);
     }
@@ -461,7 +451,7 @@ export default function CheckoutPage() {
 
   const handlePaymentError = (error) => {
     console.error('Payment error:', error);
-    toast.error('Payment failed. Please try again.');
+    toast.error(t('payment_failed') || 'Payment failed. Please try again.');
     setLoading(false);
   };
 
@@ -484,8 +474,8 @@ export default function CheckoutPage() {
           className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors text-center"
         >
           <MapPin className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-          <p className="text-gray-600">No address saved</p>
-          <p className="text-sm text-gray-400">Click to add your delivery address</p>
+          <p className="text-gray-600">{t('no_address_saved') || 'No address saved'}</p>
+          <p className="text-sm text-gray-400">{t('click_to_add_address') || 'Click to add your delivery address'}</p>
         </button>
       );
     }
@@ -507,13 +497,13 @@ export default function CheckoutPage() {
                 {formData.addressType === 'Home' && <Home className="h-3 w-3 inline mr-1" />}
                 {formData.addressType === 'Work' && <Briefcase className="h-3 w-3 inline mr-1" />}
                 {formData.addressType === 'Other' && <MapPinned className="h-3 w-3 inline mr-1" />}
-                {formData.addressType}
+                {t(formData.addressType.toLowerCase()) || formData.addressType}
               </span>
             </div>
             <p className="font-medium text-gray-900">{formData.fullName}</p>
             <p className="text-sm text-gray-600">📱 {formData.phone}</p>
             {formData.alternatePhone && (
-              <p className="text-sm text-gray-500">📱 Alt: {formData.alternatePhone}</p>
+              <p className="text-sm text-gray-500">📱 {t('alt') || 'Alt'}: {formData.alternatePhone}</p>
             )}
             <div className="mt-1 space-y-0.5 text-sm text-gray-600">
               <p>{formData.addressLine1}</p>
@@ -544,7 +534,7 @@ export default function CheckoutPage() {
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('full_name') || 'Full Name'} *</label>
             <input
               type="text"
               name="fullName"
@@ -553,12 +543,12 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.fullName ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="John Doe"
+              placeholder={t('full_name_placeholder') || 'John Doe'}
             />
             {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('email') || 'Email Address'} *</label>
             <input
               type="email"
               name="email"
@@ -567,7 +557,7 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="john@example.com"
+              placeholder={t('email_placeholder') || 'john@example.com'}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
@@ -575,7 +565,7 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone') || 'Phone Number'} *</label>
             <input
               type="tel"
               name="phone"
@@ -584,12 +574,12 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.phone ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="9876543210"
+              placeholder={t('phone_placeholder') || '9876543210'}
             />
             {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Alternate Phone</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('alternate_phone') || 'Alternate Phone'}</label>
             <input
               type="tel"
               name="alternatePhone"
@@ -598,14 +588,14 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.alternatePhone ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="Optional"
+              placeholder={t('optional') || 'Optional'}
             />
             {errors.alternatePhone && <p className="text-red-500 text-xs mt-1">{errors.alternatePhone}</p>}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 1 *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('address_line1') || 'Address Line 1'} *</label>
           <input
             type="text"
             name="addressLine1"
@@ -614,38 +604,38 @@ export default function CheckoutPage() {
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errors.addressLine1 ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="House No., Street, Area"
+            placeholder={t('address_placeholder') || 'House No., Street, Area'}
           />
           {errors.addressLine1 && <p className="text-red-500 text-xs mt-1">{errors.addressLine1}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 2</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('address_line2') || 'Address Line 2'}</label>
           <input
             type="text"
             name="addressLine2"
             value={formData.addressLine2}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Apartment, Suite, etc."
+            placeholder={t('address_placeholder2') || 'Apartment, Suite, etc.'}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('landmark') || 'Landmark'}</label>
           <input
             type="text"
             name="landmark"
             value={formData.landmark}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Near City Center"
+            placeholder={t('landmark_placeholder') || 'Near City Center'}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('city') || 'City'} *</label>
             <input
               type="text"
               name="city"
@@ -654,26 +644,26 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.city ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="Mumbai"
+              placeholder={t('city_placeholder') || 'Mumbai'}
             />
             {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('district') || 'District'}</label>
             <input
               type="text"
               name="district"
               value={formData.district}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Mumbai City"
+              placeholder={t('district_placeholder') || 'Mumbai City'}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('state') || 'State'} *</label>
             <input
               type="text"
               name="state"
@@ -682,12 +672,12 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.state ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="Maharashtra"
+              placeholder={t('state_placeholder') || 'Maharashtra'}
             />
             {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('pincode') || 'Pincode'} *</label>
             <input
               type="text"
               name="pincode"
@@ -696,35 +686,35 @@ export default function CheckoutPage() {
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.pincode ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="400001"
+              placeholder={t('pincode_placeholder') || '400001'}
             />
             {errors.pincode && <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('country') || 'Country'}</label>
           <input
             type="text"
             name="country"
             value={formData.country}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="India"
+            placeholder={t('country_placeholder') || 'India'}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Address Type</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('address_type') || 'Address Type'}</label>
           <select
             name="addressType"
             value={formData.addressType}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="Home">🏠 Home</option>
-            <option value="Work">💼 Work</option>
-            <option value="Other">📍 Other</option>
+            <option value="Home">🏠 {t('home') || 'Home'}</option>
+            <option value="Work">💼 {t('work') || 'Work'}</option>
+            <option value="Other">📍 {t('other') || 'Other'}</option>
           </select>
         </div>
 
@@ -737,12 +727,12 @@ export default function CheckoutPage() {
             {isSavingAddress ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Saving...
+                {t('saving') || 'Saving...'}
               </>
             ) : (
               <>
                 <Check className="h-4 w-4" />
-                Save Address
+                {t('save_address') || 'Save Address'}
               </>
             )}
           </button>
@@ -778,13 +768,13 @@ export default function CheckoutPage() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center max-w-md mx-auto p-8">
             <div className="text-6xl mb-4">🛒</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
-            <p className="text-gray-500 mb-6">Looks like you haven't added any items to your cart yet.</p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('cart_empty') || 'Your cart is empty'}</h2>
+            <p className="text-gray-500 mb-6">{t('cart_empty_desc') || "Looks like you haven't added any items to your cart yet."}</p>
             <button
               onClick={() => router.push('/products')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
             >
-              Continue Shopping
+              {t('continue_shopping') || 'Continue Shopping'}
             </button>
           </div>
         </div>
@@ -803,7 +793,7 @@ export default function CheckoutPage() {
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
-            Back to Cart
+            {t('back_to_cart') || 'Back to Cart'}
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -812,7 +802,7 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <Truck className="h-5 w-5 text-blue-600" />
-                  Shipping Information
+                  {t('shipping_information') || 'Shipping Information'}
                 </h2>
                 
                 {isEditingAddress ? renderAddressForm() : renderAddressView()}
@@ -821,8 +811,8 @@ export default function CheckoutPage() {
               <div className="mt-4 bg-blue-50 rounded-xl p-4 flex items-start gap-3">
                 <Clock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-blue-800">
-                  <p className="font-medium">Estimated Delivery: 3-5 business days</p>
-                  <p className="text-xs mt-1">Free shipping on orders above ₹500</p>
+                  <p className="font-medium">{t('estimated_delivery') || 'Estimated Delivery: 3-5 business days'}</p>
+                  <p className="text-xs mt-1">{t('free_shipping_desc') || 'Free shipping on orders above ₹500'}</p>
                 </div>
               </div>
             </div>
@@ -832,7 +822,7 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-24">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <ShoppingBag className="h-5 w-5 text-blue-600" />
-                  Order Summary ({itemCount} {itemCount === 1 ? 'item' : 'items'})
+                  {t('order_summary') || 'Order Summary'} ({itemCount} {itemCount === 1 ? (t('item') || 'item') : (t('items') || 'items')})
                 </h2>
                 
                 <div className="space-y-3 max-h-80 overflow-y-auto mb-4">
@@ -849,22 +839,22 @@ export default function CheckoutPage() {
 
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="text-gray-600">{t('subtotal') || 'Subtotal'}:</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Shipping:</span>
+                    <span className="text-gray-600">{t('shipping') || 'Shipping'}:</span>
                     <span className={shipping === 0 ? 'text-green-600' : 'text-gray-600'}>
-                      {shipping === 0 ? 'Free' : formatPrice(shipping)}
+                      {shipping === 0 ? t('free') || 'Free' : formatPrice(shipping)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax (18% GST):</span>
+                    <span className="text-gray-600">{t('tax') || 'Tax (18% GST)'}:</span>
                     <span>{formatPrice(tax)}</span>
                   </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between text-lg font-bold">
-                      <span>Total:</span>
+                      <span>{t('total') || 'Total'}:</span>
                       <span className="text-blue-600">{formatPrice(grandTotal)}</span>
                     </div>
                   </div>
@@ -872,7 +862,7 @@ export default function CheckoutPage() {
 
                 {/* Payment Methods */}
                 <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Select Payment Method</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">{t('select_payment_method') || 'Select Payment Method'}</label>
                   <div className="space-y-3">
                     <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-all">
                       <input
@@ -885,8 +875,8 @@ export default function CheckoutPage() {
                       />
                       <Wallet className="h-5 w-5 text-gray-500" />
                       <div className="flex-1">
-                        <p className="font-medium text-gray-800">Cash on Delivery</p>
-                        <p className="text-xs text-gray-500">Pay when you receive the order</p>
+                        <p className="font-medium text-gray-800">{t('cash_on_delivery') || 'Cash on Delivery'}</p>
+                        <p className="text-xs text-gray-500">{t('pay_on_delivery') || 'Pay when you receive the order'}</p>
                       </div>
                     </label>
                     
@@ -901,8 +891,8 @@ export default function CheckoutPage() {
                       />
                       <CreditCard className="h-5 w-5 text-gray-500" />
                       <div className="flex-1">
-                        <p className="font-medium text-gray-800">Online Payment</p>
-                        <p className="text-xs text-gray-500">Card, UPI, NetBanking via Razorpay</p>
+                        <p className="font-medium text-gray-800">{t('online_payment') || 'Online Payment'}</p>
+                        <p className="text-xs text-gray-500">{t('online_payment_desc') || 'Card, UPI, NetBanking via Razorpay'}</p>
                       </div>
                     </label>
                   </div>
@@ -919,10 +909,10 @@ export default function CheckoutPage() {
                       {loading ? (
                         <span className="flex items-center justify-center gap-2">
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                          Processing...
+                          {t('processing') || 'Processing...'}
                         </span>
                       ) : (
-                        `Place Order (COD) • ${formatPrice(grandTotal)}`
+                        `${t('place_order_cod') || 'Place Order (COD)'} • ${formatPrice(grandTotal)}`
                       )}
                     </button>
                   ) : (
@@ -933,7 +923,7 @@ export default function CheckoutPage() {
                           orderId={`ORDER_${Date.now()}`}
                           onSuccess={handlePaymentSuccess}
                           onError={handlePaymentError}
-                          buttonText={`Pay ${formatPrice(grandTotal)} with Razorpay`}
+                          buttonText={`${t('pay') || 'Pay'} ${formatPrice(grandTotal)} ${t('with_razorpay') || 'with Razorpay'}`}
                           buttonClassName="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                       </Suspense>
@@ -942,7 +932,7 @@ export default function CheckoutPage() {
                         disabled
                         className="w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed"
                       >
-                        {!formData.fullName ? 'Please add address first' : 'Invalid Amount - Please check cart'}
+                        {!formData.fullName ? t('add_address_first') || 'Please add address first' : t('invalid_amount') || 'Invalid Amount - Please check cart'}
                       </button>
                     )
                   )}
@@ -950,11 +940,11 @@ export default function CheckoutPage() {
 
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
                   <ShieldCheck className="h-4 w-4 text-green-600" />
-                  <span>100% Secure Payments</span>
+                  <span>{t('secure_payments') || '100% Secure Payments'}</span>
                   <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                  <span>Easy Returns</span>
+                  <span>{t('easy_returns') || 'Easy Returns'}</span>
                   <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                  <span>24/7 Support</span>
+                  <span>{t('support_24_7') || '24/7 Support'}</span>
                 </div>
               </div>
             </div>

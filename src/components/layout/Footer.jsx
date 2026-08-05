@@ -126,7 +126,7 @@ import React from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import Image from 'next/image';
-import { useApp } from '../hooks/useApp'; // ✅ Import useApp hook
+import { useApp } from '../../hooks/useApp'; // ✅ Import useApp hook
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();

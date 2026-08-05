@@ -126,7 +126,7 @@ import React from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import Image from 'next/image';
-import { useApp } from '../../hooks/useApp'; // ✅ Import useApp hook
+import { useApp } from '../../hooks/useApp'; // ✅ Add this import
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -144,7 +144,7 @@ export const Footer = () => {
       ],
     },
     support: {
-      title: t('support') || 'Support',
+      title: t('support') || '24/7 Support',
       links: [
         { name: t('help_center') || 'Help Center', href: '/help' },
         { name: t('contact_us') || 'Contact Us', href: '/contact' },

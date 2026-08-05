@@ -383,6 +383,7 @@
 //   );
 // }
 // app/products/ProductsClient.jsx
+
 'use client';
 
 import { useState, useEffect, useMemo, Suspense } from 'react';

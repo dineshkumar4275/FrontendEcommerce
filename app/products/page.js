@@ -59,7 +59,7 @@
 //   );
 // }
 // app/products/page.js
-import { Metadata } from 'next';
+import { Metadata } from'next';
 import { Suspense } from 'react';
 import ProductsClient from './ProductsClient';
 import { getProducts, getCategories } from '../../src/services/productService';

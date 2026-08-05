@@ -175,7 +175,7 @@ export const metadata = {
       "Discover premium fashion and clothing at Sombu Store.",
     images: [
       {
-        url: "/new-logo.png",
+        url: "/favicon.ico",
         width: 1200,
         height: 630,
         alt: "Sombu Store",

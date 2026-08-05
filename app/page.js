@@ -189,32 +189,147 @@
 //     </>
 //   );
 // }
+
 import { Metadata } from 'next';
 import HomeClient from './HomeClient';
 
-export const metadata = {
-  title: 'Sombustore - Premium Products & Amazing Offers',
-  description: 'Welcome to Sombustore - India\'s premium online shopping destination. Shop from 10,000+ products with free shipping.',
-  keywords: 'online store, premium products, shop india, buy products, best deals',
-  alternates: { canonical: 'https://www.sombu.in/' },
-  openGraph: {
-    title: 'Sombustore - Premium Products & Amazing Offers',
-    description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
-    url: 'https://www.sombu.in/',
-    siteName: 'Sombustore',
-    images: [{ url: '/favicon.ico', width: 1200, height: 630 }],
-    locale: 'en_IN',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Sombustore - Premium Products',
-    description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
-    images: ['/favicon.ico'],
-  },
-  robots: { index: true, follow: true },
-};
+// export const metadata = {
+//   title: 'Sombustore - Premium Products & Amazing Offers',
+//   description: 'Welcome to Sombustore - India\'s premium online shopping destination. Shop from 10,000+ products with free shipping.',
+//   keywords: 'online store, premium products, shop india, buy products, best deals',
+//   alternates: { canonical: 'https://www.sombu.in/' },
+//   openGraph: {
+//     title: 'Sombustore - Premium Products & Amazing Offers',
+//     description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
+//     url: 'https://www.sombu.in/',
+//     siteName: 'Sombustore',
+//     images: [{ url: '/favicon.ico', width: 1200, height: 630 }],
+//     locale: 'en_IN',
+//     type: 'website',
+//   },
+//   twitter: {
+//     card: 'summary_large_image',
+//     title: 'Sombustore - Premium Products',
+//     description: 'Welcome to Sombustore - India\'s premium online shopping destination.',
+//     images: ['/favicon.ico'],
+//   },
+//   robots: { index: true, follow: true },
+// };
 
+export const metadata = {
+  metadataBase: new URL("https://www.sombu.in"),
+
+  title: {
+    default: "Sombu Store | Online Shopping Store in Chennai, Tamil Nadu",
+    template: "%s | Sombu Store",
+  },
+
+  description:
+    "Sombu Store is an online shopping store based in Chennai, Tamil Nadu. Buy premium T-shirts, clothing, fashion, accessories and more with secure payments and fast delivery across India.",
+
+  keywords: [
+    "Sombu Store",
+    "Sombu",
+    "Sombu Chennai",
+    "Sombu Tamil Nadu",
+    "Online Shopping Chennai",
+    "Online Shopping Tamil Nadu",
+    "Fashion Store Chennai",
+    "Clothing Store Chennai",
+    "Premium T Shirts",
+    "Men T Shirts",
+    "Women T Shirts",
+    "Oversized T Shirts",
+    "Graphic T Shirts",
+    "Buy T Shirts Online",
+    "Best Clothing Store",
+    "Fashion Online India",
+    "Online Shopping India",
+    "Streetwear India",
+    "Premium Fashion",
+    "Sombu Clothing",
+    "Tamil Nadu Shopping",
+    "Chennai Shopping",
+    "Best Online Store India"
+  ],
+
+  authors: [{ name: "Sombu Store" }],
+  creator: "Sombu Store",
+  publisher: "Sombu Store",
+  applicationName: "Sombu Store",
+
+  alternates: {
+    canonical: "https://www.sombu.in",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+      "max-snippet": -1,
+    },
+  },
+
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
+      },
+      {
+        url: "/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
+  },
+
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://www.sombu.in",
+    siteName: "Sombu Store",
+    title: "Sombu Store | Online Shopping Store in Chennai, Tamil Nadu",
+    description:
+      "Buy premium fashion, clothing, oversized T-shirts and accessories online from Sombu Store. Fast delivery across India.",
+
+    images: [
+      {
+        url: "https://www.sombu.in/favicon.ico",
+        width: 1200,
+        height: 630,
+        alt: "Sombu Store",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Sombu Store | Premium Fashion",
+    description:
+      "Buy premium fashion and clothing online at Sombu Store.",
+    images: [
+      "https://www.sombu.in/favicon.ico",
+    ],
+  },
+
+  verification: {
+    google: "googleb181e800db31c273.html",
+  },
+
+  category: "Shopping",
+};
 export default function HomePage() {
   return <HomeClient />;
 }

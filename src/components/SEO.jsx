@@ -24,24 +24,50 @@ export const SEO = ({
   faqs,
   localBusiness,
 }) => {
-  const siteName = 'sombustore';
-  const defaultTitle = 'sombustore - Premium Products';
-  const defaultDescription = 'Shop premium products with amazing offers. Free shipping & easy returns.';
-  const defaultImage = '/favicon.ico';
-  const siteUrl = 'https://www.sombustore.in';
+ const siteName = "Sombu Store";
+const defaultTitle =
+  "Sombu Store | Online Shopping Store in Chennai, Tamil Nadu";
+
+const defaultDescription =
+  "Buy premium T-Shirts, clothing, fashion and accessories online from Sombu Store. Fast delivery across Chennai, Tamil Nadu and all over India.";
+
+const siteUrl = "https://www.sombu.in";
+const defaultImage = "https://www.sombu.in/favicon.ico";
 
   const seoTitle = title ? `${title} | ${siteName}` : defaultTitle;
   const seoDescription = description || defaultDescription;
   const seoImage = image || defaultImage;
 
   // Generate keywords based on page type
-  const getKeywords = () => {
-    const baseKeywords = 'shop, premium products, online store, buy products, best deals';
-    if (pageType === 'product' && product) {
-      return `${product.name}, buy ${product.name}, ${product.category}, ${baseKeywords}`;
-    }
-    return baseKeywords;
-  };
+ const getKeywords = () => {
+  const baseKeywords = [
+    "Sombu Store",
+    "Sombu",
+    "Sombu Chennai",
+    "Sombu Tamil Nadu",
+    "Online Shopping Chennai",
+    "Online Shopping Tamil Nadu",
+    "Premium T Shirts",
+    "Oversized T Shirts",
+    "Fashion Store Chennai",
+    "Clothing Store Tamil Nadu",
+    "Buy T Shirts Online",
+    "Streetwear India",
+    "Mens Clothing",
+    "Womens Clothing"
+  ];
+
+  if (pageType === "product" && product) {
+    return [
+      product.name,
+      product.category,
+      product.brand || "Sombu Store",
+      ...baseKeywords
+    ].join(", ");
+  }
+
+  return baseKeywords.join(", ");
+};
 
   return (
     <>

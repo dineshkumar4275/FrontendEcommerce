@@ -738,10 +738,11 @@
 //   );
 // }
 // app/products/[id]/ProductDetailClient.js
+// app/products/[id]/ProductDetailClient.jsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import {
@@ -765,7 +766,9 @@ import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroico
 import { Header } from '../../../src/components/layout/Header';
 import { Footer } from '../../../src/components/layout/Footer';
 import { SEO } from '../../../src/components/SEO';
+import { getProductById } from '../../../src/services/productService';
 import { useCart } from '../../../src/hooks/useCart';
+import { useApp } from '../../../src/hooks/useApp'; // ✅ Add this
 import {
   addToWishlistAsync,
   removeFromWishlistAsync,
@@ -773,7 +776,6 @@ import {
   fetchWishlist,
 } from '../../../src/store/slices/wishlistSlice';
 
-// ✅ Normalize product data
 const normalizeProduct = (product) => {
   if (!product) return null;
 
@@ -782,7 +784,6 @@ const normalizeProduct = (product) => {
   let hasColors = false;
   let hasSizes = false;
 
-  // Parse colors
   if (product.colors !== undefined && product.colors !== null) {
     if (Array.isArray(product.colors)) {
       colors = product.colors;
@@ -801,7 +802,6 @@ const normalizeProduct = (product) => {
     }
   }
 
-  // Parse sizes
   if (product.sizes !== undefined && product.sizes !== null) {
     if (Array.isArray(product.sizes)) {
       sizes = product.sizes;
@@ -823,25 +823,24 @@ const normalizeProduct = (product) => {
   const backendHasColors = product.has_colors !== undefined ? product.has_colors : product.hasColors;
   const backendHasSizes = product.has_sizes !== undefined ? product.has_sizes : product.hasSizes;
 
+  const finalHasColors = hasColors || backendHasColors || false;
+  const finalHasSizes = hasSizes || backendHasSizes || false;
+
   return {
     ...product,
     colors,
     sizes,
-    hasColors: hasColors || backendHasColors || false,
-    hasSizes: hasSizes || backendHasSizes || false,
+    hasColors: finalHasColors,
+    hasSizes: finalHasSizes,
   };
 };
 
-export default function ProductDetailClient({ 
-  product: initialProduct, 
-  categories, 
-  breadcrumbs, 
-  productId, 
-  error 
-}) {
-  // ✅ State
-  const [product, setProduct] = useState(() => normalizeProduct(initialProduct));
+export default function ProductDetailPage() {
+  const { t } = useApp(); // ✅ Get translation function
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showZoom, setShowZoom] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
@@ -854,13 +853,15 @@ export default function ProductDetailClient({
   const [activeTab, setActiveTab] = useState('description');
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [currentImage, setCurrentImage] = useState('');
-  const [loading, setLoading] = useState(!initialProduct);
 
   const imageContainerRef = useRef(null);
   const rotationInterval = useRef(null);
 
+  const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const productId = params.id;
+
   const { addToCart } = useCart();
   const { isAuthenticated, token } = useSelector((state) => state.auth);
   const wishlistState = useSelector((state) => state.wishlist || { items: [], loading: false });
@@ -868,7 +869,6 @@ export default function ProductDetailClient({
   const wishlistIds = new Set(wishlistItems.map(item => item.product_id || item.id));
   const isInWishlist = wishlistIds.has(parseInt(productId));
 
-  // ✅ Build product images
   const productImages = [
     product?.image_url,
     product?.image_url_2,
@@ -879,31 +879,23 @@ export default function ProductDetailClient({
 
   const hasMultipleImages = productImages.length > 1;
 
+  // ✅ Tabs with translations
   const tabs = [
-    { id: 'description', label: 'Description' },
-    { id: 'specifications', label: 'Specifications' },
-    { id: 'reviews', label: 'Reviews' },
-    { id: 'shipping', label: 'Shipping' },
+    { id: 'description', label: t('description') || 'Description' },
+    { id: 'specifications', label: t('specifications') || 'Specifications' },
+    { id: 'reviews', label: t('reviews') || 'Reviews' },
+    { id: 'shipping', label: t('shipping_info') || 'Shipping' },
   ];
 
-  // ✅ Effects
   useEffect(() => {
-    if (productId && !initialProduct) {
-      // Product will be fetched by server, but if not, we could fetch here
-      setLoading(false);
-    } else if (initialProduct) {
-      setProduct(normalizeProduct(initialProduct));
-      setLoading(false);
+    if (productId) {
+      fetchProduct();
     }
-  }, [initialProduct, productId]);
-
-  useEffect(() => {
     if (token || isAuthenticated) {
       dispatch(fetchWishlist());
     }
-  }, [dispatch, token, isAuthenticated]);
+  }, [productId, dispatch, token, isAuthenticated]);
 
-  // ✅ Initialize color and image
   useEffect(() => {
     if (product && product.hasColors && product.colors && product.colors.length > 0) {
       let firstColorName = '';
@@ -933,14 +925,12 @@ export default function ProductDetailClient({
     }
   }, [product]);
 
-  // ✅ Initialize size
   useEffect(() => {
     if (product && product.hasSizes && product.sizes && product.sizes.length > 0) {
       setSelectedSize(product.sizes[0]);
     }
   }, [product]);
 
-  // ✅ Auto-rotate images
   useEffect(() => {
     const shouldAutoRotate = hasMultipleImages && !isDragging && !isRotating && !showZoom && !selectedColorObj?.image;
     if (shouldAutoRotate) {
@@ -961,7 +951,24 @@ export default function ProductDetailClient({
     };
   }, [isDragging, hasMultipleImages, productImages.length, showZoom, selectedColorObj?.image]);
 
-  // ✅ Handlers
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const data = await getProductById(productId);
+      if (data) {
+        const normalized = normalizeProduct(data);
+        setProduct(normalized);
+      } else {
+        router.push('/products');
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      router.push('/products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleColorChange = (colorName, colorObj = null) => {
     setSelectedColor(colorName);
     setSelectedColorObj(colorObj);
@@ -997,10 +1004,9 @@ export default function ProductDetailClient({
   const handleMouseEnter = () => setShowZoom(true);
   const handleMouseLeave = () => setShowZoom(false);
 
-  // 🚀 DISABLED - Coming Soon Mode
+  // 🚀 NO SALE MODE - Disabled Add to Cart
   const handleAddToCart = async () => {
     // Disabled - Coming Soon
-    toast?.error?.('This product is coming soon!');
   };
 
   const handleWishlistToggle = async () => {
@@ -1023,7 +1029,7 @@ export default function ProductDetailClient({
 
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({ title: product?.name, url: window.location.href });
+      await navigator.share({ title: product.name, url: window.location.href });
     } else {
       navigator.clipboard.writeText(window.location.href);
     }
@@ -1116,11 +1122,35 @@ export default function ProductDetailClient({
     ? Math.round(((comparePriceValue - productPrice) / comparePriceValue) * 100)
     : 0;
 
-  // ✅ Loading state
+  // Prepare product schema for SEO
+  const productSchema = {
+    id: product?.id,
+    name: product?.name,
+    description: product?.description || '',
+    image_url: product?.image_url || '',
+    images: productImages,
+    price: productPrice,
+    stock: product?.stock || 0,
+    brand: product?.brand || 'sombustore',
+    sku: product?.sku || `SKU-${product?.id}`,
+    rating: product?.rating || 4.5,
+    review_count: product?.review_count || 0,
+    reviews: product?.reviews || [],
+    color: product?.color || '',
+    material: product?.material || '',
+  };
+
+  // Generate breadcrumb schema
+  const breadcrumbs = [
+    { name: t('home') || 'Home', url: 'https://www.sombu.in/' },
+    { name: t('products') || 'Products', url: 'https://www.sombu.in/products' },
+    { name: product?.name || 'Product', url: `https://www.sombu.in/products/${productId}` },
+  ];
+
   if (loading) {
     return (
       <>
-        <Header categories={categories || []} />
+        <Header categories={[]} />
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         </div>
@@ -1129,20 +1159,18 @@ export default function ProductDetailClient({
     );
   }
 
-  // ✅ Error state
-  if (error || !product) {
+  if (!product) {
     return (
       <>
-        <Header categories={categories || []} />
+        <Header categories={[]} />
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20 text-center py-20">
           <div className="text-6xl mb-4">🔍</div>
-          <h2 className="text-2xl font-bold">Product Not Found</h2>
-          <p className="text-gray-500 mt-2">The product you are looking for does not exist.</p>
+          <h2 className="text-2xl font-bold">{t('product_not_found') || 'Product Not Found'}</h2>
           <button
             onClick={() => router.push('/products')}
             className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
-            Browse Products
+            {t('browse_products') || 'Browse Products'}
           </button>
         </div>
         <Footer />
@@ -1152,8 +1180,18 @@ export default function ProductDetailClient({
 
   return (
     <>
-      {/* ✅ SEO - Already handled by parent Server Component, but keeping for client-side */}
-      <Header categories={categories || []} />
+      {/* ✅ SEO Component with Product Schema */}
+      <SEO
+        title={`${product.name} - ${t('premium_quality') || 'Premium Quality'} | Sombu Store`}
+        description={product.description || `${t('buy') || 'Buy'} ${product.name} ${t('online_best_price') || 'online at best price.'}`}
+        canonicalUrl={`https://www.sombu.in/products/${productId}`}
+        image={product.image_url || '/favicon.ico'}
+        product={productSchema}
+        breadcrumbs={breadcrumbs}
+        pageType="product"
+      />
+
+      <Header categories={[]} />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20">
         <div className="container mx-auto px-4 py-8">
           {/* 🚀 Coming Soon Banner */}
@@ -1161,8 +1199,8 @@ export default function ProductDetailClient({
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <span className="text-2xl">🚀</span>
               <div>
-                <h3 className="text-lg font-bold text-white">Coming Soon!</h3>
-                <p className="text-white/80 text-sm">This product will be available for purchase soon</p>
+                <h3 className="text-lg font-bold text-white">{t('coming_soon') || 'Coming Soon!'}</h3>
+                <p className="text-white/80 text-sm">{t('product_available_soon') || 'This product will be available for purchase soon'}</p>
               </div>
               <span className="text-2xl">✨</span>
             </div>
@@ -1170,9 +1208,9 @@ export default function ProductDetailClient({
 
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-            <a href="/" className="hover:text-purple-600">Home</a>
+            <a href="/" className="hover:text-purple-600">{t('home') || 'Home'}</a>
             <span>/</span>
-            <a href="/products" className="hover:text-purple-600">Products</a>
+            <a href="/products" className="hover:text-purple-600">{t('products') || 'Products'}</a>
             <span>/</span>
             <span className="text-purple-600 font-medium">{product.name}</span>
           </div>
@@ -1197,9 +1235,9 @@ export default function ProductDetailClient({
                   {/* 🚀 Coming Soon Overlay */}
                   <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-20">
                     <div className="bg-gradient-to-r from-yellow-400 to-orange-400 px-6 py-3 rounded-full text-black font-bold text-lg shadow-lg animate-pulse">
-                      🚀 Coming Soon
+                      🚀 {t('coming_soon') || 'Coming Soon'}
                     </div>
-                    <span className="text-white/80 text-sm mt-3">Not available for purchase</span>
+                    <span className="text-white/80 text-sm mt-3">{t('not_available') || 'Not available for purchase'}</span>
                   </div>
 
                   {showZoom && (
@@ -1225,12 +1263,12 @@ export default function ProductDetailClient({
                   <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                     {discountPercent > 0 && (
                       <span className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-sm font-bold shadow-lg">
-                        -{discountPercent}% OFF
+                        -{discountPercent}% {t('off') || 'OFF'}
                       </span>
                     )}
                     {product.is_featured && (
                       <span className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold shadow-lg">
-                        NEW ARRIVAL
+                        {t('new_arrival') || 'NEW ARRIVAL'}
                       </span>
                     )}
                   </div>
@@ -1279,6 +1317,11 @@ export default function ProductDetailClient({
                   ))}
                 </div>
               )}
+              {selectedColorObj?.image && (
+                <div className="text-center mt-4 text-sm text-purple-600">
+                  {t('showing') || 'Showing'} {selectedColor} {t('variant') || 'variant'}
+                </div>
+              )}
             </div>
 
             {/* Product Info */}
@@ -1294,11 +1337,11 @@ export default function ProductDetailClient({
               <div className="flex items-center flex-wrap gap-3 mb-4">
                 <div className="flex items-center gap-1">{renderStars(product.rating)}</div>
                 <span className="text-sm font-semibold text-amber-600">{product.rating || 4.5}</span>
-                <span className="text-sm text-blue-600">{product.review_count || 128} ratings</span>
+                <span className="text-sm text-blue-600">{product.review_count || 128} {t('ratings') || 'ratings'}</span>
                 <div className="h-4 w-px bg-gray-300" />
                 <span className="text-sm text-green-600 flex items-center gap-1">
                   <CheckIcon className="w-4 h-4" />
-                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                  {product.stock > 0 ? (t('in_stock') || 'In Stock') : (t('out_of_stock') || 'Out of Stock')}
                 </span>
               </div>
 
@@ -1315,20 +1358,20 @@ export default function ProductDetailClient({
                   )}
                   {discountPercent > 0 && (
                     <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 text-sm font-semibold rounded">
-                      Save {discountPercent}%
+                      {t('save') || 'Save'} {discountPercent}%
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery</p>
+                <p className="text-xs text-gray-500 mt-2">{t('inclusive_taxes') || 'Inclusive of all taxes • Free delivery'}</p>
               </div>
 
               {/* Size Selector */}
               {product.hasSizes && product.sizes && product.sizes.length > 0 && (
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-3">
-                    <label className="text-sm font-semibold text-gray-700">Select Size</label>
+                    <label className="text-sm font-semibold text-gray-700">{t('select_size') || 'Select Size'}</label>
                     <button className="text-xs text-purple-600 hover:underline flex items-center gap-1">
-                      <ScaleIcon className="w-3 h-3" /> Size Chart
+                      <ScaleIcon className="w-3 h-3" /> {t('size_chart') || 'Size Chart'}
                     </button>
                   </div>
                   <div className="flex gap-2 flex-wrap">
@@ -1346,7 +1389,7 @@ export default function ProductDetailClient({
                       </button>
                     ))}
                   </div>
-                  {selectedSize && <p className="text-xs text-gray-500 mt-2">Selected: {selectedSize}</p>}
+                  {selectedSize && <p className="text-xs text-gray-500 mt-2">{t('selected') || 'Selected'}: {selectedSize}</p>}
                 </div>
               )}
 
@@ -1354,7 +1397,7 @@ export default function ProductDetailClient({
               {product.hasColors && product.colors && product.colors.length > 0 && (
                 <div className="mb-6">
                   <label className="text-sm font-semibold text-gray-700 mb-3 block">
-                    Select Color: <span className="text-purple-600">{selectedColor}</span>
+                    {t('select_color') || 'Select Color'}: <span className="text-purple-600">{selectedColor}</span>
                   </label>
                   <div className="flex gap-3 flex-wrap">
                     {product.colors.map((color) => {
@@ -1384,12 +1427,20 @@ export default function ProductDetailClient({
                       );
                     })}
                   </div>
+                  {selectedColor && (
+                    <p className="text-xs text-gray-500 mt-6">
+                      {t('selected') || 'Selected'}: {selectedColor}
+                      {selectedColorObj?.image && (
+                        <span className="text-green-600 ml-2">✓ {t('color_image_loaded') || 'Color image loaded'}</span>
+                      )}
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Quantity Selector */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">{t('quantity') || 'Quantity'}</label>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
                     <button
@@ -1406,18 +1457,18 @@ export default function ProductDetailClient({
                       <PlusIcon className="w-4 h-4" />
                     </button>
                   </div>
-                  <span className="text-sm text-gray-500">{product.stock - quantity} items left</span>
+                  <span className="text-sm text-gray-500">{product.stock - quantity} {t('items_left') || 'items left'}</span>
                 </div>
               </div>
 
-              {/* Action Buttons - Disabled for Coming Soon */}
+              {/* Action Buttons */}
               <div className="flex gap-4">
                 <button
                   disabled={true}
                   className="flex-1 bg-gray-300 text-gray-500 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
                 >
                   <ShoppingCartIcon className="w-5 h-5" />
-                  🚀 Coming Soon
+                  🚀 {t('coming_soon') || 'Coming Soon'}
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -1446,7 +1497,7 @@ export default function ProductDetailClient({
                           onClick={handleShare}
                           className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                         >
-                          <ShareIcon className="w-4 h-4" /> Copy Link
+                          <ShareIcon className="w-4 h-4" /> {t('copy_link') || 'Copy Link'}
                         </button>
                       </div>
                     </>
@@ -1458,24 +1509,24 @@ export default function ProductDetailClient({
               <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <TruckIcon className="h-5 w-5 text-purple-600" />
-                  <span className="font-semibold text-gray-800">Delivery Information</span>
+                  <span className="font-semibold text-gray-800">{t('delivery_information') || 'Delivery Information'}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-gray-500">Estimated Delivery</p>
-                    <p className="font-medium text-gray-800">3-5 business days</p>
+                    <p className="text-gray-500">{t('estimated_delivery') || 'Estimated Delivery'}</p>
+                    <p className="font-medium text-gray-800">{t('3_5_business_days') || '3-5 business days'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Free Shipping</p>
-                    <p className="font-medium text-green-600">On orders above ₹500</p>
+                    <p className="text-gray-500">{t('free_shipping') || 'Free Shipping'}</p>
+                    <p className="font-medium text-green-600">{t('on_orders_above_500') || 'On orders above ₹500'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Return Policy</p>
-                    <p className="font-medium text-gray-800">7 days easy returns</p>
+                    <p className="text-gray-500">{t('return_policy') || 'Return Policy'}</p>
+                    <p className="font-medium text-gray-800">{t('7_days_returns') || '7 days easy returns'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Cash on Delivery</p>
-                    <p className="font-medium text-gray-800">Available</p>
+                    <p className="text-gray-500">{t('cash_on_delivery') || 'Cash on Delivery'}</p>
+                    <p className="font-medium text-gray-800">{t('available') || 'Available'}</p>
                   </div>
                 </div>
               </div>
@@ -1484,15 +1535,15 @@ export default function ProductDetailClient({
               <div className="mt-6 flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <ShieldCheckIcon className="w-4 h-4 text-green-600" />
-                  <span className="text-gray-600">Secure Payment</span>
+                  <span className="text-gray-600">{t('secure_payment') || 'Secure Payment'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ArrowPathIcon className="w-4 h-4 text-blue-600" />
-                  <span className="text-gray-600">Easy Returns</span>
+                  <span className="text-gray-600">{t('easy_returns') || 'Easy Returns'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ClockIcon className="w-4 h-4 text-orange-600" />
-                  <span className="text-gray-600">24/7 Support</span>
+                  <span className="text-gray-600">{t('support_24_7') || '24/7 Support'}</span>
                 </div>
               </div>
             </div>
@@ -1518,7 +1569,7 @@ export default function ProductDetailClient({
             <div className="py-6">
               {activeTab === 'description' && (
                 <div className="prose max-w-none">
-                  <p className="text-gray-600">{product.description || 'No description available.'}</p>
+                  <p className="text-gray-600">{product.description || t('no_description') || 'No description available.'}</p>
                 </div>
               )}
 
@@ -1526,17 +1577,17 @@ export default function ProductDetailClient({
                 <div className="grid md:grid-cols-2 gap-4">
                   {product.brand && (
                     <div className="flex py-2 border-b">
-                      <span className="w-32 text-gray-500">Brand</span>
+                      <span className="w-32 text-gray-500">{t('brand') || 'Brand'}</span>
                       <span className="text-gray-800 font-medium">{product.brand}</span>
                     </div>
                   )}
                   <div className="flex py-2 border-b">
-                    <span className="w-32 text-gray-500">Category</span>
+                    <span className="w-32 text-gray-500">{t('category') || 'Category'}</span>
                     <span className="text-gray-800 font-medium capitalize">{product.category}</span>
                   </div>
                   <div className="flex py-2 border-b">
-                    <span className="w-32 text-gray-500">Stock</span>
-                    <span className="text-gray-800 font-medium">{product.stock} units</span>
+                    <span className="w-32 text-gray-500">{t('stock') || 'Stock'}</span>
+                    <span className="text-gray-800 font-medium">{product.stock} {t('units') || 'units'}</span>
                   </div>
                 </div>
               )}
@@ -1547,11 +1598,11 @@ export default function ProductDetailClient({
                     <div className="text-center">
                       <div className="text-4xl font-bold text-gray-800">{product.rating || 4.5}</div>
                       <div className="flex items-center gap-1 mt-1">{renderStars(product.rating)}</div>
-                      <div className="text-sm text-gray-500 mt-1">{product.review_count || 128} reviews</div>
+                      <div className="text-sm text-gray-500 mt-1">{product.review_count || 128} {t('reviews') || 'reviews'}</div>
                     </div>
                   </div>
                   <button className="mt-6 px-6 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition">
-                    Write a Review
+                    {t('write_review') || 'Write a Review'}
                   </button>
                 </div>
               )}
@@ -1559,12 +1610,12 @@ export default function ProductDetailClient({
               {activeTab === 'shipping' && (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Shipping Information</h3>
-                    <p className="text-gray-600">Free standard shipping on all orders above ₹500. Delivery typically takes 3-5 business days.</p>
+                    <h3 className="font-semibold text-gray-800 mb-2">{t('shipping_information') || 'Shipping Information'}</h3>
+                    <p className="text-gray-600">{t('shipping_description') || 'Free standard shipping on all orders above ₹500. Delivery typically takes 3-5 business days.'}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Return Policy</h3>
-                    <p className="text-gray-600">Easy returns within 7 days of delivery. Items must be unused and in original packaging.</p>
+                    <h3 className="font-semibold text-gray-800 mb-2">{t('return_policy') || 'Return Policy'}</h3>
+                    <p className="text-gray-600">{t('return_description') || 'Easy returns within 7 days of delivery. Items must be unused and in original packaging.'}</p>
                   </div>
                 </div>
               )}

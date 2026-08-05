@@ -59,7 +59,7 @@
 //   );
 // }
 // app/products/page.js
-import { Metadata } from'next';
+import { Metadata } from 'next';
 import { Suspense } from 'react';
 import ProductsClient from './ProductsClient';
 import { getProducts, getCategories } from '../../src/services/productService';
@@ -86,16 +86,16 @@ export const metadata = {
   robots: { index: true, follow: true },
 };
 
-// ✅ Loading fallback component
+// ✅ Loading fallback
 function ProductsLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 pt-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {[...Array(8)].map((_, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          {[...Array(10)].map((_, i) => (
             <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
               <div className="aspect-square bg-gray-200"></div>
-              <div className="p-4 space-y-2">
+              <div className="p-3 space-y-2">
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/4"></div>
@@ -133,7 +133,6 @@ export default async function ProductsPage() {
   ];
 
   return (
-    // ✅ Wrap ProductsClient in Suspense
     <Suspense fallback={<ProductsLoading />}>
       <ProductsClient 
         products={products} 

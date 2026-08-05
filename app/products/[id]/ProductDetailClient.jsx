@@ -739,6 +739,7 @@
 // }
 // app/products/[id]/ProductDetailClient.js
 // app/products/[id]/ProductDetailClient.jsx
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';

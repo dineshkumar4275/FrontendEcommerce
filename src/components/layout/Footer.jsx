@@ -120,18 +120,24 @@
 //   );
 // };
 // src/components/Footer.jsx
-'use client';
+'use client'; // ✅ MUST HAVE THIS AT THE TOP
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import Image from 'next/image';
-import { useApp } from '../../hooks/useApp';
+import { useApp } from '../../hooks/useApp'; // ✅ Correct import path
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
-  // ✅ Get translation function and language
-  const { t, language } = useApp();
+  const { t, language } = useApp(); // ✅ Get translation function
+
+  // ✅ Debug: Log when footer renders
+  useEffect(() => {
+    console.log('🔄 Footer rendered - Language:', language);
+    console.log('🔄 Footer - t("company"):', t('company'));
+    console.log('🔄 Footer - t("about_us"):', t('about_us'));
+  }, [language, t]);
 
   // ✅ Force re-render when language changes
   const footerKey = `footer-${language}`;
@@ -199,7 +205,7 @@ export const Footer = () => {
               </span>
             </Link>
             <p className="text-gray-400 mb-4 text-sm">
-              {t('footer_description') || 'Your one-stop destination for all your shopping needs. Quality products, best prices, and fast delivery.'}
+              {t('footer_description')}
             </p>
             <div className="flex gap-4">
               <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors" aria-label="Facebook">
@@ -236,7 +242,7 @@ export const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm">
-              &copy; {currentYear} Sombustore. {t('all_rights_reserved') || 'All rights reserved.'}
+              &copy; {currentYear} Sombustore. {t('all_rights_reserved')}
             </p>
             <div className="flex gap-3">
               <span className="text-gray-400 text-xs">Visa</span>

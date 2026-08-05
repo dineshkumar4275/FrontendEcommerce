@@ -385,7 +385,7 @@
 // app/products/ProductsClient.jsx
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -411,6 +411,26 @@ import { Footer } from '../../src/components/layout/Footer';
 import { SEO } from '../../src/components/SEO';
 import toast from 'react-hot-toast';
 
+// ✅ Loading fallback component
+const ProductsLoading = () => (
+  <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
+            <div className="aspect-square bg-gray-200"></div>
+            <div className="p-4 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 export default function ProductsClient({ 
   products: initialProducts, 
   categories: initialCategories,
@@ -419,7 +439,7 @@ export default function ProductsClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useApp(); // ✅ Get translation function
+  const { t } = useApp();
   const { addToCart } = useCart();
   const { wishlistIds, toggleWishlist } = useWishlist();
   
@@ -427,15 +447,20 @@ export default function ProductsClient({
   const [products, setProducts] = useState(initialProducts || []);
   const [categories] = useState(initialCategories || []);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+  
+  // ✅ Safe useSearchParams - it's inside Suspense boundary
+  const searchTermParam = searchParams?.get('q') || '';
+  const categoryParam = searchParams?.get('category') || '';
+  
+  const [searchTerm, setSearchTerm] = useState(searchTermParam);
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [cartLoading, setCartLoading] = useState({});
   const [isMobile, setIsMobile] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [viewMode, setViewMode] = useState('grid');
 
   // Check mobile
   useEffect(() => {
@@ -750,18 +775,7 @@ export default function ProductsClient({
 
           {/* Products Grid */}
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
-                  <div className="aspect-square bg-gray-200"></div>
-                  <div className="p-4 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ProductsLoading />
           ) : filteredProducts.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🔍</div>

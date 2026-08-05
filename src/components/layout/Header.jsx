@@ -711,12 +711,13 @@
 //   );
 // };
 
-'use client';
 // src/components/layout/Header.jsx
+
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutoSuggestSearch } from '../products/AutoSuggestSearch';
-// ✅ CORRECT IMPORT PATH
 import { useApp } from '../../providers/AppProvider';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -779,8 +780,25 @@ export const Header = ({
   const { wishlistCount, getWishlist } = useWishlist();
   const { user, token } = useSelector((state) => state.auth);
 
-  // ✅ Use App Context for translations - This will automatically re-render
   const { t, formatPrice, currency, language } = useApp();
+
+  // ✅ Safe JSON parse function
+  const safeJSONParse = (data) => {
+    if (!data || data === 'undefined' || data === 'null') {
+      return null;
+    }
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('Failed to parse JSON:', error);
+      // Clear invalid data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+      return null;
+    }
+  };
 
   // Load wishlist when logged in
   useEffect(() => {
@@ -803,28 +821,54 @@ export const Header = ({
     setTempSortBy(sortBy);
   }, [selectedCategory, minPrice, maxPrice, sortBy]);
 
+  // ✅ Fixed checkAuth with safe JSON parsing
   useEffect(() => {
     const checkAuth = () => {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
-      if (storedToken && storedUser) {
-        try {
-          const userData = JSON.parse(storedUser);
-          setUserName(userData.name || userData.email?.split('@')[0] || 'User');
-          setUserEmail(userData.email || '');
+      try {
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+
+        // ✅ Check if user data exists and is valid
+        if (storedToken && storedUser && storedUser !== 'undefined' && storedUser !== 'null') {
+          const userData = safeJSONParse(storedUser);
+          
+          if (userData) {
+            setUserName(userData.name || userData.email?.split('@')[0] || 'User');
+            setUserEmail(userData.email || '');
+            setIsLoggedIn(true);
+          } else {
+            // Invalid user data, clear localStorage
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            setUserName('');
+            setUserEmail('');
+          }
+        } else if (user && token) {
+          // Use Redux state as fallback
+          setUserName(user.name || user.email?.split('@')[0] || 'User');
+          setUserEmail(user.email || '');
           setIsLoggedIn(true);
-        } catch (error) { console.error(error); }
-      } else if (user && token) {
-        setUserName(user.name || user.email?.split('@')[0] || 'User');
-        setUserEmail(user.email || '');
-        setIsLoggedIn(true);
-      } else {
+        } else {
+          setIsLoggedIn(false);
+          setUserName('');
+          setUserEmail('');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        // Clear potentially corrupted data
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+        }
         setIsLoggedIn(false);
         setUserName('');
         setUserEmail('');
       }
     };
+    
     checkAuth();
+    
     const handleStorageChange = () => checkAuth();
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
@@ -925,7 +969,7 @@ export const Header = ({
   const hasActiveFilters = selectedCategory || minPrice || maxPrice || sortBy !== 'newest';
   const activeFilterCount = (selectedCategory ? 1 : 0) + (minPrice || maxPrice ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
 
-  // ✅ Navigation links with translation keys
+  // Navigation links with translation keys
   const navLinks = [
     { name: 'home', href: '/', icon: SparklesIcon },
     { name: 'products', href: '/products', icon: CubeIcon },
@@ -1001,12 +1045,10 @@ export const Header = ({
 
             {/* Desktop Icons */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* ✅ Location Display - Desktop */}
               <div className="hidden md:block">
                 <LocationDisplay />
               </div>
 
-              {/* ✅ Global Selector - Desktop */}
               <div className="hidden md:block">
                 <GlobalSelector />
               </div>
@@ -1173,7 +1215,7 @@ export const Header = ({
             </div>
           </div>
 
-          {/* ✅ MOBILE SECTION */}
+          {/* Mobile Section */}
           <div className="lg:hidden mt-2 space-y-2">
             <div className="flex items-center">
               <LocationDisplay />

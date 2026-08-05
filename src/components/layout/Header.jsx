@@ -1049,9 +1049,7 @@ export const Header = ({
                 <LocationDisplay />
               </div>
 
-              <div className="hidden md:block">
-                <GlobalSelector />
-              </div>
+            
 
               {/* Mobile Search Icon */}
               <button 
@@ -1264,9 +1262,7 @@ export const Header = ({
               >
                
 
-                <div className="px-2 py-2 mb-2 bg-purple-500/5 rounded-xl border border-purple-500/20">
-                  <GlobalSelector />
-                </div>
+             
 
                 {navLinks.map((link) => (
                   <Link

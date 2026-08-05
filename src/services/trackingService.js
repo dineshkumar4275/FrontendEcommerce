@@ -1,7 +1,6 @@
 // src/services/trackingService.js
 import apiClient from '../lib/apiClient';
 
-// Simple tracking service without socket.io for now
 export const trackingService = {
   // Get tracking history from localStorage
   getTrackingHistory: async (orderId) => {
